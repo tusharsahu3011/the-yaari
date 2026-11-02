@@ -768,9 +768,9 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
             <div className="w-full flex items-start justify-center gap-3 z-20 pt-1">
               <div className="w-16 h-16 shrink-0 flex items-center justify-center filter drop-shadow-[0_8px_16px_rgba(234,179,8,0.4)]">
                 <img
-                  src="/assets/bhabhi/ai-dealer.png"
+                  src="/assets/bhabhi/dealer-robot.png"
                   alt="AI Dealer"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(234,179,8,0.5)]"
                 />
               </div>
 

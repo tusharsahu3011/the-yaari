@@ -46,7 +46,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 20 Players',
     duration: '10 - 15 Min',
-    image: '/assets/home/featured-undercover.png',
+    image: '/assets/home/card-undercover.png',
     href: '/games/undercover',
     accentColor: '#a855f7',
   },
@@ -58,7 +58,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 12 Players',
     duration: '8 - 12 Min',
-    image: '/assets/home/featured-spyfall.png',
+    image: '/assets/home/card-spyfall.png',
     href: '/games/undercover',
     accentColor: '#f59e0b',
   },
@@ -70,7 +70,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 6 Players',
     duration: '10 - 15 Min',
-    image: '/assets/home/featured-bhabhi.png',
+    image: '/assets/home/card-bhabhi.png',
     href: '/games/bhabhi',
     accentColor: '#ec4899',
   },
@@ -84,7 +84,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 8 Players',
     duration: '20 - 30 Min',
-    image: '/assets/home/game-decrypto.png',
+    image: '/assets/home/icon-decrypto.png',
     accentColor: '#06b6d4',
   },
   {
@@ -95,7 +95,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 12 Players',
     duration: '15 - 20 Min',
-    image: '/assets/home/game-codenames.png',
+    image: '/assets/home/icon-codenames.png',
     accentColor: '#8b5cf6',
   },
   {
@@ -106,7 +106,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '5 - 10 Players',
     duration: '25 - 35 Min',
-    image: '/assets/home/game-avalon.png',
+    image: '/assets/home/icon-avalon.png',
     accentColor: '#eab308',
   },
   {
@@ -117,7 +117,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '5 - 10 Players',
     duration: '30 - 45 Min',
-    image: '/assets/home/game-chancellor.png',
+    image: '/assets/home/icon-chancellor.png',
     accentColor: '#f43f5e',
   },
   {
@@ -128,7 +128,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '6 - 24 Players',
     duration: '20 - 40 Min',
-    image: '/assets/home/game-werewolf.png',
+    image: '/assets/home/icon-werewolf.png',
     accentColor: '#3b82f6',
   },
   {
@@ -139,7 +139,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '6 - 30 Players',
     duration: '10 - 15 Min',
-    image: '/assets/home/game-tworooms.png',
+    image: '/assets/home/icon-tworooms.png',
     accentColor: '#ef4444',
   },
   {
@@ -150,7 +150,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 12 Players',
     duration: '15 - 25 Min',
-    image: '/assets/home/game-wavelength.png',
+    image: '/assets/home/icon-wavelength.png',
     accentColor: '#d946ef',
   },
   {
@@ -161,7 +161,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '3 - 6 Players',
     duration: '10 - 15 Min',
-    image: '/assets/home/game-teenpatti.png',
+    image: '/assets/home/icon-teenpatti.png',
     accentColor: '#10b981',
   },
 ];
@@ -220,7 +220,7 @@ export default function HomePage() {
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md h-64 sm:h-72 flex items-center justify-center">
               <img
-                src="/assets/home/hero-composition.png"
+                src="/assets/home/hero-3d.png"
                 alt="Games 3D Art Composition"
                 className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(139,92,246,0.35)]"
               />

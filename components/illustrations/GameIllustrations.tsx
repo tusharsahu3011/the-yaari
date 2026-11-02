@@ -252,3 +252,4 @@ export function OnlineMultiplayerIllustration({ className = 'w-24 h-24' }: { cla
     </div>
   );
 }
+

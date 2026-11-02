@@ -467,7 +467,7 @@ export function BhabhiGameTable({
               }`}
             >
               <img
-                src="/assets/bhabhi/player-avatar.png"
+                src="/assets/bhabhi/avatar-you.png"
                 alt="You"
                 className="w-full h-full object-cover"
               />

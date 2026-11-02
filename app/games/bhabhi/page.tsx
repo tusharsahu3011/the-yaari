@@ -239,7 +239,7 @@ export default function BhabhiGameEntryPage() {
               {/* 3D Robot Image */}
               <div className="w-24 h-24 shrink-0 flex items-center justify-center">
                 <img
-                  src="/assets/bhabhi/entry-robot.png"
+                  src="/assets/bhabhi/solo-robot.png"
                   alt="AI Robot"
                   className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(16,185,129,0.3)] group-hover:scale-105 transition-transform"
                 />
