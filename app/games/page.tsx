@@ -39,9 +39,9 @@ const GAMES: GameItem[] = [
     players: '4 - 12 Players',
     duration: '10 - 15 Mins',
     description:
-      'Civilians share a secret word, while the Undercover has a slightly different word, and Mr. White has no word at all!',
+      'Civilians share a secret word, while the Undercover has a slightly different word, and Mr. White has no word at all! Pass & Play supported.',
     icon: '🕵️',
-    status: 'upcoming',
+    status: 'live',
     accentColor: 'from-amber-600 to-orange-600',
   },
   {
@@ -171,17 +171,17 @@ export default function GamesCataloguePage() {
             {game.status === 'live' ? (
               <div className="flex items-center gap-3 pt-2">
                 <Link
-                  href={`/games/${game.slug}/solo`}
+                  href={game.slug === 'bhabhi' ? '/games/bhabhi/solo' : `/games/${game.slug}`}
                   className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs text-center shadow hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-1.5"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />
-                  Play Solo vs AI
+                  {game.slug === 'bhabhi' ? 'Play Solo vs AI' : 'Play Pass & Play'}
                 </Link>
                 <Link
                   href={`/games/${game.slug}`}
                   className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/10 transition flex items-center justify-center gap-1"
                 >
-                  Room Details <ArrowRight className="w-3.5 h-3.5" />
+                  Details <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ) : (

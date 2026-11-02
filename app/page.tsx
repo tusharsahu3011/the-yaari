@@ -216,22 +216,25 @@ export default function HomePage() {
           </div>
 
           {/* Game 2: Undercover */}
-          <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10 flex flex-col justify-between text-left opacity-80">
+          <div className="p-5 rounded-2xl bg-gradient-to-b from-amber-950/40 to-slate-900 border border-amber-500/30 flex flex-col justify-between text-left">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-2xl">🕵️</span>
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 text-[10px] font-bold border border-yellow-500/30">
-                  Coming Soon
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
+                  Playable
                 </span>
               </div>
               <h4 className="font-extrabold text-white text-base">Undercover</h4>
               <p className="text-xs text-gray-400 mt-1">
-                Social word deduction game. Find the impostor before they blend in!
+                Social word deduction party game. Find the impostor before they blend in!
               </p>
             </div>
-            <span className="mt-4 w-full py-2 rounded-xl bg-white/5 text-gray-400 font-semibold text-xs text-center border border-white/5">
-              In Development
-            </span>
+            <Link
+              href="/games/undercover"
+              className="mt-4 w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs text-center transition"
+            >
+              Play Pass & Play
+            </Link>
           </div>
 
           {/* Game 3: Spyfall */}
