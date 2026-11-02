@@ -1,0 +1,239 @@
+================================================================================
+GAMES.CODERTUSHAR.IN - AI IMAGE GENERATION PROMPTS & ASSET SPECIFICATIONS
+================================================================================
+Bhai, niche sabhi images ke exact Midjourney / DALL-E / AI Prompts, Aspect Ratios,
+Save File Paths aur format details diye gaye hain.
+
+Jab aap images generate kar lo, toh unhe PNG format me niche diye gaye exact
+file path par save kar dena. Saare components already inhi file paths se linked hain!
+
+--------------------------------------------------------------------------------
+GUIDELINES FOR BEST RESULTS:
+--------------------------------------------------------------------------------
+- Format: PNG (preferably with transparent background where specified, or dark navy #080b18 background)
+- Style: Consistent 3D glossy isometric / Octane Render / Pixar 3D style with neon purple, cyan, and amber ambient rim glow.
+- Lighting: Volumetric neon lighting on dark backgrounds.
+- If using Midjourney, append: --v 6.1 --style raw (or your preferred version).
+
+================================================================================
+SECTION 1: HOME SCREEN (public/assets/home/)
+================================================================================
+
+1. HERO 3D COMPOSITION
+   - Save Path: public/assets/home/hero-3d.png
+   - Aspect Ratio: --ar 16:9
+   - Background: Transparent OR deep dark velvet navy (#080b18)
+   - Prompt:
+     Sleek modern 3D isometric composition of casino and party games, glossy fanned playing cards (Ace of Spades, King of Clubs, mystery detective silhouette card with fedora, howling wolf card with moon), two glossy white 3D casino dice with glowing purple LED dots, neatly stacked glossy red and blue casino poker chips with gold rims, floating yellow sparkle accents, vibrant ambient neon purple and cyan volumetric glow, dark velvet navy background, cinema 4D, octane render, 8k resolution, raytracing --ar 16:9 --style raw
+
+--------------------------------------------------------------------------------
+
+2. FEATURED GAME 1 — UNDERCOVER
+   - Save Path: public/assets/home/card-undercover.png
+   - Aspect Ratio: --ar 1:1
+   - Background: Deep dark purple (#0e0924) or transparent
+   - Prompt:
+     Stylized 3D noir detective character bust, mysterious man wearing a dark tilted fedora hat and dark sunglasses, trench coat collar popped, volumetric deep purple neon rim lighting, dramatic shadow, clean dark purple background, modern game app icon art, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+3. FEATURED GAME 2 — SPYFALL
+   - Save Path: public/assets/home/card-spyfall.png
+   - Aspect Ratio: --ar 1:1
+   - Background: Deep dark navy (#090c1f) or transparent
+   - Prompt:
+     Sleek modern 3D tactical binoculars glowing with warm golden amber light, dual lenses reflecting a sunset metropolis city skyline silhouette, glowing warm gold ambient halo, cinematic depth of field, dark navy background, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+4. FEATURED GAME 3 — BHABHI (GET AWAY)
+   - Save Path: public/assets/home/card-bhabhi.png
+   - Aspect Ratio: --ar 1:1
+   - Background: Royal purple velvet (#12092b) or transparent
+   - Prompt:
+     Two ornate 3D playing cards fanned out showing Ace of Spades and King of Clubs with gold foil edges, a gleaming royal golden crown with jewels resting on top of the cards, magical gold sparkle dust, dark royal purple velvet background, 3D render, raytracing, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+5. CATALOG GAME — DECRYPTO
+   - Save Path: public/assets/home/icon-decrypto.png
+   - Aspect Ratio: --ar 1:1
+   - Prompt:
+     Retro-cyber 3D portable oscilloscope communication device, rounded monitor screen displaying a glowing cyan audio waveform frequency, tactile dials and mini antenna, futuristic cyberpunk gadget, dark background, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+6. CATALOG GAME — CODENAMES
+   - Save Path: public/assets/home/icon-codenames.png
+   - Aspect Ratio: --ar 1:1
+   - Prompt:
+     Two stylized 3D spy silhouettes wearing trench coats and fedoras standing back-to-back in volumetric fog, one spy illuminated with red neon rim light, the other illuminated with blue neon rim light, dark purple atmosphere, 3D game art, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+7. CATALOG GAME — AVALON: SECRET IDENTITIES
+   - Save Path: public/assets/home/icon-avalon.png
+   - Aspect Ratio: --ar 1:1
+   - Prompt:
+     Solid 3D gleaming medieval golden royal chalice trophy cup, ornate engraved Celtic patterns, shining with bright golden halo light and sparkles, royal purple dark background, 3D octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+8. CATALOG GAME — SECRET CHANCELLOR
+   - Save Path: public/assets/home/icon-chancellor.png
+   - Aspect Ratio: --ar 1:1
+   - Prompt:
+     3D neoclassical government Capitol building dome with grand illuminated pillars, glowing with warm golden-white architectural lighting against a midnight navy sky, majestic 3D game icon, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+9. CATALOG GAME — ULTIMATE WEREWOLF
+   - Save Path: public/assets/home/icon-werewolf.png
+   - Aspect Ratio: --ar 1:1
+   - Prompt:
+     Stylized 3D fierce wolf silhouette howling at a large luminous glowing cyan-blue full moon, mystical blue night fog, atmospheric stars, modern 3D game icon, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+10. CATALOG GAME — TWO ROOMS AND A BOOM
+    - Save Path: public/assets/home/icon-tworooms.png
+    - Aspect Ratio: --ar 1:1
+    - Prompt:
+      3D red retro cyber briefcase bomb with an active digital LED countdown timer displaying red numbers 00:59, exposed electronic wires, subtle smoke and hazard danger glow, dark background, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+11. CATALOG GAME — WAVELENGTH
+    - Save Path: public/assets/home/icon-wavelength.png
+    - Aspect Ratio: --ar 1:1
+    - Prompt:
+      Stylized 3D silhouette of a human head in profile, radiating concentric glowing rainbow spectrum brain waves and frequency pulses, colorful neon telepathy concept, dark violet background, 3D octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+12. CATALOG GAME — TEEN PATTI FLUSH
+    - Save Path: public/assets/home/icon-teenpatti.png
+    - Aspect Ratio: --ar 1:1
+    - Prompt:
+      Stack of glossy casino poker chips in red and blue with gold foil rims, next to three fanned gleaming gold playing cards (Ace, King, Queen), magical gold dust on dark purple velvet, 3D casino game icon, octane render, 8k --ar 1:1 --style raw
+
+
+================================================================================
+SECTION 2: BHABHI GAME ENTRY SCREEN (public/assets/bhabhi/)
+================================================================================
+
+13. HEADER LEFT — 3D CARDS & CHIPS
+    - Save Path: public/assets/bhabhi/entry-cards-chips.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred) OR dark navy (#080b18)
+    - Prompt:
+      Fanned out 3D playing cards (Ace of Spades, Queen of Hearts, King of Clubs) sitting behind two neat stacks of casino poker chips in red and blue with white stripes, yellow sparkle doodles, isolated on transparent background, 3D clay/Pixar game render, clean --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+14. HEADER RIGHT — 3D PURPLE GLOWING CARDS
+    - Save Path: public/assets/bhabhi/entry-purple-cards.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred) OR dark navy (#080b18)
+    - Prompt:
+      Three fanned out modern 3D dark purple playing cards with glowing neon purple edges, center card featuring a radiant neon purple Ace of Spades emblem, magical ambient glow, isolated on transparent background, octane render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+15. SOLO MODE MASCOT — CUTE ROBOT WITH CARDS
+    - Save Path: public/assets/bhabhi/solo-robot.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred) OR dark navy (#0f1424)
+    - Prompt:
+      Cute friendly 3D glossy white robot with rounded head, smiling cyan glowing digital visor eyes, holding three fanned red playing cards in its small metallic hands, playful pose, soft studio rim lighting, isolated on transparent background, Pixar/3D character render --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+16. ONLINE MODE — 3D HOLOGRAPHIC GLOBE & CROWD
+    - Save Path: public/assets/bhabhi/online-globe.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred) OR dark navy (#0f1424)
+    - Prompt:
+      3D glowing digital wireframe holographic globe in cyan and electric blue, surrounded by three stylized colorful humanoid crowd silhouette avatars in purple, cyan, and blue gradient, global multiplayer gaming concept, isolated on transparent background, octane render --ar 1:1 --style raw
+
+
+================================================================================
+SECTION 3: BHABHI TABLE, LOBBY & AVATARS (public/assets/bhabhi/)
+================================================================================
+
+17. AI DEALER ROBOT ON GOLDEN PEDESTAL
+    - Save Path: public/assets/bhabhi/dealer-robot.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred) OR dark purple velvet
+    - Prompt:
+      Cute 3D glossy white robot mascot with rounded head, glowing blue digital visor eyes, DJ gaming headphones with blue LED lights, and a charming red bowtie, standing proudly on an ornate circular golden pedestal with magical sparkles floating around, game dealer host, isolated on transparent background, 3D Pixar style render, 8k --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+18. ROOM LOBBY HEADER CARDS WITH CROWN
+    - Save Path: public/assets/bhabhi/lobby-cards.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent (preferred)
+    - Prompt:
+      Three 3D playing cards fanned out (A, Q, K) with a cute glowing golden cartoon crown resting on the corner, gold sparkle doodles, cheerful game lobby icon, isolated on transparent background, 3D octane render --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+19. DISCARD PILE ARTWORK
+    - Save Path: public/assets/bhabhi/discard-pile.png
+    - Aspect Ratio: --ar 1:1
+    - Background: Transparent OR dark purple
+    - Prompt:
+      Small neat 3D stack of facedown playing cards with dark purple patterned backs and a glowing violet Ace of Spades emblem on the top card, casino card discard pile, isolated on dark background, 3D render --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+20. PLAYER AVATAR — "YOU"
+    - Save Path: public/assets/bhabhi/avatar-you.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular profile portrait of a cool anime young man wearing a black hoodie and dark sunglasses, confident friendly smirk, subtle green neon rim lighting, dark studio background, high quality 3D digital art avatar --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+21. OPPONENT AVATAR — "AMAN"
+    - Save Path: public/assets/bhabhi/avatar-aman.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular profile portrait of a handsome stylish South Asian young man with curly dark hair and trendy tinted sunglasses, wearing a casual jacket, warm welcoming smile, amber and gold rim lighting, dark background, 3D character portrait --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+22. OPPONENT AVATAR — "SIMRAN"
+    - Save Path: public/assets/bhabhi/avatar-simran.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular profile portrait of a pretty South Asian young woman with long dark wavy hair, radiant cheerful smile, subtle violet-purple neon rim lighting, dark background, 3D digital character avatar --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+23. OPPONENT AVATAR — "ROHAN"
+    - Save Path: public/assets/bhabhi/avatar-rohan.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular profile portrait of an energetic young gamer guy wearing modern over-ear gaming headphones with glowing cyan LEDs, big friendly smile, cool streetwear, cyan ambient rim lighting, dark background, 3D avatar --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+24. OPPONENT AVATAR — "PRIYA"
+    - Save Path: public/assets/bhabhi/avatar-priya.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular profile portrait of an expressive smiling young woman with warm brown eyes, joyful laughter expression, subtle pink and magenta rim lighting, dark background, 3D digital character avatar --ar 1:1 --style raw
+
+--------------------------------------------------------------------------------
+
+25. AI BOT AVATAR — "BOT 1 / BOT 2 / BOT 3"
+    - Save Path: public/assets/bhabhi/bot-avatar.png
+    - Aspect Ratio: --ar 1:1 (circular format)
+    - Prompt:
+      Circular avatar of a cute glossy white robot head with rounded face and glowing cyan digital visor eyes, friendly bot opponent face, dark background, 3D Pixar style --ar 1:1 --style raw
+
+================================================================================
+END OF SPECIFICATIONS
+================================================================================
