@@ -93,3 +93,4 @@ export interface BhabhiGameState {
   safeCount: number;
   history: GameEventRecord[];
 }
+

@@ -24,3 +24,4 @@ export function createSeededRng(seed: number): () => number {
     return (s - 1) / 2147483646;
   };
 }
+

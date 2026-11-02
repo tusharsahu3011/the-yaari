@@ -98,3 +98,4 @@ export function chooseBotMove(
   // Fallback
   return legalCards[0];
 }
+

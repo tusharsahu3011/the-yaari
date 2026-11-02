@@ -29,3 +29,4 @@ export function findHighestLeadCard(
     highestLeadPlayerIndex: highest.playerIndex,
   };
 }
+

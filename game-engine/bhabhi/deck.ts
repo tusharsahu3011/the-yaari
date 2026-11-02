@@ -93,3 +93,4 @@ export function sortHand(cards: Card[]): Card[] {
     return a.rank - b.rank;
   });
 }
+
