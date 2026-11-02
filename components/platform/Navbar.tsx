@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { soundManager } from '@/lib/audio/sound-effects';
 import {
   Gamepad2,
   Home,
@@ -40,7 +41,7 @@ export function Navbar() {
         setNameInput(autoName);
         localStorage.setItem('gameshub_player_name', autoName);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   const handleSaveName = () => {
@@ -49,7 +50,7 @@ export function Navbar() {
     setIsEditingName(false);
     try {
       localStorage.setItem('gameshub_player_name', nameInput.trim());
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const navLinks = [
@@ -64,19 +65,16 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#080b14]/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1.5px] shadow-lg shadow-purple-900/40 group-hover:shadow-purple-700/60 transition">
-            <div className="w-full h-full bg-[#0a0d18] rounded-[10px] flex items-center justify-center">
-              <Gamepad2 className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-500 to-indigo-500 p-[1.5px] shadow-lg shadow-purple-900/40">
+            <div className="w-full h-full bg-[#080b14] rounded-[10px] flex items-center justify-center">
+              <Gamepad2 className="w-5 h-5 text-purple-400 group-hover:scale-105 transition-transform" />
             </div>
           </div>
-          <div className="flex flex-col text-left">
-            <span className="font-black text-lg tracking-tight text-white flex items-center gap-1">
-              Games <span className="text-xs font-normal text-gray-400">by</span>{' '}
-              <span className="text-purple-400">Coder Tushar</span>
-            </span>
-            <span className="text-[10px] font-semibold text-purple-300/70 tracking-widest uppercase">
-              Multiplayer Gaming Hub
+          <div className="flex flex-col text-left leading-tight">
+            <span className="text-[11px] text-gray-300 font-normal">Games by</span>
+            <span className="font-extrabold text-sm tracking-tight text-white">
+              Coder Tushar
             </span>
           </div>
         </Link>
@@ -92,11 +90,10 @@ export function Navbar() {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-                  isActive
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${isActive
+                    ? 'bg-[#632df3] text-white shadow-md shadow-purple-600/40'
                     : 'text-gray-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-purple-400'}`} />
                 <span>{item.label}</span>
@@ -109,21 +106,19 @@ export function Navbar() {
         <div className="hidden sm:flex items-center gap-3">
           {/* Dark mode moon icon (visual parity) */}
           <button
-            className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition border border-white/5"
+            className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition"
             title="Dark theme active"
           >
-            <Moon className="w-4 h-4 text-purple-300" />
+            <Moon className="w-4 h-4 text-gray-300" />
           </button>
 
           {/* User Profile Pill / Dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-200 transition"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12162a] hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-200 transition"
             >
-              <div className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-[10px]">
-                👤
-              </div>
+              <User className="w-3.5 h-3.5 text-gray-400" />
               <span className="max-w-[110px] truncate">{playerName}</span>
               <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
             </button>
@@ -169,27 +164,17 @@ export function Navbar() {
                     </button>
                   </div>
                 )}
-
-                <div className="pt-1">
-                  <Link
-                    href="/profile"
-                    onClick={() => setIsProfileDropdownOpen(false)}
-                    className="block w-full py-2 rounded-xl text-center text-xs font-bold bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition"
-                  >
-                    View Stats & Profile
-                  </Link>
-                </div>
               </div>
             )}
           </div>
 
-          {/* Sign In CTA */}
-          <Link
-            href="/profile"
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition active:scale-95"
+          {/* Sign In Button */}
+          <button
+            onClick={() => soundManager.playSelect()}
+            className="px-4 py-1.5 rounded-xl bg-[#632df3] hover:bg-[#5223d6] text-white text-xs font-bold shadow-md shadow-purple-600/30 transition"
           >
             Sign In
-          </Link>
+          </button>
         </div>
 
         {/* Mobile menu toggle */}
@@ -216,11 +201,10 @@ export function Navbar() {
                 key={item.label}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${
-                  isActive
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${isActive
                     ? 'bg-purple-600 text-white'
                     : 'text-gray-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4 text-purple-400" />
                 <span>{item.label}</span>

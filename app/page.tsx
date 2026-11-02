@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Play,
   Users,
@@ -17,8 +18,8 @@ import {
   Flame,
   Layers,
   Crown,
-  Eye,
-  Search,
+  Tag,
+  CircleDot,
 } from 'lucide-react';
 
 interface GameDef {
@@ -29,7 +30,8 @@ interface GameDef {
   status: 'ready' | 'dev';
   players: string;
   duration: string;
-  icon: string;
+  icon?: string;
+  image: string;
   href?: string;
   accentColor: string;
 }
@@ -44,7 +46,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 20 Players',
     duration: '10 - 15 Min',
-    icon: '🕵️',
+    image: '/assets/home/featured-undercover.png',
     href: '/games/undercover',
     accentColor: '#a855f7',
   },
@@ -56,8 +58,8 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 12 Players',
     duration: '8 - 12 Min',
-    icon: '🕶️',
-    href: '/games/undercover', // or spyfall
+    image: '/assets/home/featured-spyfall.png',
+    href: '/games/undercover',
     accentColor: '#f59e0b',
   },
   {
@@ -68,7 +70,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'ready',
     players: '3 - 6 Players',
     duration: '10 - 15 Min',
-    icon: '🃏',
+    image: '/assets/home/featured-bhabhi.png',
     href: '/games/bhabhi',
     accentColor: '#ec4899',
   },
@@ -82,7 +84,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 8 Players',
     duration: '20 - 30 Min',
-    icon: '📻',
+    image: '/assets/home/game-decrypto.png',
     accentColor: '#06b6d4',
   },
   {
@@ -93,7 +95,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 12 Players',
     duration: '15 - 20 Min',
-    icon: '🕵️‍♂️',
+    image: '/assets/home/game-codenames.png',
     accentColor: '#8b5cf6',
   },
   {
@@ -104,7 +106,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '5 - 10 Players',
     duration: '25 - 35 Min',
-    icon: '🏆',
+    image: '/assets/home/game-avalon.png',
     accentColor: '#eab308',
   },
   {
@@ -115,7 +117,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '5 - 10 Players',
     duration: '30 - 45 Min',
-    icon: '🏛️',
+    image: '/assets/home/game-chancellor.png',
     accentColor: '#f43f5e',
   },
   {
@@ -126,7 +128,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '6 - 24 Players',
     duration: '20 - 40 Min',
-    icon: '🐺',
+    image: '/assets/home/game-werewolf.png',
     accentColor: '#3b82f6',
   },
   {
@@ -137,7 +139,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '6 - 30 Players',
     duration: '10 - 15 Min',
-    icon: '💣',
+    image: '/assets/home/game-tworooms.png',
     accentColor: '#ef4444',
   },
   {
@@ -148,7 +150,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '4 - 12 Players',
     duration: '15 - 25 Min',
-    icon: '🧠',
+    image: '/assets/home/game-wavelength.png',
     accentColor: '#d946ef',
   },
   {
@@ -159,7 +161,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     status: 'dev',
     players: '3 - 6 Players',
     duration: '10 - 15 Min',
-    icon: '🎴',
+    image: '/assets/home/game-teenpatti.png',
     accentColor: '#10b981',
   },
 ];
@@ -174,17 +176,17 @@ export default function HomePage() {
   });
 
   return (
-    <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-8 py-6 space-y-12 max-w-7xl">
+    <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-8 py-6 space-y-10 max-w-7xl select-none">
       {/* 1. Hero Section (Image 5 visual parity) */}
-      <section className="relative w-full rounded-3xl p-6 sm:p-12 bg-gradient-to-br from-[#12162e] via-[#0d1022] to-[#070913] border border-white/10 shadow-2xl overflow-hidden">
+      <section className="relative w-full rounded-3xl p-6 sm:p-10 lg:p-12 bg-gradient-to-br from-[#12162e] via-[#0d1022] to-[#070913] border border-white/10 shadow-2xl overflow-hidden">
         {/* Ambient neon backdrop glow */}
-        <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-purple-600/20 blur-[120px] pointer-events-none rounded-full" />
+        <div className="absolute top-0 right-1/4 w-[450px] h-[350px] bg-purple-600/25 blur-[130px] pointer-events-none rounded-full" />
         <div className="absolute bottom-0 left-10 w-[300px] h-[200px] bg-cyan-600/15 blur-[100px] pointer-events-none rounded-full" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Text & CTA Column */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+          <div className="lg:col-span-7 space-y-5 text-left">
+            <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black text-white tracking-tight leading-[1.1]">
               Epic Party & Card Games for your{' '}
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
                 Dost & Yaar.
@@ -198,59 +200,30 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 href="/games"
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm shadow-xl shadow-purple-600/30 transition transform active:scale-95"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-extrabold text-sm shadow-xl shadow-purple-600/40 transition transform active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white" />
-                Browse All Games
+                <span>Browse All Games</span>
               </Link>
 
               <Link
                 href="/games/bhabhi"
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-bold text-sm transition"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#12162a] hover:bg-white/10 border border-white/15 text-white font-bold text-sm transition"
               >
                 <Users className="w-4 h-4 text-purple-400" />
-                Create Room
+                <span>Create Room</span>
               </Link>
             </div>
           </div>
 
-          {/* Right Visual 3D Showcase (Image 5 composition) */}
+          {/* Right Visual 3D Showcase (Image 5 exact 3D composition) */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-sm h-64 sm:h-72 flex items-center justify-center">
-              {/* Card 1: Detective Undercover */}
-              <div className="absolute -left-2 top-4 w-32 h-44 rounded-2xl bg-gradient-to-br from-purple-800 to-indigo-950 border-2 border-purple-400/50 shadow-2xl p-3 flex flex-col justify-between transform -rotate-12 hover:-rotate-6 transition duration-300">
-                <span className="text-2xl">🕵️</span>
-                <div className="text-[10px] font-black uppercase text-purple-200">Undercover</div>
-              </div>
-
-              {/* Card 2: Werewolf */}
-              <div className="absolute left-20 top-0 w-36 h-48 rounded-2xl bg-gradient-to-br from-blue-900 to-indigo-950 border-2 border-blue-400/50 shadow-2xl p-3 flex flex-col justify-between transform -rotate-3 hover:rotate-0 transition duration-300 z-10">
-                <div className="text-center">
-                  <span className="text-3xl">🐺</span>
-                </div>
-                <div className="text-[10px] font-black uppercase text-center text-blue-200">Werewolf</div>
-              </div>
-
-              {/* Card 3: Ace of Spades */}
-              <div className="absolute right-4 top-6 w-34 h-46 rounded-2xl bg-gradient-to-br from-slate-100 to-gray-200 border-2 border-white shadow-2xl p-3 flex flex-col justify-between transform rotate-12 hover:rotate-6 transition duration-300 z-20">
-                <div className="text-black font-black text-xl">A♠</div>
-                <div className="text-center text-3xl">♠</div>
-                <div className="text-right text-black font-black text-xs">A♠</div>
-              </div>
-
-              {/* Casino chips stack & dice */}
-              <div className="absolute -bottom-2 left-10 flex items-center gap-1 z-30">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-red-700 border-2 border-white/60 shadow-lg flex items-center justify-center text-[10px] font-black text-white">
-                  50
-                </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-700 border-2 border-white/60 shadow-lg -ml-4 flex items-center justify-center text-[10px] font-black text-white">
-                  100
-                </div>
-              </div>
-
-              <div className="absolute -bottom-1 right-12 z-30 transform rotate-12 text-3xl">
-                🎲
-              </div>
+            <div className="relative w-full max-w-md h-64 sm:h-72 flex items-center justify-center">
+              <img
+                src="/assets/home/hero-composition.png"
+                alt="Games 3D Art Composition"
+                className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(139,92,246,0.35)]"
+              />
             </div>
           </div>
         </div>
@@ -264,11 +237,11 @@ export default function HomePage() {
           {/* Card 1: Single Player */}
           <Link
             href="/games/bhabhi/solo"
-            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-emerald-500/30 hover:border-emerald-400 transition shadow-lg shadow-emerald-950/20 flex items-center justify-between"
+            className="group relative p-4 sm:p-5 rounded-2xl bg-[#0f1424] border border-emerald-500/40 hover:border-emerald-400 transition shadow-lg shadow-emerald-950/30 flex items-center justify-between"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <Users className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shrink-0">
+                <Users className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition">
@@ -277,7 +250,7 @@ export default function HomePage() {
                 <p className="text-xs text-gray-400">Play offline, at your own pace</p>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform shrink-0">
               <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
@@ -285,11 +258,11 @@ export default function HomePage() {
           {/* Card 2: Local Party */}
           <Link
             href="/games/undercover"
-            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-purple-500/30 hover:border-purple-400 transition shadow-lg shadow-purple-950/20 flex items-center justify-between"
+            className="group relative p-4 sm:p-5 rounded-2xl bg-[#0f1424] border border-purple-500/40 hover:border-purple-400 transition shadow-lg shadow-purple-950/30 flex items-center justify-between"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
-                <Users className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-400 flex items-center justify-center shrink-0">
+                <Users className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-purple-300 transition">
@@ -298,7 +271,7 @@ export default function HomePage() {
                 <p className="text-xs text-gray-400">Play together on one device</p>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:translate-x-1 transition-transform shrink-0">
               <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
@@ -306,27 +279,27 @@ export default function HomePage() {
           {/* Card 3: Online Multiplayer */}
           <Link
             href="/games/bhabhi"
-            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-cyan-500/30 hover:border-cyan-400 transition shadow-lg shadow-cyan-950/20 flex items-center justify-between"
+            className="group relative p-4 sm:p-5 rounded-2xl bg-[#0f1424] border border-cyan-500/40 hover:border-cyan-400 transition shadow-lg shadow-cyan-950/30 flex items-center justify-between"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
-                <Radio className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center shrink-0">
+                <Radio className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
                   Online Multiplayer
                 </h3>
-                <p className="text-xs text-gray-400">Create or join a room & play anywhere</p>
+                <p className="text-xs text-gray-400">Create or join a room and play with friends anywhere</p>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform shrink-0">
               <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
         </div>
       </section>
 
-      {/* 3. Featured Games Carousel / Row (Image 5 visual parity) */}
+      {/* 3. Featured Games Row (Image 5 visual parity) */}
       <section className="w-full space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Featured Games</h2>
@@ -340,9 +313,9 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Featured Card 1: Undercover */}
-          <div className="p-5 rounded-2xl bg-[#11162a] border border-purple-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+          <div className="p-5 rounded-2xl bg-[#101428] border border-purple-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
               </span>
             </div>
@@ -352,7 +325,13 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Undercover</h3>
                 <p className="text-xs text-gray-400">Social Deduction • Group</p>
               </div>
-              <span className="text-4xl">🕵️</span>
+              <div className="w-20 h-20 shrink-0">
+                <img
+                  src="/assets/home/featured-undercover.png"
+                  alt="Undercover"
+                  className="w-full h-full object-contain rounded-xl"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -362,7 +341,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/games/undercover"
-                className="w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-md shadow-purple-600/30 transition transform hover:scale-110 active:scale-95"
+                className="w-9 h-9 rounded-full bg-[#632df3] hover:bg-[#5224d8] text-white flex items-center justify-center shadow-md shadow-purple-600/40 transition transform hover:scale-110 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white ml-0.5" />
               </Link>
@@ -370,9 +349,9 @@ export default function HomePage() {
           </div>
 
           {/* Featured Card 2: Spyfall */}
-          <div className="p-5 rounded-2xl bg-[#11162a] border border-amber-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+          <div className="p-5 rounded-2xl bg-[#101428] border border-amber-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
               </span>
             </div>
@@ -382,7 +361,13 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Spyfall</h3>
                 <p className="text-xs text-gray-400">Interrogation • Bluffing</p>
               </div>
-              <span className="text-4xl">🕶️</span>
+              <div className="w-20 h-20 shrink-0">
+                <img
+                  src="/assets/home/featured-spyfall.png"
+                  alt="Spyfall"
+                  className="w-full h-full object-contain rounded-xl"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -400,9 +385,9 @@ export default function HomePage() {
           </div>
 
           {/* Featured Card 3: Bhabhi (Get Away) */}
-          <div className="p-5 rounded-2xl bg-[#11162a] border border-rose-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+          <div className="p-5 rounded-2xl bg-[#101428] border border-pink-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
               </span>
             </div>
@@ -412,7 +397,13 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Bhabhi (Get Away)</h3>
                 <p className="text-xs text-gray-400">Card Game • Evasion</p>
               </div>
-              <span className="text-4xl">🃏</span>
+              <div className="w-20 h-20 shrink-0">
+                <img
+                  src="/assets/home/featured-bhabhi.png"
+                  alt="Bhabhi"
+                  className="w-full h-full object-contain rounded-xl"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -441,36 +432,39 @@ export default function HomePage() {
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 bg-[#101424] p-1 rounded-xl border border-white/10">
+          <div className="flex items-center gap-1.5 bg-[#0e1224] p-1 rounded-xl border border-white/10">
             <button
               onClick={() => setGamesFilter('all')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 gamesFilter === 'all'
                   ? 'bg-emerald-500 text-black shadow-sm'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              All Games ({ALL_GAMES_CATALOG.length})
+              <Tag className="w-3.5 h-3.5" />
+              <span>All Games {ALL_GAMES_CATALOG.length}</span>
             </button>
             <button
               onClick={() => setGamesFilter('ready')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 gamesFilter === 'ready'
                   ? 'bg-emerald-500 text-black shadow-sm'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Ready to Play (3)
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Ready to Play 3</span>
             </button>
             <button
               onClick={() => setGamesFilter('dev')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 gamesFilter === 'dev'
                   ? 'bg-emerald-500 text-black shadow-sm'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              In Development (8)
+              <CircleDot className="w-3.5 h-3.5" />
+              <span>In Development 8</span>
             </button>
           </div>
         </div>
@@ -483,10 +477,10 @@ export default function HomePage() {
             return (
               <div
                 key={game.id}
-                className={`p-4 rounded-2xl bg-[#0f1424] border transition flex flex-col justify-between space-y-3 relative overflow-hidden group ${
+                className={`p-4 rounded-2xl bg-[#0e1224] border transition flex flex-col justify-between space-y-3 relative overflow-hidden group ${
                   isReady
-                    ? 'border-white/15 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/20'
-                    : 'border-white/10 opacity-70'
+                    ? 'border-purple-500/30 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/30'
+                    : 'border-white/10 hover:border-white/20'
                 }`}
               >
                 <div>
@@ -495,18 +489,29 @@ export default function HomePage() {
                       className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
                         isReady
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                          : 'bg-white/10 text-purple-300 border border-purple-500/20'
+                          : 'bg-purple-950/60 text-purple-300 border border-purple-500/30'
                       }`}
                     >
                       {isReady ? 'READY TO PLAY' : 'IN DEVELOPMENT'}
                     </span>
-                    <span className="text-xl">{game.icon}</span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition">
-                    {game.title}
-                  </h3>
-                  <p className="text-[11px] text-gray-400">{game.genre}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition">
+                        {game.title}
+                      </h3>
+                      <p className="text-[11px] text-gray-400">{game.genre}</p>
+                    </div>
+
+                    <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-black/30 border border-white/5">
+                      <img
+                        src={game.image}
+                        alt={game.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500">
@@ -531,7 +536,7 @@ export default function HomePage() {
       <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-3 p-4 sm:p-5 rounded-2xl bg-[#0c101e] border border-white/10">
         <div className="flex items-center gap-3 p-2">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-            <Zap className="w-5 h-5" />
+            <Zap className="w-5 h-5 fill-amber-400" />
           </div>
           <div>
             <div className="text-xs font-bold text-white">No Payments</div>

@@ -41,10 +41,10 @@ interface BhabhiGameTableProps {
 }
 
 const DEFAULT_PLAYERS: PlayerConfig[] = [
-  { id: 'human-1', name: 'You', isBot: false, avatar: '😎' },
-  { id: 'bot-1', name: 'Bot 1', isBot: true, botDifficulty: 'smart', avatar: '🤖' },
-  { id: 'bot-2', name: 'Bot 2', isBot: true, botDifficulty: 'normal', avatar: '🤖' },
-  { id: 'bot-3', name: 'Bot 3', isBot: true, botDifficulty: 'easy', avatar: '🤖' },
+  { id: 'human-1', name: 'You', isBot: false, avatar: '/assets/bhabhi/player-avatar.png' },
+  { id: 'bot-1', name: 'Bot 1', isBot: true, botDifficulty: 'smart', avatar: '/assets/bhabhi/bot-avatar.png' },
+  { id: 'bot-2', name: 'Bot 2', isBot: true, botDifficulty: 'normal', avatar: '/assets/bhabhi/bot-avatar.png' },
+  { id: 'bot-3', name: 'Bot 3', isBot: true, botDifficulty: 'easy', avatar: '/assets/bhabhi/bot-avatar.png' },
 ];
 
 export function BhabhiGameTable({
@@ -78,6 +78,13 @@ export function BhabhiGameTable({
   const playableCards = isHumanTurn ? getPlayableCards(humanIndex, gameState) : [];
   const playableCardIds = new Set(playableCards.map((c) => c.id));
   const humanCanThulla = isHumanTurn && canStrikeThulla(humanIndex, gameState);
+
+  // Auto-select first playable card if nothing selected
+  useEffect(() => {
+    if (isHumanTurn && playableCards.length > 0 && !selectedCardId) {
+      setSelectedCardId(playableCards[0].id);
+    }
+  }, [isHumanTurn, playableCards, selectedCardId]);
 
   // Turn Timer countdown
   useEffect(() => {
@@ -148,21 +155,22 @@ export function BhabhiGameTable({
   useEffect(() => {
     if (gameState.phase !== 'playing') return;
 
-    const currentIdx = gameState.currentTurnIndex;
-    const currentPlayer = gameState.players[currentIdx];
+    const currentTurnIdx = gameState.currentTurnIndex;
+    const currentPlayer = gameState.players[currentTurnIdx];
 
-    if (!currentPlayer.isBot || currentPlayer.isSafe) return;
+    if (!currentPlayer || !currentPlayer.isBot || currentPlayer.isSafe) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       try {
-        const botCard = chooseBotMove(
-          currentIdx,
-          gameState
-        );
-        const res = playCardAction(gameState, currentIdx, botCard);
-        if (!res.error) {
-          triggerEventAudio(res.state);
-          setGameState(res.state);
+        const botMove = chooseBotMove(currentTurnIdx, gameState);
+        if (botMove) {
+          const res = playCardAction(gameState, currentTurnIdx, botMove);
+          if (!res.error) {
+            triggerEventAudio(res.state);
+            setGameState(res.state);
+          }
         }
       } catch (err) {
         console.error('Bot play error', err);
@@ -172,29 +180,28 @@ export function BhabhiGameTable({
     return () => clearTimeout(timer);
   }, [gameState, botSpeed]);
 
-  // Contextual Hint Text (Image 3: Lightbulb banner)
+  // Contextual Hint Banner text (Image 3)
   const getContextualHint = () => {
     if (gameState.phase === 'game_over') {
-      return 'Game complete! Review the final Bhabhi standings.';
-    }
-    if (!isHumanTurn) {
-      const activeBot = gameState.players[gameState.currentTurnIndex];
-      return `Waiting for ${activeBot?.name || 'opponent'} to choose their card...`;
-    }
-    if (!gameState.activeTrick || gameState.activeTrick.cards.length === 0) {
-      if (gameState.history.length === 0) {
-        return 'You hold the Ace of Spades (A♠)! You must lead it to open the match.';
+      const bhabhi = gameState.players.find((p) => !p.isSafe);
+      if (bhabhi) {
+        return `Game Over! ${bhabhi.name} became the Bhabhi! 👑`;
       }
-      return 'It is your lead! Play any card from your hand to begin the trick.';
+      return 'Game Finished!';
     }
-    if (humanCanThulla) {
-      return 'You are VOID in the lead suit! Strike a Thulla to dump the pile on the highest card!';
+    if (isHumanTurn) {
+      if (humanCanThulla) {
+        return '💥 You are VOID in the lead suit! Strike a THULLA on the highest card!';
+      }
+      if (gameState.activeTrick?.leadSuit) {
+        return `Play a ${getSuitName(gameState.activeTrick.leadSuit)} card (since it\'s the lead suit).`;
+      }
+      return 'You lead this trick! Play any card (or A♠ if first round).';
     }
-    const leadSuitName = gameState.activeTrick.leadSuit ? getSuitName(gameState.activeTrick.leadSuit) : 'the lead suit';
-    return `Play a ${leadSuitName} card (since it's the lead suit).`;
+    const currentP = gameState.players[gameState.currentTurnIndex];
+    return `${currentP?.name || 'Bot'} is thinking...`;
   };
 
-  // Opponent layout distribution around the oval table (Image 3)
   const topBot = opponents.find((o) => o.player.name.includes('1')) || opponents[0];
   const rightBot = opponents.find((o) => o.player.name.includes('2')) || opponents[1];
   const leftBot = opponents.find((o) => o.player.name.includes('3')) || opponents[2];
@@ -262,121 +269,135 @@ export function BhabhiGameTable({
         </div>
       </div>
 
-      {/* 3. The Oval Felt Card Table (Image 3) */}
-      <div className="relative w-full h-[460px] sm:h-[500px] rounded-[48px] bg-gradient-to-b from-[#1b103a] via-[#130b2c] to-[#0d0720] border-4 border-[#8b5cf6]/60 shadow-[0_0_60px_rgba(139,92,246,0.3)] flex flex-col justify-between p-6 sm:p-8 overflow-hidden">
-        {/* Subtle inner velvet glow */}
-        <div className="absolute inset-4 rounded-[40px] border border-purple-400/20 pointer-events-none" />
+      {/* 3. The Oval Felt Card Table (Image 3 exact velvet oval and rim glow) */}
+      <div className="relative w-full h-[470px] sm:h-[510px] rounded-[52px] bg-[radial-gradient(ellipse_at_center,_#2b135c_0%,_#160b33_60%,_#09041a_100%)] border-4 border-[#8b2cf5] shadow-[0_0_80px_rgba(139,44,245,0.45)] flex flex-col justify-between p-5 sm:p-7 overflow-hidden">
+        {/* Gold inner line accent */}
+        <div className="absolute inset-2.5 rounded-[46px] border border-amber-400/20 pointer-events-none" />
 
         {/* TOP OPPONENT: Bot 1 */}
         {topBot && (
           <div className="w-full flex flex-col items-center z-10">
             {/* Fanned facedown purple cards behind bot */}
             <div className="flex -space-x-4 mb-1">
-              {[...Array(Math.min(6, topBot.player.hand.length))].map((_, i) => (
+              {[...Array(Math.min(7, topBot.player.hand.length))].map((_, i) => (
                 <div
                   key={i}
-                  className="w-7 h-10 rounded-md bg-gradient-to-br from-purple-800 to-indigo-950 border border-purple-400/40 shadow-md transform -rotate-3"
+                  className="w-7 h-10 rounded-md bg-gradient-to-br from-purple-700 to-indigo-950 border border-purple-400/50 shadow-md transform -rotate-3"
                 />
               ))}
             </div>
 
-            {/* Avatar & Badge */}
+            {/* Bot 1 Avatar & Badge */}
             <div
               className={`relative flex flex-col items-center ${
-                gameState.currentTurnIndex === topBot.index ? 'scale-105' : 'opacity-85'
+                gameState.currentTurnIndex === topBot.index ? 'scale-105' : 'opacity-90'
               }`}
             >
               <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                className={`w-14 h-14 rounded-full overflow-hidden border-2 transition shadow-lg ${
                   gameState.currentTurnIndex === topBot.index
-                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
-                    : 'border-purple-400/50 bg-[#16122d]'
+                    ? 'border-cyan-400 ring-4 ring-cyan-400/50 animate-pulse'
+                    : 'border-purple-400/60 ring-2 ring-purple-500/20'
                 }`}
               >
-                {topBot.player.avatar}
+                <img
+                  src="/assets/bhabhi/bot-avatar.png"
+                  alt="Bot 1"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="mt-1 px-3 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1.5 shadow">
                 <span>{topBot.player.name}</span>
                 <span className="text-[10px] text-purple-300 font-mono">
-                  ({topBot.player.hand.length} Cards)
+                  {topBot.player.hand.length} Cards
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {/* MIDDLE SECTION: Left Bot, Center Trick, Right Bot */}
+        {/* MIDDLE SECTION: Left Bot 3, Center Trick, Right Bot 2 */}
         <div className="w-full flex items-center justify-between my-auto z-10 px-2 sm:px-6">
           {/* LEFT OPPONENT: Bot 3 */}
           {leftBot && (
             <div className="flex flex-col items-center">
+              {/* Cards behind */}
+              <div className="flex -space-x-3 mb-1">
+                {[...Array(Math.min(5, leftBot.player.hand.length))].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-6 h-9 rounded bg-gradient-to-br from-purple-700 to-indigo-950 border border-purple-400/40 shadow-sm"
+                  />
+                ))}
+              </div>
               <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                className={`w-14 h-14 rounded-full overflow-hidden border-2 transition shadow-lg ${
                   gameState.currentTurnIndex === leftBot.index
-                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
-                    : 'border-emerald-400/50 bg-[#16122d]'
+                    ? 'border-cyan-400 ring-4 ring-cyan-400/50 animate-pulse'
+                    : 'border-emerald-400/60 ring-2 ring-emerald-500/20'
                 }`}
               >
-                {leftBot.player.avatar}
+                <img
+                  src="/assets/bhabhi/bot-avatar.png"
+                  alt="Bot 3"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
                 <span>{leftBot.player.name}</span>
                 <span className="text-[10px] text-emerald-300 font-mono">
-                  ({leftBot.player.hand.length})
+                  {leftBot.player.hand.length} Cards
                 </span>
-              </div>
-              {/* Cards stack */}
-              <div className="flex -space-x-3 mt-1.5">
-                {[...Array(Math.min(4, leftBot.player.hand.length))].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-5 h-8 rounded bg-purple-900 border border-purple-400/40 shadow-sm"
-                  />
-                ))}
               </div>
             </div>
           )}
 
-          {/* CENTER TRICK FELT AREA (Image 3) */}
+          {/* CENTER TRICK FELT AREA (Image 3: Glowing Concentric Halo!) */}
           <div className="flex flex-col items-center space-y-3">
             {/* Lead Suit Pill Banner */}
             {gameState.activeTrick?.leadSuit && (
-              <div className="px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/60 text-cyan-300 text-xs font-black shadow-lg shadow-cyan-900/30 flex items-center gap-2">
-                <span>{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
+              <div className="px-5 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-400/80 text-cyan-300 text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.5)] flex items-center gap-2">
+                <span className="text-base">{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
                 <span>{getSuitName(gameState.activeTrick.leadSuit)} are the Lead Suit</span>
               </div>
             )}
 
-            {/* Played Cards in Trick */}
-            <div className="relative min-h-[120px] flex items-center justify-center gap-2 sm:gap-3 p-2">
+            {/* Played Cards with Concentric Cyan Halo Rings */}
+            <div className="relative min-h-[130px] flex items-center justify-center p-3">
+              {/* Cyan concentric glowing rings in center felt (Image 3) */}
+              <div className="absolute w-36 h-36 rounded-full border border-cyan-400/30 blur-[2px] pointer-events-none" />
+              <div className="absolute w-48 h-48 rounded-full border border-cyan-400/20 blur-[4px] pointer-events-none" />
+
               {(!gameState.activeTrick || gameState.activeTrick.cards.length === 0) ? (
                 <div className="w-20 h-28 rounded-2xl border-2 border-dashed border-purple-400/30 flex flex-col items-center justify-center text-purple-300/40 text-[10px] font-bold">
                   <span>EMPTY TRICK</span>
                   <span>Lead card</span>
                 </div>
               ) : (
-                gameState.activeTrick.cards.map((item, idx: number) => {
-                  const isWinning = idx === 0;
+                <div className="flex items-center gap-2 sm:gap-3 z-10">
+                  {gameState.activeTrick.cards.map((item, idx: number) => {
+                    const isWinning = idx === 0;
 
-                  return (
-                    <div
-                      key={item.card.id}
-                      className={`transition-all duration-300 transform ${
-                        isWinning
-                          ? 'ring-4 ring-cyan-400 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.6)] scale-105'
-                          : 'scale-95'
-                      }`}
-                    >
-                      <PlayingCard card={item.card} size="md" />
-                    </div>
-                  );
-                })
+                    return (
+                      <div
+                        key={item.card.id}
+                        className={`transition-all duration-300 transform ${
+                          isWinning
+                            ? 'ring-4 ring-cyan-400 rounded-xl shadow-[0_0_30px_rgba(6,182,212,0.8)] scale-110 z-20'
+                            : 'scale-95 z-10'
+                        }`}
+                      >
+                        <PlayingCard card={item.card} size="md" />
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
             {/* Trick Card Count */}
             {gameState.activeTrick && gameState.activeTrick.cards.length > 0 && (
-              <div className="text-[11px] font-bold text-gray-300 bg-black/40 px-3 py-0.5 rounded-full border border-white/10">
+              <div className="text-[11px] font-bold text-gray-300 bg-black/60 px-3 py-0.5 rounded-full border border-white/15">
                 Current Trick ({gameState.activeTrick.cards.length} cards)
               </div>
             )}
@@ -385,53 +406,71 @@ export function BhabhiGameTable({
           {/* RIGHT OPPONENT: Bot 2 */}
           {rightBot && (
             <div className="flex flex-col items-center">
+              {/* Cards behind */}
+              <div className="flex -space-x-3 mb-1">
+                {[...Array(Math.min(5, rightBot.player.hand.length))].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-6 h-9 rounded bg-gradient-to-br from-purple-700 to-indigo-950 border border-purple-400/40 shadow-sm"
+                  />
+                ))}
+              </div>
               <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                className={`w-14 h-14 rounded-full overflow-hidden border-2 transition shadow-lg ${
                   gameState.currentTurnIndex === rightBot.index
-                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
-                    : 'border-amber-400/50 bg-[#16122d]'
+                    ? 'border-cyan-400 ring-4 ring-cyan-400/50 animate-pulse'
+                    : 'border-amber-400/60 ring-2 ring-amber-500/20'
                 }`}
               >
-                {rightBot.player.avatar}
+                <img
+                  src="/assets/bhabhi/bot-avatar.png"
+                  alt="Bot 2"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
                 <span>{rightBot.player.name}</span>
                 <span className="text-[10px] text-amber-300 font-mono">
-                  ({rightBot.player.hand.length})
+                  {rightBot.player.hand.length} Cards
                 </span>
-              </div>
-              {/* Cards stack */}
-              <div className="flex -space-x-3 mt-1.5">
-                {[...Array(Math.min(4, rightBot.player.hand.length))].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-5 h-8 rounded bg-purple-900 border border-purple-400/40 shadow-sm"
-                  />
-                ))}
               </div>
             </div>
           )}
         </div>
 
-        {/* BOTTOM SECTION: Discard, Hint, and You (Image 3) */}
-        <div className="w-full flex items-center justify-between z-10 pt-2 border-t border-white/5">
-          {/* Discard Pile indicator */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-xs text-gray-300">
-            <Layers className="w-3.5 h-3.5 text-purple-400" />
-            <span>Discard Pile: </span>
-            <strong className="text-white">{gameState.discardPile.length} cards</strong>
+        {/* BOTTOM SECTION: You Avatar & Discard Pile (Image 3) */}
+        <div className="w-full flex items-center justify-between z-10 pt-2 border-t border-white/10">
+          {/* Discard Pile indicator with Spade artwork */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border border-purple-400/30 bg-[#16122d]">
+              <img
+                src="/assets/bhabhi/discard-pile.png"
+                alt="Discard Pile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="text-left">
+              <span className="text-[11px] font-bold text-gray-300 block">Discard Pile</span>
+              <span className="text-xs font-mono font-black text-purple-300">
+                {gameState.discardPile.length} cards
+              </span>
+            </div>
           </div>
 
-          {/* "You" Avatar in Green Glow */}
-          <div className="flex items-center gap-2">
+          {/* "You" Avatar in Glowing Green Ring (Image 3) */}
+          <div className="flex items-center gap-3">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl border-2 transition shadow-lg ${
+              className={`w-14 h-14 rounded-full overflow-hidden border-2 transition shadow-xl ${
                 isHumanTurn
-                  ? 'border-emerald-400 bg-emerald-950 ring-4 ring-emerald-400/40 animate-pulse'
-                  : 'border-white/20 bg-[#16122d]'
+                  ? 'border-emerald-400 ring-4 ring-emerald-400/50 animate-pulse'
+                  : 'border-emerald-500/60 ring-2 ring-emerald-500/30'
               }`}
             >
-              {humanPlayer.avatar}
+              <img
+                src="/assets/bhabhi/player-avatar.png"
+                alt="You"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <div className="text-xs font-black text-white flex items-center gap-1.5">
@@ -451,7 +490,7 @@ export function BhabhiGameTable({
       </div>
 
       {/* 4. Contextual Hint Banner (Image 3: Lightbulb Banner) */}
-      <div className="w-full max-w-2xl flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#101424] border border-amber-500/30 text-amber-200 text-xs font-semibold shadow-lg text-center">
+      <div className="w-full max-w-2xl flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#101424] border border-amber-500/40 text-amber-200 text-xs font-semibold shadow-lg text-center">
         <Lightbulb className="w-4 h-4 text-amber-400 shrink-0" />
         <span>{getContextualHint()}</span>
       </div>
@@ -489,7 +528,7 @@ export function BhabhiGameTable({
           <button
             onClick={handleConfirmPlayCard}
             disabled={!isHumanTurn || !selectedCardId}
-            className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 text-black font-black text-sm sm:text-base flex items-center gap-2 shadow-xl shadow-emerald-500/20 transition transform active:scale-95"
+            className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 text-black font-black text-sm sm:text-base flex items-center gap-2 shadow-xl shadow-emerald-500/30 transition transform active:scale-95"
           >
             <Play className="w-4 h-4 fill-black" />
             <span>Play Card</span>
@@ -498,7 +537,7 @@ export function BhabhiGameTable({
           {gameState.phase === 'game_over' ? (
             <button
               onClick={handleRestart}
-              className="px-6 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm flex items-center gap-2 shadow-lg shadow-purple-600/30 transition"
+              className="px-6 py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-extrabold text-sm flex items-center gap-2 shadow-lg shadow-purple-600/30 transition"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Deal Again</span>
@@ -512,10 +551,10 @@ export function BhabhiGameTable({
                   if (valid) setSelectedCardId(valid.id);
                 }
               }}
-              className="px-6 py-3.5 rounded-2xl bg-[#16122d] hover:bg-white/10 border border-white/15 text-white font-bold text-sm flex items-center gap-2 transition"
+              className="px-6 py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-purple-600/30 transition"
             >
-              <Layers className="w-4 h-4 text-purple-400" />
-              <span>Auto Select Card</span>
+              <Layers className="w-4 h-4 text-white" />
+              <span>Draw Card</span>
             </button>
           )}
         </div>
