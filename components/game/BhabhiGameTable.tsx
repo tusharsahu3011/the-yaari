@@ -64,6 +64,7 @@ export function BhabhiGameTable({
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [isThinking, setIsThinking] = useState(false);
+  const [handSortMode, setHandSortMode] = useState<'suit' | 'rank'>('suit');
 
   const humanIndex = 0;
   const humanPlayer = gameState.players[humanIndex];
@@ -75,6 +76,23 @@ export function BhabhiGameTable({
   const playableCards = isHumanTurn ? getPlayableCards(humanIndex, gameState) : [];
   const playableCardIds = new Set(playableCards.map((c) => c.id));
   const humanCanThulla = isHumanTurn && canStrikeThulla(humanIndex, gameState);
+
+  // Dynamic opponents mapping (supporting 3 to 6 players)
+  const opponents = gameState.players
+    .map((p, idx) => ({ player: p, index: idx }))
+    .filter((item) => item.index !== humanIndex);
+
+  // Sorted hand representation
+  const displayedHand = [...humanPlayer.hand].sort((a, b) => {
+    if (handSortMode === 'rank') {
+      return a.rank - b.rank;
+    }
+    const suitOrder: Record<string, number> = { S: 0, H: 1, C: 2, D: 3 };
+    if (suitOrder[a.suit] !== suitOrder[b.suit]) {
+      return suitOrder[a.suit] - suitOrder[b.suit];
+    }
+    return a.rank - b.rank;
+  });
 
   // Restart Game
   const handleRestart = useCallback(() => {
@@ -297,69 +315,68 @@ export function BhabhiGameTable({
           <span className="font-bold text-white">{gameState.discardPile.length} cards</span>
         </div>
 
-        {/* Top Player (Bot 2: Priya) */}
-        <div className="self-center flex flex-col items-center">
-          <PlayerSeatView
-            player={gameState.players[2]}
-            playerIndex={2}
-            isCurrentTurn={gameState.currentTurnIndex === 2}
-            isThinking={isThinking && gameState.currentTurnIndex === 2}
-          />
+        {/* Opponents Seats (Distributed dynamically for 3 to 6 players) */}
+        <div className="w-full flex items-center justify-around px-2 sm:px-6 z-10">
+          {opponents.map((opp) => (
+            <PlayerSeatView
+              key={opp.player.id}
+              player={opp.player}
+              playerIndex={opp.index}
+              isCurrentTurn={gameState.currentTurnIndex === opp.index}
+              isThinking={isThinking && gameState.currentTurnIndex === opp.index}
+            />
+          ))}
         </div>
 
-        {/* Middle Row: Left Player (Bot 1: Rohit), Center Trick Area, Right Player (Bot 3: Aman) */}
-        <div className="flex items-center justify-between w-full px-2 sm:px-6">
-          {/* Left Player (Bot 1) */}
-          <div className="flex flex-col items-center">
-            <PlayerSeatView
-              player={gameState.players[1]}
-              playerIndex={1}
-              isCurrentTurn={gameState.currentTurnIndex === 1}
-              isThinking={isThinking && gameState.currentTurnIndex === 1}
-            />
-          </div>
+        {/* Center Trick Arena */}
+        <div className="self-center relative w-64 sm:w-80 h-44 sm:h-52 rounded-2xl bg-black/25 border border-white/10 flex flex-col items-center justify-center p-2">
+          {/* Prominent Lead Suit Indicator (Section 22) */}
+          {gameState.activeTrick.leadSuit && (
+            <div className="mb-2 px-3 py-1 rounded-full bg-black/70 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+              <span className="text-sm">{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
+              <span>Lead: {getSuitName(gameState.activeTrick.leadSuit)}</span>
+            </div>
+          )}
 
-          {/* Center Trick Arena */}
-          <div className="relative w-64 sm:w-80 h-44 sm:h-52 rounded-2xl bg-black/25 border border-white/10 flex flex-col items-center justify-center p-2">
-            {/* Center Status / Alert Banner */}
-            {gameState.lastResolution && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30">
-                {gameState.lastResolution.type === 'THULLA' ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs shadow-lg shadow-rose-700/60 animate-bounce">
-                    <Flame className="w-3.5 h-3.5" />
-                    THULLA STRUCK! 💥
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-600 text-white font-extrabold text-xs shadow-lg shadow-cyan-700/60">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Clean Sweep ✨
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Trick Cards Played */}
-            <div className="flex items-center justify-center -space-x-4 sm:-space-x-6 min-h-[110px]">
-              {gameState.activeTrick.cards.length === 0 ? (
-                <div className="text-center text-xs text-emerald-200/50 italic px-4 py-6 border border-dashed border-emerald-500/20 rounded-xl">
-                  {gameState.firstTrick
-                    ? 'Waiting for Ace of Spades (A♠)...'
-                    : 'Awaiting trick lead...'}
+          {/* Center Status / Alert Banner */}
+          {gameState.lastResolution && (
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30">
+              {gameState.lastResolution.type === 'THULLA' ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs shadow-lg shadow-rose-700/60 animate-bounce whitespace-nowrap">
+                  <Flame className="w-3.5 h-3.5" />
+                  THULLA STRUCK! 💥
                 </div>
               ) : (
-                gameState.activeTrick.cards.map((played, idx) => (
-                  <div
-                    key={`${played.card.id}-${idx}`}
-                    className="flex flex-col items-center transition-transform hover:scale-110 hover:z-30"
-                  >
-                    <PlayingCard card={played.card} size="sm" isThullaCandidate={played.isThulla} />
-                    <span className="text-[10px] font-bold text-white/90 bg-black/60 px-1.5 py-0.5 rounded mt-1">
-                      {gameState.players[played.playerIndex].name.split(' ')[0]}
-                    </span>
-                  </div>
-                ))
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-600 text-white font-extrabold text-xs shadow-lg shadow-cyan-700/60 whitespace-nowrap">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Clean Sweep ✨
+                </div>
               )}
             </div>
+          )}
+
+          {/* Trick Cards Played */}
+          <div className="flex items-center justify-center -space-x-4 sm:-space-x-6 min-h-[105px]">
+            {gameState.activeTrick.cards.length === 0 ? (
+              <div className="text-center text-xs text-emerald-200/50 italic px-4 py-6 border border-dashed border-emerald-500/20 rounded-xl">
+                {gameState.firstTrick
+                  ? 'Waiting for Ace of Spades (A♠)...'
+                  : 'Awaiting trick lead...'}
+              </div>
+            ) : (
+              gameState.activeTrick.cards.map((played, idx) => (
+                <div
+                  key={`${played.card.id}-${idx}`}
+                  className="flex flex-col items-center transition-transform hover:scale-110 hover:z-30"
+                >
+                  <PlayingCard card={played.card} size="sm" isThullaCandidate={played.isThulla} />
+                  <span className="text-[10px] font-bold text-white/90 bg-black/60 px-1.5 py-0.5 rounded mt-1">
+                    {gameState.players[played.playerIndex].name.split(' ')[0]}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
 
             {/* Turn Prompt Banner */}
             {gameState.phase === 'playing' && (
@@ -380,17 +397,6 @@ export function BhabhiGameTable({
             )}
           </div>
 
-          {/* Right Player (Bot 3) */}
-          <div className="flex flex-col items-center">
-            <PlayerSeatView
-              player={gameState.players[3]}
-              playerIndex={3}
-              isCurrentTurn={gameState.currentTurnIndex === 3}
-              isThinking={isThinking && gameState.currentTurnIndex === 3}
-            />
-          </div>
-        </div>
-
         {/* Bottom Center: Safe Badge or Escaped Message for Human */}
         <div className="self-center">
           {humanPlayer.isSafe && (
@@ -402,34 +408,61 @@ export function BhabhiGameTable({
         </div>
       </div>
 
-      {/* Human Player Hand Section */}
+      {/* Human Player Hand Section (Section 20) */}
       <div className="w-full max-w-6xl mt-3 flex flex-col items-center z-20">
-        <div className="w-full flex items-center justify-between mb-2 px-2 text-xs text-gray-300">
-          <div className="flex items-center gap-2">
+        <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-2 px-2 text-xs text-gray-300">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-base">{humanPlayer.avatar}</span>
             <span className="font-bold text-white text-sm">Your Hand</span>
-            <span className="px-2 py-0.5 rounded-full bg-white/10 font-medium">
-              {humanPlayer.hand.length} cards remaining
+            <span className="px-2 py-0.5 rounded-full bg-white/10 font-medium text-[11px]">
+              {humanPlayer.hand.length} cards
             </span>
+
+            {/* Hand Sorting Controls */}
+            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 text-[11px] ml-1 sm:ml-3">
+              <span className="text-gray-400 text-[10px] px-1 font-semibold hidden sm:inline">Sort:</span>
+              <button
+                type="button"
+                onClick={() => setHandSortMode('suit')}
+                className={`px-2 py-0.5 rounded-lg font-bold transition text-[10px] ${
+                  handSortMode === 'suit'
+                    ? 'bg-purple-600 text-white shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                ♠ By Suit
+              </button>
+              <button
+                type="button"
+                onClick={() => setHandSortMode('rank')}
+                className={`px-2 py-0.5 rounded-lg font-bold transition text-[10px] ${
+                  handSortMode === 'rank'
+                    ? 'bg-purple-600 text-white shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                🔢 By Rank
+              </button>
+            </div>
           </div>
 
           {isHumanTurn && (
             <div className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              Tap any highlighted card to play it immediately
+              Tap any highlighted card to play immediately
             </div>
           )}
         </div>
 
         {/* Hand Cards Horizontal Scroll / Fan */}
         <div className="w-full overflow-x-auto pb-4 pt-2 px-4 flex items-center justify-start sm:justify-center -space-x-4 sm:-space-x-5 min-h-[140px] rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-          {humanPlayer.hand.length === 0 ? (
+          {displayedHand.length === 0 ? (
             <div className="text-center py-6 text-sm text-emerald-400 font-bold flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-400" />
               Your hand is empty! You have won your freedom!
             </div>
           ) : (
-            humanPlayer.hand.map((card) => {
+            displayedHand.map((card) => {
               const isPlayable = playableCardIds.has(card.id);
               return (
                 <PlayingCard
