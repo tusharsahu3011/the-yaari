@@ -59,10 +59,13 @@ export function Navbar() {
             <Trophy className="w-4 h-4" />
             Play Solo vs AI
           </Link>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/20 text-xs font-medium text-purple-300">
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/20 text-xs font-medium text-purple-300 transition"
+          >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Guest Player
-          </div>
+            Profile & Stats
+          </Link>
         </div>
       </div>
     </header>

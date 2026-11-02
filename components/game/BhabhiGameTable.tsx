@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
+import { soundManager } from '@/lib/audio/sound-effects';
 import {
   BhabhiGameState,
   Card,
@@ -87,6 +88,18 @@ export function BhabhiGameTable({
     });
   }, [initialPlayers]);
 
+  const triggerEventAudio = (nextState: BhabhiGameState) => {
+    soundManager.playCardSnap();
+    if (nextState.lastResolution?.type === 'THULLA') {
+      soundManager.playThullaBoom();
+    } else if (nextState.lastResolution?.type === 'CLEAN_SWEEP') {
+      soundManager.playCleanSweepChime();
+    }
+    if (nextState.lastResolution?.newlySafePlayers?.length) {
+      soundManager.playPlayerSafeFanfare();
+    }
+  };
+
   // Handle Human Move
   const handlePlayCard = (card: Card) => {
     if (!isHumanTurn) return;
@@ -96,12 +109,18 @@ export function BhabhiGameTable({
       return;
     }
     setGameState(nextState);
+    triggerEventAudio(nextState);
 
     // Update commentary from last event
     const lastEvent = nextState.history[nextState.history.length - 1];
     if (lastEvent) {
       const quote = getDealerCommentary(lastEvent, nextState, personality);
-      if (quote) setLatestCommentary(quote);
+      if (quote) {
+        setLatestCommentary(quote);
+        if (audioEnabled) {
+          soundManager.speakDealerCommentary(quote.text, personality);
+        }
+      }
     }
   };
 
@@ -119,11 +138,17 @@ export function BhabhiGameTable({
           const chosenCard = chooseBotMove(currentIdx, gameState);
           const { state: nextState } = playCardAction(gameState, currentIdx, chosenCard);
           setGameState(nextState);
+          triggerEventAudio(nextState);
 
           const lastEvent = nextState.history[nextState.history.length - 1];
           if (lastEvent) {
             const quote = getDealerCommentary(lastEvent, nextState, personality);
-            if (quote) setLatestCommentary(quote);
+            if (quote) {
+              setLatestCommentary(quote);
+              if (audioEnabled) {
+                soundManager.speakDealerCommentary(quote.text, personality);
+              }
+            }
           }
         } catch (err) {
           console.error('Bot move failed', err);
@@ -134,7 +159,7 @@ export function BhabhiGameTable({
 
       return () => clearTimeout(timer);
     }
-  }, [gameState, botSpeed, personality]);
+  }, [gameState, botSpeed, personality, audioEnabled]);
 
   // Confetti when Human gets Safe or Game Ends
   useEffect(() => {
@@ -204,6 +229,24 @@ export function BhabhiGameTable({
             <option value={900}>⏱️ Normal</option>
             <option value={1500}>🐢 Slow</option>
           </select>
+
+          {/* Sound & Voice Toggle */}
+          <button
+            onClick={() => {
+              const next = !audioEnabled;
+              setAudioEnabled(next);
+              soundManager.setSoundEnabled(next);
+              soundManager.setVoiceEnabled(next);
+            }}
+            title={audioEnabled ? 'Sound & AI Voice Enabled' : 'Sound & Voice Muted'}
+            className="p-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition"
+          >
+            {audioEnabled ? (
+              <Volume2 className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-gray-500" />
+            )}
+          </button>
 
           {/* Restart */}
           <button

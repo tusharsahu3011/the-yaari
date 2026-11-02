@@ -48,3 +48,4 @@ export interface MaskedRoomState {
   canStrikeThulla?: boolean;
   isYourTurn?: boolean;
 }
+

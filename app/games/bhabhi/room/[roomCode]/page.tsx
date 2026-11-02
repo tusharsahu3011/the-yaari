@@ -26,10 +26,17 @@ import {
 import { MaskedRoomState, MaskedRoomPlayer, RoomChatMessage } from '@/lib/rooms/room-types';
 import { PlayingCard } from '@/components/cards/PlayingCard';
 import { Card, getSuitSymbol, getSuitName } from '@/game-engine/bhabhi';
+import { VoiceMeshManager } from '@/lib/webrtc/voice-manager';
 
 export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
   const [copied, setCopied] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
+  const [selfSpeaking, setSelfSpeaking] = useState(false);
+  const voiceRef = useRef<VoiceMeshManager | null>(null);
+
+  if (!voiceRef.current && typeof window !== 'undefined') {
+    voiceRef.current = new VoiceMeshManager();
+  }
   const [roomState, setRoomState] = useState<MaskedRoomState | null>(null);
   const [inputMsg, setInputMsg] = useState('');
   const [playerId, setPlayerId] = useState<string>('');
@@ -120,6 +127,31 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
       confetti({ particleCount: 110, spread: 90, origin: { y: 0.5 } });
     }
   }, [roomState?.status, roomState?.players, playerId]);
+
+  // Clean up voice manager on unmount
+  useEffect(() => {
+    return () => {
+      voiceRef.current?.stop();
+    };
+  }, []);
+
+  const toggleMicrophone = async () => {
+    if (!voiceRef.current) return;
+    if (!isMicOn) {
+      const success = await voiceRef.current.startMicrophone(
+        (speaking) => setSelfSpeaking(speaking),
+        (err) => setErrorMsg(err)
+      );
+      if (success) {
+        setIsMicOn(true);
+        voiceRef.current.setMute(false);
+      }
+    } else {
+      voiceRef.current.setMute(true);
+      setIsMicOn(false);
+      setSelfSpeaking(false);
+    }
+  };
 
   const copyInvite = () => {
     if (typeof window !== 'undefined') {
@@ -227,7 +259,7 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsMicOn(!isMicOn)}
+              onClick={toggleMicrophone}
               className={`p-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
                 isMicOn
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-700/50'
@@ -539,8 +571,21 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                     </button>
                   )}
 
-                  <div className="w-14 h-14 rounded-2xl bg-slate-800/80 border border-white/10 flex items-center justify-center text-2xl shadow-inner">
+                  <div
+                    className={`relative w-14 h-14 rounded-2xl bg-slate-800/80 border border-white/10 flex items-center justify-center text-2xl shadow-inner transition-all ${
+                      isMe && selfSpeaking
+                        ? 'ring-4 ring-emerald-400 shadow-lg shadow-emerald-500/50 scale-105'
+                        : ''
+                    }`}
+                  >
                     {p.avatar}
+                    {isMe && isMicOn && (
+                      <span
+                        className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-[#121626] ${
+                          selfSpeaking ? 'bg-emerald-400 animate-ping' : 'bg-emerald-500'
+                        }`}
+                      />
+                    )}
                   </div>
 
                   <div className="space-y-0.5">
@@ -616,7 +661,7 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
               <span className="text-xs font-bold text-white">Voice Channel</span>
             </div>
             <button
-              onClick={() => setIsMicOn(!isMicOn)}
+              onClick={toggleMicrophone}
               className={`p-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
                 isMicOn
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-700/50'

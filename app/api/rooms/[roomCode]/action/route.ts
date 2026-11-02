@@ -72,3 +72,4 @@ export async function POST(
   const updatedState = getMaskedRoomState(roomCode, playerId);
   return NextResponse.json({ success: true, state: updatedState });
 }
+
