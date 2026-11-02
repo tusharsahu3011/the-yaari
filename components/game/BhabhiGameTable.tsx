@@ -1,24 +1,21 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { soundManager } from '@/lib/audio/sound-effects';
 import {
   BhabhiGameState,
   Card,
   DealerPersonality,
-  DealerQuote,
   PlayerConfig,
   chooseBotMove,
-  computeGameSummary,
   createInitialGameState,
   createSeededRng,
-  getDealerCommentary,
   getPlayableCards,
   getSuitSymbol,
   getSuitName,
   playCardAction,
-  sortHand,
   canStrikeThulla,
 } from '@/game-engine/bhabhi';
 import { PlayingCard } from '@/components/cards/PlayingCard';
@@ -28,11 +25,15 @@ import {
   RotateCcw,
   Sparkles,
   Trophy,
-  Volume2,
-  VolumeX,
-  Zap,
-  Info,
-  CheckCircle2,
+  Layers,
+  ArrowLeft,
+  BookOpen,
+  Settings,
+  Clock,
+  Lightbulb,
+  Play,
+  X,
+  Bot,
 } from 'lucide-react';
 
 interface BhabhiGameTableProps {
@@ -41,9 +42,9 @@ interface BhabhiGameTableProps {
 
 const DEFAULT_PLAYERS: PlayerConfig[] = [
   { id: 'human-1', name: 'You', isBot: false, avatar: '😎' },
-  { id: 'bot-1', name: 'Rohit (Smart)', isBot: true, botDifficulty: 'smart', avatar: '🤖' },
-  { id: 'bot-2', name: 'Priya (Normal)', isBot: true, botDifficulty: 'normal', avatar: '🦊' },
-  { id: 'bot-3', name: 'Aman (Easy)', isBot: true, botDifficulty: 'easy', avatar: '🐼' },
+  { id: 'bot-1', name: 'Bot 1', isBot: true, botDifficulty: 'smart', avatar: '🤖' },
+  { id: 'bot-2', name: 'Bot 2', isBot: true, botDifficulty: 'normal', avatar: '🤖' },
+  { id: 'bot-3', name: 'Bot 3', isBot: true, botDifficulty: 'easy', avatar: '🤖' },
 ];
 
 export function BhabhiGameTable({
@@ -58,13 +59,14 @@ export function BhabhiGameTable({
   useEffect(() => {
     setGameState(createInitialGameState(initialPlayers));
   }, [initialPlayers]);
-  const [personality, setPersonality] = useState<DealerPersonality>('desi_host');
-  const [botSpeed, setBotSpeed] = useState<number>(900); // ms
-  const [latestCommentary, setLatestCommentary] = useState<DealerQuote | null>(null);
+
+  const [botSpeed] = useState<number>(900); // ms
   const [isRulesOpen, setIsRulesOpen] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [isThinking, setIsThinking] = useState(false);
-  const [handSortMode, setHandSortMode] = useState<'suit' | 'rank'>('suit');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+
+  // Turn Countdown Timer (Image 3: Turn Time: 00:45)
+  const [turnTime, setTurnTime] = useState<number>(45);
 
   const humanIndex = 0;
   const humanPlayer = gameState.players[humanIndex];
@@ -77,33 +79,31 @@ export function BhabhiGameTable({
   const playableCardIds = new Set(playableCards.map((c) => c.id));
   const humanCanThulla = isHumanTurn && canStrikeThulla(humanIndex, gameState);
 
-  // Dynamic opponents mapping (supporting 3 to 6 players)
+  // Turn Timer countdown
+  useEffect(() => {
+    if (gameState.phase !== 'playing') return;
+    const timer = setInterval(() => {
+      setTurnTime((prev) => (prev > 0 ? prev - 1 : 45));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameState.phase, gameState.currentTurnIndex]);
+
+  // Reset turn time on turn change
+  useEffect(() => {
+    setTurnTime(45);
+  }, [gameState.currentTurnIndex]);
+
+  // Dynamic opponents mapping (3 to 6 players)
   const opponents = gameState.players
     .map((p, idx) => ({ player: p, index: idx }))
     .filter((item) => item.index !== humanIndex);
 
-  // Sorted hand representation
-  const displayedHand = [...humanPlayer.hand].sort((a, b) => {
-    if (handSortMode === 'rank') {
-      return a.rank - b.rank;
-    }
-    const suitOrder: Record<string, number> = { S: 0, H: 1, C: 2, D: 3 };
-    if (suitOrder[a.suit] !== suitOrder[b.suit]) {
-      return suitOrder[a.suit] - suitOrder[b.suit];
-    }
-    return a.rank - b.rank;
-  });
-
   // Restart Game
   const handleRestart = useCallback(() => {
+    soundManager.playDramaticBoom();
     const newState = createInitialGameState(initialPlayers);
     setGameState(newState);
-    setLatestCommentary({
-      dealerName: 'Chacha Chaudhary',
-      avatar: '👳‍♂️',
-      text: 'New round! Cards dealt fresh. Whoever has the Ace of Spades leads!',
-      mood: 'hype',
-    });
+    setSelectedCardId(null);
   }, [initialPlayers]);
 
   const triggerEventAudio = (nextState: BhabhiGameState) => {
@@ -118,525 +118,435 @@ export function BhabhiGameTable({
     }
   };
 
-  // Handle Human Move
-  const handlePlayCard = (card: Card) => {
-    if (!isHumanTurn) return;
-    const { state: nextState, error } = playCardAction(gameState, humanIndex, card);
-    if (error) {
-      alert(error);
+  // Human card play
+  const handleCardClick = (card: Card) => {
+    if (!isHumanTurn || !playableCardIds.has(card.id)) {
+      soundManager.playTap();
       return;
     }
-    setGameState(nextState);
-    triggerEventAudio(nextState);
+    setSelectedCardId(card.id);
+  };
 
-    // Update commentary from last event
-    const lastEvent = nextState.history[nextState.history.length - 1];
-    if (lastEvent) {
-      const quote = getDealerCommentary(lastEvent, nextState, personality);
-      if (quote) {
-        setLatestCommentary(quote);
-        if (audioEnabled) {
-          soundManager.speakDealerCommentary(quote.text, personality);
-        }
+  const handleConfirmPlayCard = () => {
+    if (!isHumanTurn || !selectedCardId) return;
+    const cardToPlay = humanPlayer.hand.find((c) => c.id === selectedCardId);
+    if (!cardToPlay) return;
+
+    try {
+      const res = playCardAction(gameState, humanIndex, cardToPlay);
+      if (!res.error) {
+        triggerEventAudio(res.state);
+        setGameState(res.state);
+        setSelectedCardId(null);
       }
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  // Bot Turn Automation Effect
+  // Bot Turn Automation Loop
   useEffect(() => {
     if (gameState.phase !== 'playing') return;
 
     const currentIdx = gameState.currentTurnIndex;
     const currentPlayer = gameState.players[currentIdx];
 
-    if (currentPlayer && currentPlayer.isBot && !currentPlayer.isSafe) {
-      setIsThinking(true);
-      const timer = setTimeout(() => {
-        try {
-          const chosenCard = chooseBotMove(currentIdx, gameState);
-          const { state: nextState } = playCardAction(gameState, currentIdx, chosenCard);
-          setGameState(nextState);
-          triggerEventAudio(nextState);
+    if (!currentPlayer.isBot || currentPlayer.isSafe) return;
 
-          const lastEvent = nextState.history[nextState.history.length - 1];
-          if (lastEvent) {
-            const quote = getDealerCommentary(lastEvent, nextState, personality);
-            if (quote) {
-              setLatestCommentary(quote);
-              if (audioEnabled) {
-                soundManager.speakDealerCommentary(quote.text, personality);
-              }
-            }
-          }
-        } catch (err) {
-          console.error('Bot move failed', err);
-        } finally {
-          setIsThinking(false);
+    const timer = setTimeout(() => {
+      try {
+        const botCard = chooseBotMove(
+          currentIdx,
+          gameState
+        );
+        const res = playCardAction(gameState, currentIdx, botCard);
+        if (!res.error) {
+          triggerEventAudio(res.state);
+          setGameState(res.state);
         }
-      }, botSpeed);
+      } catch (err) {
+        console.error('Bot play error', err);
+      }
+    }, botSpeed);
 
-      return () => clearTimeout(timer);
-    }
-  }, [gameState, botSpeed, personality, audioEnabled]);
+    return () => clearTimeout(timer);
+  }, [gameState, botSpeed]);
 
-  // Confetti when Human gets Safe or Game Ends
-  useEffect(() => {
-    if (humanPlayer.isSafe && humanPlayer.safeRank === 1) {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.7 },
-      });
-    }
-
+  // Contextual Hint Text (Image 3: Lightbulb banner)
+  const getContextualHint = () => {
     if (gameState.phase === 'game_over') {
-      confetti({
-        particleCount: 120,
-        spread: 90,
-        origin: { y: 0.5 },
-      });
+      return 'Game complete! Review the final Bhabhi standings.';
     }
-  }, [humanPlayer.isSafe, humanPlayer.safeRank, gameState.phase]);
+    if (!isHumanTurn) {
+      const activeBot = gameState.players[gameState.currentTurnIndex];
+      return `Waiting for ${activeBot?.name || 'opponent'} to choose their card...`;
+    }
+    if (!gameState.activeTrick || gameState.activeTrick.cards.length === 0) {
+      if (gameState.history.length === 0) {
+        return 'You hold the Ace of Spades (A♠)! You must lead it to open the match.';
+      }
+      return 'It is your lead! Play any card from your hand to begin the trick.';
+    }
+    if (humanCanThulla) {
+      return 'You are VOID in the lead suit! Strike a Thulla to dump the pile on the highest card!';
+    }
+    const leadSuitName = gameState.activeTrick.leadSuit ? getSuitName(gameState.activeTrick.leadSuit) : 'the lead suit';
+    return `Play a ${leadSuitName} card (since it's the lead suit).`;
+  };
 
-  // Compute Game Summary if game over
-  const gameSummary =
-    gameState.phase === 'game_over' ? computeGameSummary(gameState) : null;
+  // Opponent layout distribution around the oval table (Image 3)
+  const topBot = opponents.find((o) => o.player.name.includes('1')) || opponents[0];
+  const rightBot = opponents.find((o) => o.player.name.includes('2')) || opponents[1];
+  const leftBot = opponents.find((o) => o.player.name.includes('3')) || opponents[2];
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-4rem)] flex flex-col items-center justify-between p-2 sm:p-4 bg-[#090b11] select-none">
-      {/* Top Bar: Controls & Status */}
-      <div className="w-full max-w-6xl flex flex-wrap items-center justify-between gap-3 px-3 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm z-20">
+    <div className="w-full max-w-6xl mx-auto flex flex-col items-center select-none py-2 space-y-4">
+      {/* 1. Top Navigation Bar (Image 3) */}
+      <div className="w-full flex items-center justify-between px-3 py-2 rounded-2xl bg-[#0d1020] border border-white/10 shadow-lg flex-wrap gap-2">
         <div className="flex items-center gap-3">
+          <Link
+            href="/games/bhabhi"
+            className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-white px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/10 transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="font-extrabold text-sm sm:text-base tracking-tight text-white">
-              Bhabhi (Solo vs AI)
-            </span>
+            <span className="text-amber-400 font-black text-base">🃏</span>
+            <span className="font-black text-sm text-white">Bhabhi</span>
+            <span className="text-xs text-gray-400 font-semibold">(Get Away)</span>
           </div>
-          <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-900/60 text-purple-300 font-semibold border border-purple-500/30">
-            Trick #{gameState.activeTrick.trickNumber}
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 flex items-center gap-1.5">
+            <Bot className="w-3.5 h-3.5 text-purple-400" /> Solo vs AI
           </span>
-          {gameState.activeTrick.leadSuit && (
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/40 flex items-center gap-1">
-              Lead: {getSuitSymbol(gameState.activeTrick.leadSuit)}{' '}
-              {getSuitName(gameState.activeTrick.leadSuit)}
-            </span>
-          )}
         </div>
 
-        {/* Action Controls */}
         <div className="flex items-center gap-2">
-          {/* Personality selector */}
-          <select
-            value={personality}
-            onChange={(e) => setPersonality(e.target.value as DealerPersonality)}
-            className="text-xs bg-[#121624] border border-white/15 text-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-purple-400"
-          >
-            <option value="desi_host">👳‍♂️ Chacha Chaudhary (Desi)</option>
-            <option value="savage">🕶️ Viper (Savage)</option>
-            <option value="dramatic">🧙‍♂️ Grandmaster (Dramatic)</option>
-          </select>
-
-          {/* Speed selector */}
-          <select
-            value={botSpeed}
-            onChange={(e) => setBotSpeed(Number(e.target.value))}
-            className="text-xs bg-[#121624] border border-white/15 text-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-purple-400"
-          >
-            <option value={500}>⚡ Fast</option>
-            <option value={900}>⏱️ Normal</option>
-            <option value={1500}>🐢 Slow</option>
-          </select>
-
-          {/* Sound & Voice Toggle */}
           <button
-            onClick={() => {
-              const next = !audioEnabled;
-              setAudioEnabled(next);
-              soundManager.setSoundEnabled(next);
-              soundManager.setVoiceEnabled(next);
-            }}
-            title={audioEnabled ? 'Sound & AI Voice Enabled' : 'Sound & Voice Muted'}
-            className="p-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition"
+            onClick={() => setIsRulesOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-gray-300 hover:text-white transition"
           >
-            {audioEnabled ? (
-              <Volume2 className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <VolumeX className="w-4 h-4 text-gray-500" />
-            )}
+            <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+            <span>Rules</span>
           </button>
-
-          {/* Restart */}
           <button
-            onClick={handleRestart}
-            title="Restart Game"
-            className="p-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition"
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition"
+            title="Table settings"
           >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-
-          {/* Rules */}
-          <button
-            onClick={() => setIsRulesOpen(!isRulesOpen)}
-            title="Game Rules"
-            className="p-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition"
-          >
-            <Info className="w-4 h-4" />
+            <Settings className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* AI Dealer Commentary Speech Bubble */}
-      <div className="w-full max-w-2xl my-2 z-20">
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-950/80 via-slate-900/90 to-indigo-950/80 border border-purple-500/30 shadow-lg shadow-purple-950/50 backdrop-blur-md">
-          <div className="text-2xl sm:text-3xl animate-bounce">
-            {latestCommentary?.avatar || '👳‍♂️'}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-purple-300 uppercase tracking-wider">
-                {latestCommentary?.dealerName || 'Dealer Chacha'}
-              </span>
-              <span className="text-[10px] text-gray-400">• Live Commentary</span>
-            </div>
-            <p className="text-xs sm:text-sm font-medium text-gray-100 italic">
-              "{latestCommentary?.text || 'Ace of Spades must open! The battle begins!'}"
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Central Card Table Felt */}
-      <div className="relative w-full max-w-5xl h-[480px] sm:h-[520px] rounded-3xl felt-table border-4 border-[#032e23] flex flex-col justify-between p-4 shadow-2xl overflow-hidden my-auto">
-        {/* Discard Pile indicator in corner */}
-        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md text-xs text-gray-300">
-          <span className="w-2 h-2 rounded-full bg-gray-400" />
-          <span>Discarded: </span>
-          <span className="font-bold text-white">{gameState.discardPile.length} cards</span>
-        </div>
-
-        {/* Opponents Seats (Distributed dynamically for 3 to 6 players) */}
-        <div className="w-full flex items-center justify-around px-2 sm:px-6 z-10">
-          {opponents.map((opp) => (
-            <PlayerSeatView
-              key={opp.player.id}
-              player={opp.player}
-              playerIndex={opp.index}
-              isCurrentTurn={gameState.currentTurnIndex === opp.index}
-              isThinking={isThinking && gameState.currentTurnIndex === opp.index}
-            />
-          ))}
-        </div>
-
-        {/* Center Trick Arena */}
-        <div className="self-center relative w-64 sm:w-80 h-44 sm:h-52 rounded-2xl bg-black/25 border border-white/10 flex flex-col items-center justify-center p-2">
-          {/* Prominent Lead Suit Indicator (Section 22) */}
-          {gameState.activeTrick.leadSuit && (
-            <div className="mb-2 px-3 py-1 rounded-full bg-black/70 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md">
-              <span className="text-sm">{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
-              <span>Lead: {getSuitName(gameState.activeTrick.leadSuit)}</span>
-            </div>
-          )}
-
-          {/* Center Status / Alert Banner */}
-          {gameState.lastResolution && (
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30">
-              {gameState.lastResolution.type === 'THULLA' ? (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs shadow-lg shadow-rose-700/60 animate-bounce whitespace-nowrap">
-                  <Flame className="w-3.5 h-3.5" />
-                  THULLA STRUCK! 💥
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-600 text-white font-extrabold text-xs shadow-lg shadow-cyan-700/60 whitespace-nowrap">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Clean Sweep ✨
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Trick Cards Played */}
-          <div className="flex items-center justify-center -space-x-4 sm:-space-x-6 min-h-[105px]">
-            {gameState.activeTrick.cards.length === 0 ? (
-              <div className="text-center text-xs text-emerald-200/50 italic px-4 py-6 border border-dashed border-emerald-500/20 rounded-xl">
-                {gameState.firstTrick
-                  ? 'Waiting for Ace of Spades (A♠)...'
-                  : 'Awaiting trick lead...'}
-              </div>
-            ) : (
-              gameState.activeTrick.cards.map((played, idx) => (
-                <div
-                  key={`${played.card.id}-${idx}`}
-                  className="flex flex-col items-center transition-transform hover:scale-110 hover:z-30"
-                >
-                  <PlayingCard card={played.card} size="sm" isThullaCandidate={played.isThulla} />
-                  <span className="text-[10px] font-bold text-white/90 bg-black/60 px-1.5 py-0.5 rounded mt-1">
-                    {gameState.players[played.playerIndex].name.split(' ')[0]}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-
-            {/* Turn Prompt Banner */}
-            {gameState.phase === 'playing' && (
-              <div className="mt-2 text-center">
-                {isHumanTurn ? (
-                  <div className="flex items-center gap-1 text-xs font-bold text-amber-300 bg-amber-950/70 border border-amber-500/40 px-3 py-1 rounded-full shadow animate-pulse">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    {humanCanThulla
-                      ? '⚡ No lead suit! Strike a THULLA!'
-                      : '👉 YOUR TURN! Pick a playable card below.'}
-                  </div>
-                ) : (
-                  <div className="text-[11px] text-gray-300">
-                    {gameState.players[gameState.currentTurnIndex]?.name}'s turn...
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-        {/* Bottom Center: Safe Badge or Escaped Message for Human */}
-        <div className="self-center">
-          {humanPlayer.isSafe && (
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold text-xs shadow-lg">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              You Got Away! Escaped Safe (Rank #{humanPlayer.safeRank})
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Human Player Hand Section (Section 20) */}
-      <div className="w-full max-w-6xl mt-3 flex flex-col items-center z-20">
-        <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-2 px-2 text-xs text-gray-300">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-base">{humanPlayer.avatar}</span>
-            <span className="font-bold text-white text-sm">Your Hand</span>
-            <span className="px-2 py-0.5 rounded-full bg-white/10 font-medium text-[11px]">
-              {humanPlayer.hand.length} cards
+      {/* 2. Top Info Badges (Image 3) */}
+      <div className="w-full flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-3 py-1 rounded-xl bg-[#111827] border border-white/10 text-white font-bold">
+            Round {gameState.activeTrick ? gameState.activeTrick.trickNumber : 1} / 5
+          </span>
+          {gameState.activeTrick?.leadSuit && (
+            <span className="text-xs px-3 py-1 rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold flex items-center gap-1.5">
+              <span>Lead Suit:</span>
+              <span className="text-base">{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
+              <span>{getSuitName(gameState.activeTrick.leadSuit)}</span>
             </span>
-
-            {/* Hand Sorting Controls */}
-            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 text-[11px] ml-1 sm:ml-3">
-              <span className="text-gray-400 text-[10px] px-1 font-semibold hidden sm:inline">Sort:</span>
-              <button
-                type="button"
-                onClick={() => setHandSortMode('suit')}
-                className={`px-2 py-0.5 rounded-lg font-bold transition text-[10px] ${
-                  handSortMode === 'suit'
-                    ? 'bg-purple-600 text-white shadow'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                ♠ By Suit
-              </button>
-              <button
-                type="button"
-                onClick={() => setHandSortMode('rank')}
-                className={`px-2 py-0.5 rounded-lg font-bold transition text-[10px] ${
-                  handSortMode === 'rank'
-                    ? 'bg-purple-600 text-white shadow'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                🔢 By Rank
-              </button>
-            </div>
-          </div>
-
-          {isHumanTurn && (
-            <div className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              Tap any highlighted card to play immediately
-            </div>
           )}
         </div>
 
-        {/* Hand Cards Horizontal Scroll / Fan */}
-        <div className="w-full overflow-x-auto pb-4 pt-2 px-4 flex items-center justify-start sm:justify-center -space-x-4 sm:-space-x-5 min-h-[140px] rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-          {displayedHand.length === 0 ? (
-            <div className="text-center py-6 text-sm text-emerald-400 font-bold flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" />
-              Your hand is empty! You have won your freedom!
-            </div>
-          ) : (
-            displayedHand.map((card) => {
-              const isPlayable = playableCardIds.has(card.id);
-              return (
-                <PlayingCard
-                  key={card.id}
-                  card={card}
-                  size="md"
-                  isPlayable={isPlayable}
-                  isThullaCandidate={humanCanThulla && isPlayable}
-                  onClick={() => handlePlayCard(card)}
-                />
-              );
-            })
-          )}
+        <div className="flex items-center gap-2 bg-[#111827] border border-white/10 px-3 py-1 rounded-xl">
+          <Clock className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-xs text-gray-400 font-medium">Turn Time:</span>
+          <span className="font-mono text-xs font-black text-emerald-400">
+            00:{turnTime < 10 ? `0${turnTime}` : turnTime}
+          </span>
         </div>
       </div>
 
-      {/* Game Over Victory / Loss Modal */}
-      {gameSummary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-md p-6 rounded-3xl bg-gradient-to-b from-[#181d30] to-[#0c0f1a] border border-white/20 shadow-2xl flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shadow-lg shadow-rose-600/40 -mt-12 mb-4">
-              <Crown className="w-8 h-8 text-white" />
-            </div>
+      {/* 3. The Oval Felt Card Table (Image 3) */}
+      <div className="relative w-full h-[460px] sm:h-[500px] rounded-[48px] bg-gradient-to-b from-[#1b103a] via-[#130b2c] to-[#0d0720] border-4 border-[#8b5cf6]/60 shadow-[0_0_60px_rgba(139,92,246,0.3)] flex flex-col justify-between p-6 sm:p-8 overflow-hidden">
+        {/* Subtle inner velvet glow */}
+        <div className="absolute inset-4 rounded-[40px] border border-purple-400/20 pointer-events-none" />
 
-            <h2 className="text-2xl font-black tracking-tight text-white mb-1">
-              Match Finished!
-            </h2>
-            <p className="text-sm text-gray-300 mb-6">
-              The game has concluded. Here are the final standings:
-            </p>
-
-            {/* Bhabhi Spotlight */}
-            <div className="w-full p-4 rounded-2xl bg-rose-950/50 border border-rose-500/40 mb-6 flex items-center gap-3">
-              <div className="text-3xl">{gameSummary.bhabhi.avatar}</div>
-              <div className="text-left flex-1">
-                <span className="text-[10px] font-bold text-rose-300 uppercase tracking-wider">
-                  The Official Bhabhi (Loser)
-                </span>
-                <h3 className="font-extrabold text-base text-rose-100">
-                  {gameSummary.bhabhi.name}
-                </h3>
-              </div>
-              <div className="text-xl">👑</div>
-            </div>
-
-            {/* Standings Table */}
-            <div className="w-full space-y-2 mb-6">
-              {gameSummary.rankings.map((r, idx) => (
+        {/* TOP OPPONENT: Bot 1 */}
+        {topBot && (
+          <div className="w-full flex flex-col items-center z-10">
+            {/* Fanned facedown purple cards behind bot */}
+            <div className="flex -space-x-4 mb-1">
+              {[...Array(Math.min(6, topBot.player.hand.length))].map((_, i) => (
                 <div
-                  key={r.playerIndex}
-                  className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold ${
-                    r.isBhabhi
-                      ? 'bg-rose-950/30 border-rose-500/30 text-rose-300'
-                      : 'bg-white/5 border-white/10 text-gray-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 text-gray-400 font-mono">#{idx + 1}</span>
-                    <span>{r.avatar}</span>
-                    <span>{r.name}</span>
-                  </div>
-                  <span
-                    className={`px-2 py-0.5 rounded-full ${
-                      r.isBhabhi
-                        ? 'bg-rose-600 text-white'
-                        : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
-                    }`}
-                  >
-                    {r.statusLabel}
-                  </span>
-                </div>
+                  key={i}
+                  className="w-7 h-10 rounded-md bg-gradient-to-br from-purple-800 to-indigo-950 border border-purple-400/40 shadow-md transform -rotate-3"
+                />
               ))}
             </div>
 
-            {/* Rematch Button */}
-            <button
-              onClick={handleRestart}
-              className="w-full py-3 rounded-2xl font-bold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/40 hover:brightness-110 active:scale-95 transition"
+            {/* Avatar & Badge */}
+            <div
+              className={`relative flex flex-col items-center ${
+                gameState.currentTurnIndex === topBot.index ? 'scale-105' : 'opacity-85'
+              }`}
             >
-              Play Another Game
-            </button>
+              <div
+                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                  gameState.currentTurnIndex === topBot.index
+                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
+                    : 'border-purple-400/50 bg-[#16122d]'
+                }`}
+              >
+                {topBot.player.avatar}
+              </div>
+              <div className="mt-1 px-3 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1.5 shadow">
+                <span>{topBot.player.name}</span>
+                <span className="text-[10px] text-purple-300 font-mono">
+                  ({topBot.player.hand.length} Cards)
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MIDDLE SECTION: Left Bot, Center Trick, Right Bot */}
+        <div className="w-full flex items-center justify-between my-auto z-10 px-2 sm:px-6">
+          {/* LEFT OPPONENT: Bot 3 */}
+          {leftBot && (
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                  gameState.currentTurnIndex === leftBot.index
+                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
+                    : 'border-emerald-400/50 bg-[#16122d]'
+                }`}
+              >
+                {leftBot.player.avatar}
+              </div>
+              <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
+                <span>{leftBot.player.name}</span>
+                <span className="text-[10px] text-emerald-300 font-mono">
+                  ({leftBot.player.hand.length})
+                </span>
+              </div>
+              {/* Cards stack */}
+              <div className="flex -space-x-3 mt-1.5">
+                {[...Array(Math.min(4, leftBot.player.hand.length))].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-8 rounded bg-purple-900 border border-purple-400/40 shadow-sm"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CENTER TRICK FELT AREA (Image 3) */}
+          <div className="flex flex-col items-center space-y-3">
+            {/* Lead Suit Pill Banner */}
+            {gameState.activeTrick?.leadSuit && (
+              <div className="px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/60 text-cyan-300 text-xs font-black shadow-lg shadow-cyan-900/30 flex items-center gap-2">
+                <span>{getSuitSymbol(gameState.activeTrick.leadSuit)}</span>
+                <span>{getSuitName(gameState.activeTrick.leadSuit)} are the Lead Suit</span>
+              </div>
+            )}
+
+            {/* Played Cards in Trick */}
+            <div className="relative min-h-[120px] flex items-center justify-center gap-2 sm:gap-3 p-2">
+              {(!gameState.activeTrick || gameState.activeTrick.cards.length === 0) ? (
+                <div className="w-20 h-28 rounded-2xl border-2 border-dashed border-purple-400/30 flex flex-col items-center justify-center text-purple-300/40 text-[10px] font-bold">
+                  <span>EMPTY TRICK</span>
+                  <span>Lead card</span>
+                </div>
+              ) : (
+                gameState.activeTrick.cards.map((item, idx: number) => {
+                  const isWinning = idx === 0;
+
+                  return (
+                    <div
+                      key={item.card.id}
+                      className={`transition-all duration-300 transform ${
+                        isWinning
+                          ? 'ring-4 ring-cyan-400 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.6)] scale-105'
+                          : 'scale-95'
+                      }`}
+                    >
+                      <PlayingCard card={item.card} size="md" />
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Trick Card Count */}
+            {gameState.activeTrick && gameState.activeTrick.cards.length > 0 && (
+              <div className="text-[11px] font-bold text-gray-300 bg-black/40 px-3 py-0.5 rounded-full border border-white/10">
+                Current Trick ({gameState.activeTrick.cards.length} cards)
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT OPPONENT: Bot 2 */}
+          {rightBot && (
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition shadow-lg ${
+                  gameState.currentTurnIndex === rightBot.index
+                    ? 'border-cyan-400 bg-cyan-950/60 ring-4 ring-cyan-400/40 animate-pulse'
+                    : 'border-amber-400/50 bg-[#16122d]'
+                }`}
+              >
+                {rightBot.player.avatar}
+              </div>
+              <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
+                <span>{rightBot.player.name}</span>
+                <span className="text-[10px] text-amber-300 font-mono">
+                  ({rightBot.player.hand.length})
+                </span>
+              </div>
+              {/* Cards stack */}
+              <div className="flex -space-x-3 mt-1.5">
+                {[...Array(Math.min(4, rightBot.player.hand.length))].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-8 rounded bg-purple-900 border border-purple-400/40 shadow-sm"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOTTOM SECTION: Discard, Hint, and You (Image 3) */}
+        <div className="w-full flex items-center justify-between z-10 pt-2 border-t border-white/5">
+          {/* Discard Pile indicator */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-xs text-gray-300">
+            <Layers className="w-3.5 h-3.5 text-purple-400" />
+            <span>Discard Pile: </span>
+            <strong className="text-white">{gameState.discardPile.length} cards</strong>
+          </div>
+
+          {/* "You" Avatar in Green Glow */}
+          <div className="flex items-center gap-2">
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl border-2 transition shadow-lg ${
+                isHumanTurn
+                  ? 'border-emerald-400 bg-emerald-950 ring-4 ring-emerald-400/40 animate-pulse'
+                  : 'border-white/20 bg-[#16122d]'
+              }`}
+            >
+              {humanPlayer.avatar}
+            </div>
+            <div>
+              <div className="text-xs font-black text-white flex items-center gap-1.5">
+                <span>You</span>
+                {isHumanTurn && (
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    Your Turn
+                  </span>
+                )}
+              </div>
+              <div className="text-[11px] text-emerald-300 font-mono font-bold">
+                {humanPlayer.hand.length} Cards
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* 4. Contextual Hint Banner (Image 3: Lightbulb Banner) */}
+      <div className="w-full max-w-2xl flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#101424] border border-amber-500/30 text-amber-200 text-xs font-semibold shadow-lg text-center">
+        <Lightbulb className="w-4 h-4 text-amber-400 shrink-0" />
+        <span>{getContextualHint()}</span>
+      </div>
+
+      {/* 5. Player's Hand & Action Buttons (Image 3) */}
+      <div className="w-full flex flex-col items-center space-y-4">
+        {/* Horizontal Fanned Card Hand */}
+        <div className="w-full overflow-x-auto pb-3 flex justify-center items-end px-4 min-h-[140px]">
+          <div className="flex -space-x-5 sm:-space-x-6 hover:-space-x-3 transition-all duration-300 py-4">
+            {humanPlayer.hand.map((card) => {
+              const isPlayable = isHumanTurn && playableCardIds.has(card.id);
+              const isSelected = selectedCardId === card.id;
+
+              return (
+                <div
+                  key={card.id}
+                  onClick={() => handleCardClick(card)}
+                  className={`transition-all duration-200 cursor-pointer transform ${
+                    isSelected
+                      ? '-translate-y-6 scale-110 ring-4 ring-emerald-400 rounded-xl z-30 shadow-2xl'
+                      : isPlayable
+                      ? 'hover:-translate-y-4 hover:scale-105 z-10'
+                      : 'opacity-50 hover:opacity-75 z-0'
+                  }`}
+                >
+                  <PlayingCard card={card} size="md" isPlayable={isPlayable} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Action Buttons (Image 3: Play Card, Draw Card / Restart) */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleConfirmPlayCard}
+            disabled={!isHumanTurn || !selectedCardId}
+            className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 text-black font-black text-sm sm:text-base flex items-center gap-2 shadow-xl shadow-emerald-500/20 transition transform active:scale-95"
+          >
+            <Play className="w-4 h-4 fill-black" />
+            <span>Play Card</span>
+          </button>
+
+          {gameState.phase === 'game_over' ? (
+            <button
+              onClick={handleRestart}
+              className="px-6 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm flex items-center gap-2 shadow-lg shadow-purple-600/30 transition"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Deal Again</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                soundManager.playTap();
+                if (humanPlayer.hand.length > 0 && isHumanTurn) {
+                  const valid = humanPlayer.hand.find((c) => playableCardIds.has(c.id));
+                  if (valid) setSelectedCardId(valid.id);
+                }
+              }}
+              className="px-6 py-3.5 rounded-2xl bg-[#16122d] hover:bg-white/10 border border-white/15 text-white font-bold text-sm flex items-center gap-2 transition"
+            >
+              <Layers className="w-4 h-4 text-purple-400" />
+              <span>Auto Select Card</span>
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Rules Modal */}
       {isRulesOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-lg p-6 rounded-3xl bg-[#111422] border border-white/20 shadow-2xl text-left max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-              <h3 className="font-black text-lg text-white">How to Play Bhabhi (Thulla)</h3>
-              <button
-                onClick={() => setIsRulesOpen(false)}
-                className="text-gray-400 hover:text-white text-sm"
-              >
-                ✕ Close
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-md bg-[#111827] border border-white/15 rounded-3xl p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-amber-400" /> Bhabhi Rules
+              </h3>
+              <button onClick={() => setIsRulesOpen(false)} className="text-gray-400 hover:text-white">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3 text-xs text-gray-300 leading-relaxed">
-              <p>
-                <strong>Goal:</strong> Empty your hand! The last player left holding cards is the <strong>Bhabhi</strong> (loser).
-              </p>
-              <p>
-                <strong>1. Opening:</strong> The player who receives the <strong>Ace of Spades (A♠)</strong> MUST start the game by leading it.
-              </p>
-              <p>
-                <strong>2. Follow Suit:</strong> The first card played in a trick sets the <em>lead suit</em>. If you hold ANY card of that suit, you MUST play it.
-              </p>
-              <p>
-                <strong>3. Thulla (Thoko):</strong> If you do NOT hold any cards of the lead suit, you can play ANY card! The trick stops immediately. The player who played the <strong>highest card of the original lead suit</strong> must pick up the entire pile! The player who struck the Thulla leads the next trick.
-              </p>
-              <p>
-                <strong>4. Clean Sweep:</strong> If all active players follow the lead suit, the highest card wins and the pile is discarded. The winner leads next.
-              </p>
+            <div className="space-y-2 text-xs text-gray-300">
+              <p>• <strong>Ace of Spades (A♠)</strong> leads the first round.</p>
+              <p>• Must follow the lead suit if you possess any card of that suit.</p>
+              <p>• If void in the lead suit, strike a <strong>Thulla</strong> to dump the pile on the highest lead card!</p>
+              <p>• First to empty their hand gets away safe. Last player left holding cards is the <strong>Bhabhi</strong>!</p>
             </div>
+            <button
+              onClick={() => setIsRulesOpen(false)}
+              className="w-full py-2.5 rounded-xl bg-emerald-500 text-black font-extrabold text-xs"
+            >
+              Got it
+            </button>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
-
-function PlayerSeatView({
-  player,
-  playerIndex,
-  isCurrentTurn,
-  isThinking,
-}: {
-  player: any;
-  playerIndex: number;
-  isCurrentTurn: boolean;
-  isThinking: boolean;
-}) {
-  return (
-    <div className="flex flex-col items-center">
-      {/* Avatar Container */}
-      <div
-        className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-xl sm:text-2xl border-2 transition-all duration-300 ${
-          isCurrentTurn
-            ? 'border-amber-400 bg-amber-950/50 ring-4 ring-amber-400/40 scale-105'
-            : player.isSafe
-            ? 'border-emerald-500 bg-emerald-950/40 opacity-75'
-            : 'border-white/10 bg-slate-900/80'
-        }`}
-      >
-        <span>{player.avatar}</span>
-
-        {/* Turn indicator badge */}
-        {isCurrentTurn && (
-          <div className="absolute -top-2 px-1.5 py-0.5 rounded-full bg-amber-400 text-black font-black text-[9px] uppercase tracking-wider animate-bounce">
-            Turn
-          </div>
-        )}
-
-        {/* Safe Badge */}
-        {player.isSafe && (
-          <div className="absolute -bottom-2 px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-black text-[9px] uppercase tracking-wider">
-            Safe #{player.safeRank}
-          </div>
-        )}
-      </div>
-
-      {/* Name and Cards Count */}
-      <span className="text-xs font-bold text-white mt-1 max-w-[90px] truncate text-center">
-        {player.name}
-      </span>
-      {!player.isSafe && (
-        <span className="text-[10px] text-gray-400 font-medium">
-          {isThinking ? (
-            <span className="text-amber-400 animate-pulse">Thinking...</span>
-          ) : (
-            `${player.hand.length} cards`
-          )}
-        </span>
       )}
     </div>
   );

@@ -148,3 +148,4 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
     </div>
   );
 }
+

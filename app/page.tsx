@@ -1,278 +1,561 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Gamepad2,
-  Sparkles,
-  Users,
-  Bot,
-  Flame,
-  ShieldCheck,
-  ArrowRight,
-  Trophy,
   Play,
+  Users,
+  Gamepad2,
+  ArrowRight,
+  Sparkles,
+  Zap,
+  Smartphone,
+  ShieldCheck,
+  CheckCircle2,
+  Radio,
+  Clock,
+  Flame,
   Layers,
-  Mic,
+  Crown,
+  Eye,
+  Search,
 } from 'lucide-react';
 
+interface GameDef {
+  id: string;
+  title: string;
+  genre: string;
+  category: string;
+  status: 'ready' | 'dev';
+  players: string;
+  duration: string;
+  icon: string;
+  href?: string;
+  accentColor: string;
+}
+
+const ALL_GAMES_CATALOG: GameDef[] = [
+  // Ready to Play (3)
+  {
+    id: 'undercover',
+    title: 'Undercover',
+    genre: 'Social Deduction • Group',
+    category: 'bluff',
+    status: 'ready',
+    players: '3 - 20 Players',
+    duration: '10 - 15 Min',
+    icon: '🕵️',
+    href: '/games/undercover',
+    accentColor: '#a855f7',
+  },
+  {
+    id: 'spyfall',
+    title: 'Spyfall',
+    genre: 'Interrogation • Bluffing',
+    category: 'bluff',
+    status: 'ready',
+    players: '3 - 12 Players',
+    duration: '8 - 12 Min',
+    icon: '🕶️',
+    href: '/games/undercover', // or spyfall
+    accentColor: '#f59e0b',
+  },
+  {
+    id: 'bhabhi',
+    title: 'Bhabhi (Get Away)',
+    genre: 'Card Game • Evasion',
+    category: 'cards',
+    status: 'ready',
+    players: '3 - 6 Players',
+    duration: '10 - 15 Min',
+    icon: '🃏',
+    href: '/games/bhabhi',
+    accentColor: '#ec4899',
+  },
+
+  // In Development (8)
+  {
+    id: 'decrypto',
+    title: 'Decrypto',
+    genre: 'Code Transmission',
+    category: 'words',
+    status: 'dev',
+    players: '4 - 8 Players',
+    duration: '20 - 30 Min',
+    icon: '📻',
+    accentColor: '#06b6d4',
+  },
+  {
+    id: 'codenames',
+    title: 'Codenames',
+    genre: 'Word Association',
+    category: 'words',
+    status: 'dev',
+    players: '4 - 12 Players',
+    duration: '15 - 20 Min',
+    icon: '🕵️‍♂️',
+    accentColor: '#8b5cf6',
+  },
+  {
+    id: 'avalon',
+    title: 'Avalon: Secret Identities',
+    genre: 'Hidden Loyalty',
+    category: 'bluff',
+    status: 'dev',
+    players: '5 - 10 Players',
+    duration: '25 - 35 Min',
+    icon: '🏆',
+    accentColor: '#eab308',
+  },
+  {
+    id: 'secret-chancellor',
+    title: 'Secret Chancellor',
+    genre: 'Political Deduction',
+    category: 'bluff',
+    status: 'dev',
+    players: '5 - 10 Players',
+    duration: '30 - 45 Min',
+    icon: '🏛️',
+    accentColor: '#f43f5e',
+  },
+  {
+    id: 'werewolf',
+    title: 'Ultimate Werewolf',
+    genre: 'Social Deduction',
+    category: 'bluff',
+    status: 'dev',
+    players: '6 - 24 Players',
+    duration: '20 - 40 Min',
+    icon: '🐺',
+    accentColor: '#3b82f6',
+  },
+  {
+    id: 'two-rooms',
+    title: 'Two Rooms and a Boom',
+    genre: 'Hostage Swaps',
+    category: 'bluff',
+    status: 'dev',
+    players: '6 - 30 Players',
+    duration: '10 - 15 Min',
+    icon: '💣',
+    accentColor: '#ef4444',
+  },
+  {
+    id: 'wavelength',
+    title: 'Wavelength',
+    genre: 'Mind Reading',
+    category: 'words',
+    status: 'dev',
+    players: '4 - 12 Players',
+    duration: '15 - 25 Min',
+    icon: '🧠',
+    accentColor: '#d946ef',
+  },
+  {
+    id: 'teen-patti',
+    title: 'Teen Patti Flush',
+    genre: 'Card / Wagering',
+    category: 'cards',
+    status: 'dev',
+    players: '3 - 6 Players',
+    duration: '10 - 15 Min',
+    icon: '🎴',
+    accentColor: '#10b981',
+  },
+];
+
 export default function HomePage() {
+  const [gamesFilter, setGamesFilter] = useState<'all' | 'ready' | 'dev'>('all');
+
+  const filteredGames = ALL_GAMES_CATALOG.filter((g) => {
+    if (gamesFilter === 'ready') return g.status === 'ready';
+    if (gamesFilter === 'dev') return g.status === 'dev';
+    return true;
+  });
+
   return (
-    <div className="flex flex-col items-center w-full">
-      {/* Hero Section */}
-      <section className="relative w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden flex flex-col items-center text-center">
-        {/* Background glow effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[350px] bg-gradient-to-tr from-purple-600/20 via-indigo-600/20 to-cyan-500/10 blur-[100px] pointer-events-none rounded-full" />
+    <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-8 py-6 space-y-12 max-w-7xl">
+      {/* 1. Hero Section (Image 5 visual parity) */}
+      <section className="relative w-full rounded-3xl p-6 sm:p-12 bg-gradient-to-br from-[#12162e] via-[#0d1022] to-[#070913] border border-white/10 shadow-2xl overflow-hidden">
+        {/* Ambient neon backdrop glow */}
+        <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-purple-600/20 blur-[120px] pointer-events-none rounded-full" />
+        <div className="absolute bottom-0 left-10 w-[300px] h-[200px] bg-cyan-600/15 blur-[100px] pointer-events-none rounded-full" />
 
-        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-6 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Browser-First Multiplayer & Card Gaming Hub</span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white mb-6">
-            Play. Laugh.{' '}
-            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
-              Compete.
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-xl text-gray-300 max-w-2xl mb-8 leading-relaxed font-normal">
-            No downloads, no installations. Jump into classic card games like{' '}
-            <strong className="text-white">Bhabhi (Thulla)</strong>, play solo against smart AI bots,
-            or host private rooms with friends.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/games/bhabhi/solo"
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base shadow-xl shadow-purple-900/40 hover:brightness-110 active:scale-95 transition"
-            >
-              <Play className="w-5 h-5 fill-white" />
-              Play Bhabhi Now (Free)
-            </Link>
-            <Link
-              href="/games"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 font-semibold text-base transition"
-            >
-              <Gamepad2 className="w-5 h-5 text-cyan-400" />
-              Explore All Games
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Flagship Game Spotlight */}
-      <section className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Featured Flagship Game
-            </h2>
-            <p className="text-sm text-gray-400">
-              The classic subcontinental card game with server-validated rules & AI commentary
-            </p>
-          </div>
-          <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-            🟢 Playable Now
-          </span>
-        </div>
-
-        <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-br from-[#121629] via-[#0d1020] to-[#080a14] border border-white/15 shadow-2xl overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="flex-1 space-y-4 text-left">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-purple-600 text-[11px] font-black uppercase tracking-wider text-white">
-                Card Game
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left Text & CTA Column */}
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+              Epic Party & Card Games for your{' '}
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
+                Dost & Yaar.
               </span>
-              <span className="text-xs text-gray-400">3 - 6 Players • 5 - 10 Mins</span>
-            </div>
+            </h1>
 
-            <h3 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              🃏 Bhabhi — Thulla / Get Away
-            </h3>
-
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-              The goal is simple: get rid of every card in your hand! Open with the mandatory{' '}
-              <strong className="text-amber-300">Ace of Spades (A♠)</strong>, follow the lead suit,
-              and strike a <strong className="text-rose-400">Thulla</strong> when void to dump the entire
-              trick onto the highest lead player. The last person left with cards is crowned the{' '}
-              <span className="underline decoration-rose-500 font-bold text-white">Bhabhi</span>!
+            <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-xl font-normal">
+              Bring the vibes! Play social deduction, word games, card classics and more — with friends on one device or online with custom rooms.
             </p>
 
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
-                href="/games/bhabhi/solo"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-900/30 hover:brightness-110 active:scale-95 transition"
+                href="/games"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm shadow-xl shadow-purple-600/30 transition transform active:scale-95"
               >
-                <Bot className="w-4 h-4" />
-                Play Solo vs AI
+                <Play className="w-4 h-4 fill-white" />
+                Browse All Games
               </Link>
+
               <Link
                 href="/games/bhabhi"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm border border-white/10 transition"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-bold text-sm transition"
               >
-                Game Details & Room
-                <ArrowRight className="w-4 h-4" />
+                <Users className="w-4 h-4 text-purple-400" />
+                Create Room
               </Link>
             </div>
           </div>
 
-          {/* Visual Cards Mockup */}
-          <div className="flex items-center -space-x-8 sm:-space-x-10 p-4">
-            <div className="w-20 h-28 sm:w-24 sm:h-36 rounded-xl bg-white border border-slate-300 shadow-xl flex flex-col justify-between p-2 text-slate-900 -rotate-12 hover:rotate-0 transition">
-              <span className="font-bold text-sm">A♠</span>
-              <span className="text-3xl self-center">♠</span>
-              <span className="font-bold text-sm rotate-180 self-end">A♠</span>
-            </div>
-            <div className="w-20 h-28 sm:w-24 sm:h-36 rounded-xl bg-white border border-slate-300 shadow-2xl flex flex-col justify-between p-2 text-red-600 -rotate-3 hover:rotate-0 transition z-10">
-              <span className="font-bold text-sm">K♥</span>
-              <span className="text-3xl self-center">♥</span>
-              <span className="font-bold text-sm rotate-180 self-end">K♥</span>
-            </div>
-            <div className="w-20 h-28 sm:w-24 sm:h-36 rounded-xl bg-white border border-slate-300 shadow-xl flex flex-col justify-between p-2 text-slate-900 rotate-12 hover:rotate-0 transition">
-              <span className="font-bold text-sm">Q♣</span>
-              <span className="text-3xl self-center">♣</span>
-              <span className="font-bold text-sm rotate-180 self-end">Q♣</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Play Your Way 3 Pillars */}
-      <section className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-center mb-10">
-          Play Your Way
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Pillar 1 */}
-          <div className="p-6 rounded-3xl bg-[#101424] border border-white/10 flex flex-col text-left space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-              <Bot className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Solo vs Smart AI</h3>
-            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-              Don't wait for a group. Play anytime against rule-aware AI bots featuring customizable
-              difficulty levels and strategic suit tracking.
-            </p>
-          </div>
-
-          {/* Pillar 2 */}
-          <div className="p-6 rounded-3xl bg-[#101424] border border-white/10 flex flex-col text-left space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-              <Users className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Private Multiplayer Rooms</h3>
-            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-              Share a 6-letter room code or link. Play seamlessly across phones, laptops, and tablets
-              with real-time state synchronization.
-            </p>
-          </div>
-
-          {/* Pillar 3 */}
-          <div className="p-6 rounded-3xl bg-[#101424] border border-white/10 flex flex-col text-left space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">AI Dealer Commentary</h3>
-            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-              Experience dynamic commentary from hilarious dealer personalities like Chacha Chaudhary,
-              Viper the Savage, and the Dramatic Grandmaster!
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Catalog & Coming Soon */}
-      <section className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-10 mb-12">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-center mb-8">
-          The Games Roadmap
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Game 1: Bhabhi */}
-          <div className="p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900 border border-purple-500/30 flex flex-col justify-between text-left">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-2xl">🃏</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                  Playable
-                </span>
-              </div>
-              <h4 className="font-extrabold text-white text-base">Bhabhi (Thulla)</h4>
-              <p className="text-xs text-gray-400 mt-1">
-                Classic card shedding game. Don't be the last player holding cards.
-              </p>
-            </div>
-            <Link
-              href="/games/bhabhi/solo"
-              className="mt-4 w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs text-center transition"
-            >
-              Play Now
-            </Link>
-          </div>
-
-          {/* Game 2: Undercover */}
-          <div className="p-5 rounded-2xl bg-gradient-to-b from-amber-950/40 to-slate-900 border border-amber-500/30 flex flex-col justify-between text-left">
-            <div>
-              <div className="flex items-center justify-between mb-3">
+          {/* Right Visual 3D Showcase (Image 5 composition) */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-sm h-64 sm:h-72 flex items-center justify-center">
+              {/* Card 1: Detective Undercover */}
+              <div className="absolute -left-2 top-4 w-32 h-44 rounded-2xl bg-gradient-to-br from-purple-800 to-indigo-950 border-2 border-purple-400/50 shadow-2xl p-3 flex flex-col justify-between transform -rotate-12 hover:-rotate-6 transition duration-300">
                 <span className="text-2xl">🕵️</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                  Playable
-                </span>
+                <div className="text-[10px] font-black uppercase text-purple-200">Undercover</div>
               </div>
-              <h4 className="font-extrabold text-white text-base">Undercover</h4>
-              <p className="text-xs text-gray-400 mt-1">
-                Social word deduction party game. Find the impostor before they blend in!
-              </p>
+
+              {/* Card 2: Werewolf */}
+              <div className="absolute left-20 top-0 w-36 h-48 rounded-2xl bg-gradient-to-br from-blue-900 to-indigo-950 border-2 border-blue-400/50 shadow-2xl p-3 flex flex-col justify-between transform -rotate-3 hover:rotate-0 transition duration-300 z-10">
+                <div className="text-center">
+                  <span className="text-3xl">🐺</span>
+                </div>
+                <div className="text-[10px] font-black uppercase text-center text-blue-200">Werewolf</div>
+              </div>
+
+              {/* Card 3: Ace of Spades */}
+              <div className="absolute right-4 top-6 w-34 h-46 rounded-2xl bg-gradient-to-br from-slate-100 to-gray-200 border-2 border-white shadow-2xl p-3 flex flex-col justify-between transform rotate-12 hover:rotate-6 transition duration-300 z-20">
+                <div className="text-black font-black text-xl">A♠</div>
+                <div className="text-center text-3xl">♠</div>
+                <div className="text-right text-black font-black text-xs">A♠</div>
+              </div>
+
+              {/* Casino chips stack & dice */}
+              <div className="absolute -bottom-2 left-10 flex items-center gap-1 z-30">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-red-700 border-2 border-white/60 shadow-lg flex items-center justify-center text-[10px] font-black text-white">
+                  50
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-700 border-2 border-white/60 shadow-lg -ml-4 flex items-center justify-center text-[10px] font-black text-white">
+                  100
+                </div>
+              </div>
+
+              <div className="absolute -bottom-1 right-12 z-30 transform rotate-12 text-3xl">
+                🎲
+              </div>
             </div>
-            <Link
-              href="/games/undercover"
-              className="mt-4 w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs text-center transition"
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Play Your Way Row (3 wide cards matching Image 5) */}
+      <section className="w-full space-y-4">
+        <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Play Your Way</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Single Player */}
+          <Link
+            href="/games/bhabhi/solo"
+            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-emerald-500/30 hover:border-emerald-400 transition shadow-lg shadow-emerald-950/20 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition">
+                  Single Player
+                </h3>
+                <p className="text-xs text-gray-400">Play offline, at your own pace</p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </Link>
+
+          {/* Card 2: Local Party */}
+          <Link
+            href="/games/undercover"
+            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-purple-500/30 hover:border-purple-400 transition shadow-lg shadow-purple-950/20 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-purple-300 transition">
+                  Local Party
+                </h3>
+                <p className="text-xs text-gray-400">Play together on one device</p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </Link>
+
+          {/* Card 3: Online Multiplayer */}
+          <Link
+            href="/games/bhabhi"
+            className="group relative p-5 rounded-2xl bg-[#0f1424] border border-cyan-500/30 hover:border-cyan-400 transition shadow-lg shadow-cyan-950/20 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                <Radio className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
+                  Online Multiplayer
+                </h3>
+                <p className="text-xs text-gray-400">Create or join a room & play anywhere</p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* 3. Featured Games Carousel / Row (Image 5 visual parity) */}
+      <section className="w-full space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Featured Games</h2>
+          <Link
+            href="/games"
+            className="text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1 transition"
+          >
+            View All <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Featured Card 1: Undercover */}
+          <div className="p-5 rounded-2xl bg-[#11162a] border border-purple-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-black text-white">Undercover</h3>
+                <p className="text-xs text-gray-400">Social Deduction • Group</p>
+              </div>
+              <span className="text-4xl">🕵️</span>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+                <span>👥 3 - 20 Players</span>
+                <span>⏱️ 10 - 15 Min</span>
+              </div>
+              <Link
+                href="/games/undercover"
+                className="w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-md shadow-purple-600/30 transition transform hover:scale-110 active:scale-95"
+              >
+                <Play className="w-4 h-4 fill-white ml-0.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Featured Card 2: Spyfall */}
+          <div className="p-5 rounded-2xl bg-[#11162a] border border-amber-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-black text-white">Spyfall</h3>
+                <p className="text-xs text-gray-400">Interrogation • Bluffing</p>
+              </div>
+              <span className="text-4xl">🕶️</span>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+                <span>👥 3 - 12 Players</span>
+                <span>⏱️ 8 - 12 Min</span>
+              </div>
+              <Link
+                href="/games/undercover"
+                className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-md shadow-amber-500/30 transition transform hover:scale-110 active:scale-95"
+              >
+                <Play className="w-4 h-4 fill-black ml-0.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Featured Card 3: Bhabhi (Get Away) */}
+          <div className="p-5 rounded-2xl bg-[#11162a] border border-rose-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-black text-white">Bhabhi (Get Away)</h3>
+                <p className="text-xs text-gray-400">Card Game • Evasion</p>
+              </div>
+              <span className="text-4xl">🃏</span>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+                <span>👥 3 - 6 Players</span>
+                <span>⏱️ 10 - 15 Min</span>
+              </div>
+              <Link
+                href="/games/bhabhi"
+                className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-md shadow-amber-500/30 transition transform hover:scale-110 active:scale-95"
+              >
+                <Play className="w-4 h-4 fill-black ml-0.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. All Games (11) Catalogue with Filters (Image 5 visual parity) */}
+      <section className="w-full space-y-5">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              All Games <span className="text-gray-400 text-sm font-normal">({ALL_GAMES_CATALOG.length})</span>
+            </h2>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 bg-[#101424] p-1 rounded-xl border border-white/10">
+            <button
+              onClick={() => setGamesFilter('all')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                gamesFilter === 'all'
+                  ? 'bg-emerald-500 text-black shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
-              Play Pass & Play
-            </Link>
+              All Games ({ALL_GAMES_CATALOG.length})
+            </button>
+            <button
+              onClick={() => setGamesFilter('ready')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                gamesFilter === 'ready'
+                  ? 'bg-emerald-500 text-black shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Ready to Play (3)
+            </button>
+            <button
+              onClick={() => setGamesFilter('dev')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                gamesFilter === 'dev'
+                  ? 'bg-emerald-500 text-black shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              In Development (8)
+            </button>
           </div>
+        </div>
 
-          {/* Game 3: Spyfall */}
-          <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10 flex flex-col justify-between text-left opacity-80">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-2xl">🔍</span>
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 text-[10px] font-bold border border-yellow-500/30">
-                  Coming Soon
-                </span>
+        {/* 11 Games Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {filteredGames.map((game) => {
+            const isReady = game.status === 'ready';
+
+            return (
+              <div
+                key={game.id}
+                className={`p-4 rounded-2xl bg-[#0f1424] border transition flex flex-col justify-between space-y-3 relative overflow-hidden group ${
+                  isReady
+                    ? 'border-white/15 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/20'
+                    : 'border-white/10 opacity-70'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        isReady
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-white/10 text-purple-300 border border-purple-500/20'
+                      }`}
+                    >
+                      {isReady ? 'READY TO PLAY' : 'IN DEVELOPMENT'}
+                    </span>
+                    <span className="text-xl">{game.icon}</span>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition">
+                    {game.title}
+                  </h3>
+                  <p className="text-[11px] text-gray-400">{game.genre}</p>
+                </div>
+
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500">
+                  <span>{game.players}</span>
+                  <span>{game.duration}</span>
+                </div>
+
+                {isReady && game.href && (
+                  <Link
+                    href={game.href}
+                    className="absolute inset-0"
+                    title={`Play ${game.title}`}
+                  />
+                )}
               </div>
-              <h4 className="font-extrabold text-white text-base">Spyfall</h4>
-              <p className="text-xs text-gray-400 mt-1">
-                Ask clever questions without revealing the secret location to the spy.
-              </p>
-            </div>
-            <span className="mt-4 w-full py-2 rounded-xl bg-white/5 text-gray-400 font-semibold text-xs text-center border border-white/5">
-              In Development
-            </span>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 5. Value Proposition Strip (Image 5 bottom strip) */}
+      <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-3 p-4 sm:p-5 rounded-2xl bg-[#0c101e] border border-white/10">
+        <div className="flex items-center gap-3 p-2">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5" />
           </div>
+          <div>
+            <div className="text-xs font-bold text-white">No Payments</div>
+            <div className="text-[11px] text-gray-400">Play for fun, not for money</div>
+          </div>
+        </div>
 
-          {/* Game 4: Wavelength */}
-          <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10 flex flex-col justify-between text-left opacity-80">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-2xl">🎯</span>
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 text-[10px] font-bold border border-yellow-500/30">
-                  Coming Soon
-                </span>
-              </div>
-              <h4 className="font-extrabold text-white text-base">Wavelength</h4>
-              <p className="text-xs text-gray-400 mt-1">
-                Telepathic party game of fine spectrums and social intuition.
-              </p>
-            </div>
-            <span className="mt-4 w-full py-2 rounded-xl bg-white/5 text-gray-400 font-semibold text-xs text-center border border-white/5">
-              In Development
-            </span>
+        <div className="flex items-center gap-3 p-2">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+            <span className="font-black text-xs">Ad</span>
+          </div>
+          <div>
+            <div className="text-xs font-bold text-white">Ad Supported</div>
+            <div className="text-[11px] text-gray-400">Free to play with minimal ads</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-2">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+            <Smartphone className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-white">Web & App</div>
+            <div className="text-[11px] text-gray-400">Play on web now, app coming soon</div>
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import React, { Suspense } from 'react';
 import { Navbar } from '@/components/platform/Navbar';
 import { Footer } from '@/components/platform/Footer';
 
@@ -34,7 +35,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#090b11] text-gray-100 selection:bg-purple-600 selection:text-white">
-        <Navbar />
+        <Suspense fallback={<div className="h-16 w-full bg-[#080b14]/90 border-b border-white/10" />}>
+          <Navbar />
+        </Suspense>
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
       </body>

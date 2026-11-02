@@ -499,3 +499,4 @@ export function SetupScreen({ onStartMission, defaultPlayers }: SetupScreenProps
     </div>
   );
 }
+
