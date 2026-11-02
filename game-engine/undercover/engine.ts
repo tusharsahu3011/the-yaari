@@ -1,4 +1,5 @@
 import {
+  RecommendedRoles,
   UndercoverGameState,
   UndercoverPlayer,
   UndercoverRole,
@@ -7,10 +8,52 @@ import {
 } from './types';
 import { getRandomWordPair } from './words';
 
+export const AGENT_COLORS = [
+  '#06b6d4', // Cyan
+  '#f43f5e', // Rose
+  '#a855f7', // Purple
+  '#10b981', // Emerald
+  '#f59e0b', // Amber
+  '#818cf8', // Indigo
+  '#ec4899', // Pink
+  '#14b8a6', // Teal
+];
+
+export const RANDOM_AGENT_NAMES = [
+  'Alex', 'Jordan', 'Maya', 'Liam', 'Chloe', 'Sam',
+  'Leo', 'Zara', 'Ethan', 'Priya', 'Noah', 'Elena',
+  'Marcus', 'Sophia', 'Rohan', 'Kai', 'Aria', 'Lucas',
+  'Aarav', 'Ananya', 'Vikram', 'Meera', 'Kabir', 'Isha',
+];
+
+export function getRecommendedRoles(playerCount: number): RecommendedRoles {
+  if (playerCount < 3) return { undercovers: 1, mrWhites: 0 };
+  if (playerCount <= 4) return { undercovers: 1, mrWhites: 0 };
+  if (playerCount <= 6) return { undercovers: 1, mrWhites: 1 };
+  if (playerCount <= 10) return { undercovers: 2, mrWhites: 1 };
+  return {
+    undercovers: Math.max(2, Math.floor(playerCount / 4)),
+    mrWhites: 1,
+  };
+}
+
+export function checkMrWhiteGuess(guess: string, secretWord: string): boolean {
+  if (!guess || !secretWord) return false;
+  const cleanGuess = guess.trim().toLowerCase();
+  const cleanSecret = secretWord.trim().toLowerCase();
+
+  if (cleanGuess === cleanSecret) return true;
+  if (cleanSecret.includes(cleanGuess) && cleanGuess.length >= 3) return true;
+  if (cleanGuess.includes(cleanSecret) && cleanSecret.length >= 3) return true;
+
+  return false;
+}
+
 export interface UndercoverSetupOptions {
   undercoverCount?: number;
   mrWhiteCount?: number;
   category?: string;
+  customPair?: { civilian: string; undercover: string };
   rng?: () => number;
 }
 
@@ -19,20 +62,21 @@ export function initUndercoverGame(
   options: UndercoverSetupOptions = {}
 ): UndercoverGameState {
   const n = playerConfigs.length;
-  if (n < 4) {
-    throw new Error(`Undercover requires at least 4 players. Provided: ${n}`);
+  if (n < 3) {
+    throw new Error(`Undercover requires at least 3 players. Provided: ${n}`);
   }
 
   const rng = options.rng || Math.random;
-  const wordPair = getRandomWordPair(options.category, rng);
+  const wordPair = getRandomWordPair(options.category || 'all', rng, options.customPair);
 
-  // Recommended role distribution
-  const undercoverCount = options.undercoverCount ?? (n >= 8 ? 2 : 1);
-  const mrWhiteCount = options.mrWhiteCount ?? (n >= 5 ? 1 : 0);
+  // Recommended role distribution fallback
+  const rec = getRecommendedRoles(n);
+  const undercoverCount = options.undercoverCount !== undefined ? options.undercoverCount : rec.undercovers;
+  const mrWhiteCount = options.mrWhiteCount !== undefined ? options.mrWhiteCount : rec.mrWhites;
   const civilianCount = n - undercoverCount - mrWhiteCount;
 
-  if (civilianCount <= undercoverCount) {
-    throw new Error('Too many special roles for the number of players.');
+  if (civilianCount < 1) {
+    throw new Error('Not enough civilians for the selected number of special roles.');
   }
 
   // Pool of roles
@@ -42,13 +86,13 @@ export function initUndercoverGame(
     ...Array(mrWhiteCount).fill('mr_white'),
   ];
 
-  // Shuffle roles
+  // Fisher-Yates shuffle
   for (let i = roles.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [roles[i], roles[j]] = [roles[j], roles[i]];
   }
 
-  const defaultAvatars = ['🕵️', '🎩', '🕶️', '🔍', '🦊', '🦉', '🦁', '🐼', '🚀', '⭐'];
+  const defaultAvatars = ['🕵️', '🎩', '🕶️', '🔍', '🦊', '🦉', '🦁', '🐼', '🚀', '⭐', '🐯', '🦅'];
 
   const players: UndercoverPlayer[] = playerConfigs.map((cfg, idx) => {
     const role = roles[idx];
@@ -64,11 +108,14 @@ export function initUndercoverGame(
 
     return {
       id: cfg.id,
-      name: cfg.name,
+      name: cfg.name.trim(),
       avatar: cfg.avatar || defaultAvatars[idx % defaultAvatars.length],
+      color: AGENT_COLORS[idx % AGENT_COLORS.length],
       role,
       secretWord,
       isEliminated: false,
+      eliminatedRound: null,
+      votesReceived: 0,
       hasViewedSecret: false,
       descriptionHistory: [],
     };
@@ -83,7 +130,7 @@ export function initUndercoverGame(
     revealPlayerIndex: 0,
     votes: {},
     winner: null,
-    history: [`Game initialized with ${n} players. Secret roles assigned.`],
+    history: [`Game initialized with ${n} players. Secret identities assigned.`],
   };
 }
 
@@ -104,7 +151,7 @@ export function advanceSecretView(
     state.phase = 'describing';
     state.revealPlayerIndex = nextRevealIdx;
     state.currentDescriberIndex = 0;
-    state.history.push('All players have viewed their roles. Round 1 descriptions begin!');
+    state.history.push('All agents have reviewed their confidential briefings. Round 1 clues begin!');
   } else {
     state.revealPlayerIndex = nextRevealIdx;
   }
@@ -142,7 +189,7 @@ export function submitPlayerDescription(
     // All active players described! Move to voting
     state.phase = 'voting';
     state.votes = {};
-    state.history.push('All players have spoken. Time to discuss and vote!');
+    state.history.push('All agents have spoken. Time to deliberate and vote!');
   } else {
     state.currentDescriberIndex = nextIdx;
   }
@@ -197,9 +244,11 @@ export function resolveVoting(prevState: UndercoverGameState): UndercoverGameSta
   if (!eliminatedPlayer) return state;
 
   eliminatedPlayer.isEliminated = true;
+  eliminatedPlayer.eliminatedRound = state.roundNumber;
+  eliminatedPlayer.votesReceived = maxVotes;
   state.eliminatedPlayerId = eliminatedId;
   state.history.push(
-    `🗳️ ${eliminatedPlayer.name} was eliminated with ${maxVotes} votes! Role was: ${eliminatedPlayer.role.toUpperCase()}.`
+    `🗳️ ${eliminatedPlayer.name} was eliminated with ${maxVotes} votes! Role unmasked: ${eliminatedPlayer.role.toUpperCase()}.`
   );
 
   // If eliminated player was Mr. White, give them 1 guess to steal the win!
@@ -224,21 +273,20 @@ export function submitMrWhiteWordGuess(
     history: [...prevState.history],
   };
 
-  const cleanGuess = guessedWord.trim().toLowerCase();
-  const actualWord = state.wordPair.civilianWord.toLowerCase();
+  const isCorrect = checkMrWhiteGuess(guessedWord, state.wordPair.civilianWord);
 
-  if (cleanGuess === actualWord) {
+  if (isCorrect) {
     // Mr. White guessed correctly!
     state.winner = 'mr_white';
     state.phase = 'game_over';
     const mrWhitePlayer = state.players.find((p) => p.id === state.mrWhiteGuesserId);
-    state.winReason = `🎩 ${mrWhitePlayer?.name || 'Mr. White'} correctly guessed the secret word "${state.wordPair.civilianWord}" and stole the victory!`;
+    state.winReason = `🎩 ${mrWhitePlayer?.name || 'Mr. White'} correctly deduced the secret word "${state.wordPair.civilianWord}" and pulled off the ultimate heist!`;
     state.history.push(state.winReason);
     return state;
   }
 
   state.history.push(
-    `❌ Incorrect guess "${guessedWord}"! The Civilians' secret word was safe.`
+    `❌ Mr. White guessed "${guessedWord}", which was incorrect! The Civilians' secret word remains safe.`
   );
 
   return evaluateWinConditions(state);
@@ -249,9 +297,10 @@ export function evaluateWinConditions(state: UndercoverGameState): UndercoverGam
   const activeCivilians = active.filter((p) => p.role === 'civilian').length;
   const activeUndercovers = active.filter((p) => p.role === 'undercover').length;
   const activeMrWhites = active.filter((p) => p.role === 'mr_white').length;
+  const totalThreats = activeUndercovers + activeMrWhites;
 
   // 1. Civilians win if all Undercovers and Mr. Whites are eliminated!
-  if (activeUndercovers === 0 && activeMrWhites === 0) {
+  if (totalThreats === 0) {
     state.winner = 'civilians';
     state.phase = 'game_over';
     state.winReason = '🎉 Civilians rooted out all the impostors! Civilians win!';
@@ -260,7 +309,7 @@ export function evaluateWinConditions(state: UndercoverGameState): UndercoverGam
   }
 
   // 2. Undercovers win if Undercovers >= Civilians
-  if (activeUndercovers >= activeCivilians && activeMrWhites === 0) {
+  if (activeUndercovers >= activeCivilians) {
     state.winner = 'undercover';
     state.phase = 'game_over';
     state.winReason = '🕵️ The Undercovers have overwhelmed the civilians! Undercovers win!';
@@ -268,7 +317,16 @@ export function evaluateWinConditions(state: UndercoverGameState): UndercoverGam
     return state;
   }
 
-  // 3. Game continues: next round
+  // 3. Mr. White wins if only 1 civilian remains and Mr White is alive with no undercovers
+  if (activeCivilians <= 1 && totalThreats >= 1 && activeUndercovers === 0) {
+    state.winner = 'mr_white';
+    state.phase = 'game_over';
+    state.winReason = '🎩 Mr. White successfully blended in and outlasted the civilians!';
+    state.history.push(state.winReason);
+    return state;
+  }
+
+  // 4. Game continues: next round
   state.roundNumber += 1;
   state.phase = 'describing';
   state.votes = {};
