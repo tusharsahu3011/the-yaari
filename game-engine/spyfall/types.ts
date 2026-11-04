@@ -56,3 +56,4 @@ export interface SpyfallGameState {
   winner: 'spies' | 'innocents' | null;
   winReason: string | null;
 }
+

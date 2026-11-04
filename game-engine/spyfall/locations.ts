@@ -261,3 +261,4 @@ export const ALL_LOCATIONS: LocationDefinition[] = [
 ];
 
 export const LOCATION_CATEGORIES = ['All', 'Everyday', 'High Stakes', 'Adventure', 'Mystery'] as const;
+
