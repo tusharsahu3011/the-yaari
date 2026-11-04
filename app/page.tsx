@@ -391,8 +391,8 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Small Brand Pill */}
             <div className="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-white">
-              <Tv className="w-3.5 h-3.5 text-purple-400" />
-              <span>GAMESHUB ORIGINAL</span>
+              <Tv className="w-3.5 h-3.5 text-cyan-400" />
+              <span>THE YAARI ORIGINAL</span>
             </div>
 
             {/* Trending Rank Pill (Prime Video '#2 in India' style) */}

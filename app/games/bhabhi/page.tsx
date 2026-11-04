@@ -20,6 +20,10 @@ import {
   Users,
   Clock,
   User,
+  Tv,
+  TrendingUp,
+  Shield,
+  Volume2,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
 import {
@@ -29,10 +33,11 @@ import {
   EntryCardsAndChipsIllustration,
   EntryPurpleCardsIllustration,
 } from '@/components/illustrations/GameIllustrations';
+import { AdBannerSlot } from '@/components/ads/AdBannerSlot';
 
 export default function BhabhiGameEntryPage() {
   const router = useRouter();
-  const [playerName, setPlayerName] = useState('VibeSeeker_9410');
+  const [playerName, setPlayerName] = useState('Yaar_9410');
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -44,15 +49,16 @@ export default function BhabhiGameEntryPage() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('gameshub_player_name');
+      const saved =
+        localStorage.getItem('theyaari_player_name') || localStorage.getItem('gameshub_player_name');
       if (saved) {
         setPlayerName(saved);
         setNameInput(saved);
       } else {
-        const autoName = `VibeSeeker_${Math.floor(1000 + Math.random() * 9000)}`;
+        const autoName = `Yaar_${Math.floor(1000 + Math.random() * 9000)}`;
         setPlayerName(autoName);
         setNameInput(autoName);
-        localStorage.setItem('gameshub_player_name', autoName);
+        localStorage.setItem('theyaari_player_name', autoName);
       }
     } catch (e) {}
   }, []);
@@ -63,6 +69,7 @@ export default function BhabhiGameEntryPage() {
     setPlayerName(nameInput.trim());
     setIsEditingName(false);
     try {
+      localStorage.setItem('theyaari_player_name', nameInput.trim());
       localStorage.setItem('gameshub_player_name', nameInput.trim());
     } catch (e) {}
   };
@@ -104,100 +111,108 @@ export default function BhabhiGameEntryPage() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 select-none">
-      {/* Top Navigation Bar (Image 4) */}
-      <div className="flex items-center justify-between pb-4 border-b border-white/10">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 select-none">
+      {/* Prime Video Back Navigation Strip */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <Link
           href="/"
-          className="flex items-center gap-2 text-xs font-bold text-gray-300 hover:text-white transition px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
+          className="flex items-center gap-2 text-xs font-bold text-zinc-300 hover:text-white transition px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Games Hub</span>
+          <span>The Yaari Stream</span>
         </Link>
 
         <div className="flex items-center gap-2">
-          <span className="text-amber-400 font-black text-base">🃏</span>
+          <span className="text-amber-400 font-black text-sm">🃏</span>
           <span className="font-extrabold text-sm text-white">Bhabhi</span>
-          <span className="text-xs text-gray-400 font-semibold">(Get Away)</span>
+          <span className="text-xs text-zinc-400 font-semibold">(Get Away)</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              soundManager.playSelect();
-              setIsRulesModalOpen(true);
-            }}
-            className="flex items-center gap-1.5 text-xs font-bold text-gray-300 hover:text-white px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition"
-          >
-            <BookOpen className="w-4 h-4 text-amber-400" />
-            <span>Rules & Guide</span>
-          </button>
-          <button
-            onClick={() => soundManager.playTap()}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition"
-            title="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            soundManager.playSelect();
+            setIsRulesModalOpen(true);
+          }}
+          className="flex items-center gap-1.5 text-xs font-bold text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition cursor-pointer"
+        >
+          <BookOpen className="w-4 h-4 text-cyan-400" />
+          <span>Rules Guide</span>
+        </button>
       </div>
 
-      {/* Hero Header Section with Left & Right 3D Art (Image 4 signature!) */}
-      <div className="relative py-6 overflow-hidden rounded-3xl bg-gradient-to-b from-[#100d28]/60 to-transparent">
-        {/* Left 3D Cards + Chips */}
-        <div className="absolute left-2 top-1/2 -translate-y-1/2 w-44 sm:w-56 pointer-events-none hidden md:block opacity-90">
-          <SmartAssetImage
-            src="/assets/bhabhi/entry-cards-chips.png"
-            alt="Playing Cards and Chips"
-            className="w-full h-auto"
-            fallback={<EntryCardsAndChipsIllustration className="w-full h-36" />}
+      {/* =========================================================================
+          PRIME VIDEO STYLE MOVIE/SHOW HERO DETAIL BILLBOARD
+          ========================================================================= */}
+      <section className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] min-h-[420px] sm:min-h-[480px] flex items-end bg-[#050811] p-6 sm:p-10 lg:p-12">
+        {/* Full-Bleed 3D Backdrop Artwork */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+          <img
+            src="/assets/home/card-bhabhi.png"
+            alt="Bhabhi Get Away Artwork"
+            className="w-full h-full object-cover object-center sm:object-right scale-100"
           />
+          {/* Prime Video Vignettes */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030610] via-[#030610]/90 via-55% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#030610] via-[#030610]/70 via-30% to-transparent" />
+          {/* Ambient Pink Glow */}
+          <div className="absolute top-1/2 right-10 -translate-y-1/2 w-[450px] h-[400px] bg-pink-600/20 blur-[130px] rounded-full pointer-events-none" />
         </div>
 
-        {/* Right 3D Glowing Purple Cards */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 w-44 sm:w-56 pointer-events-none hidden md:block opacity-90">
-          <SmartAssetImage
-            src="/assets/bhabhi/entry-purple-cards.png"
-            alt="Glowing Purple Cards"
-            className="w-full h-auto"
-            fallback={<EntryPurpleCardsIllustration className="w-full h-36" />}
-          />
-        </div>
-
-        {/* Center Content */}
-        <div className="text-center relative z-10 space-y-3 px-4 max-w-xl mx-auto">
-          {/* Sparkle Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300 text-[11px] font-black tracking-widest uppercase shadow-md shadow-purple-950/40">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Traditional Indian Card Game</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        {/* Hero Content */}
+        <div className="relative z-10 w-full space-y-4 max-w-2xl text-left">
+          {/* Meta Tags */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30 flex items-center gap-1.5">
+              <Tv className="w-3.5 h-3.5 text-cyan-400" />
+              <span>THE YAARI ORIGINAL</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>#1 IN CARD GAMES</span>
+            </span>
+            <span className="text-xs text-zinc-400">•</span>
+            <span className="text-xs text-zinc-300 font-semibold">South Asian Card Classic</span>
           </div>
 
-          {/* Title */}
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight flex items-center justify-center gap-2">
-            <span>Bhabhi</span>{' '}
-            <span className="text-amber-300 flex items-center gap-1.5">
-              (Get Away) <Crown className="w-7 h-7 text-amber-400 fill-amber-400" />
-            </span>
-          </h1>
+          {/* Title with Logo Box */}
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-black/80 border-2 border-pink-500/60 p-1 shrink-0 shadow-2xl shadow-pink-950/60">
+              <img
+                src="/assets/home/card-bhabhi.png"
+                alt="Bhabhi Logo"
+                className="w-full h-full object-cover rounded-xl"
+              />
+            </div>
+            <div>
+              <div className="text-xs font-black text-pink-400 uppercase tracking-widest">
+                <span>♠ EVASION CLASSIC</span>
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Bhabhi</span> <span className="text-pink-400 text-2xl sm:text-4xl">(Get Away)</span>
+              </h1>
+            </div>
+          </div>
 
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal">
-            A classic evasion card game where the goal is simple — get rid of all your cards, or become the Bhabhi!
+          {/* Synopsis */}
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">
+            Clear your cards as fast as possible by following lead suits. If a player fails to follow suit,
+            a high-stakes <strong>&quot;Thulla&quot;</strong> penalty is triggered and the highest card holder picks up the
+            pile! The last remaining player is crowned the Bhabhi.
           </p>
 
-          {/* Playing as Pill */}
-          <div className="pt-1">
-            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#12162a] border border-white/10 text-xs shadow-lg">
-              <div className="w-6 h-6 rounded-full bg-[#632df3] text-white flex items-center justify-center text-xs">
-                <User className="w-3.5 h-3.5" />
-              </div>
+          {/* Player Identity Pill */}
+          <div className="flex items-center gap-3 pt-1">
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#0a0e1c] border border-white/10 text-xs">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 text-[11px] font-bold text-white">
+                {playerName.charAt(0).toUpperCase()}
+              </span>
               {!isEditingName ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-400">Playing as</span>
+                  <span className="text-zinc-400">Playing as</span>
                   <strong className="text-white font-bold">{playerName}</strong>
                   <button
                     onClick={() => setIsEditingName(true)}
-                    className="text-purple-400 hover:text-purple-300 p-0.5 ml-1"
+                    className="text-cyan-400 hover:text-cyan-300 p-0.5 cursor-pointer"
                     title="Change username"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -210,12 +225,12 @@ export default function BhabhiGameEntryPage() {
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
                     maxLength={18}
-                    className="bg-black/60 border border-purple-400 rounded px-2 py-0.5 text-xs text-white focus:outline-none"
+                    className="bg-black/60 border border-cyan-400 rounded px-2 py-0.5 text-xs text-white focus:outline-none"
                     autoFocus
                   />
                   <button
                     onClick={handleSaveName}
-                    className="p-1 rounded bg-emerald-500 text-black font-bold text-[10px]"
+                    className="p-1 rounded bg-cyan-500 text-black font-bold text-[10px] cursor-pointer"
                   >
                     <Check className="w-3 h-3 stroke-[3]" />
                   </button>
@@ -223,142 +238,175 @@ export default function BhabhiGameEntryPage() {
               )}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* 2 Main Game Mode Cards (Image 4 visual parity) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Mode 1: Solo vs AI Bots */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-[#0f1424] border-2 border-emerald-500/40 shadow-2xl shadow-emerald-950/30 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-emerald-400 transition">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5" /> SOLO MODE
-              </span>
-            </div>
-
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <h2 className="text-2xl sm:text-3xl font-black text-white">Solo vs AI Bots</h2>
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-xs">
-                  Play against smart AI opponents (Kabir, Simran, Arjun) and sharpen your strategy.
-                </p>
-              </div>
-
-              {/* 3D Robot Image */}
-              <SmartAssetImage
-                src="/assets/bhabhi/solo-robot.png"
-                alt="AI Robot"
-                className="w-24 h-24 shrink-0"
-                fallback={<SoloRobotIllustration className="w-24 h-24" />}
-              />
-            </div>
-
-            <div className="flex items-center gap-4 text-xs text-gray-400 pt-1 font-medium">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-emerald-400" />
-                4 Players (You + 3 AI)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-emerald-400" />
-                10 – 15 Min
-              </span>
-            </div>
-          </div>
-
-          <div>
+          {/* Prime Video Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            {/* Big White Button */}
             <Link
               href="/games/bhabhi/solo"
-              className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-base flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-500/20 active:scale-[0.99]"
+              onClick={() => soundManager.playSelect()}
+              className="flex items-center gap-2.5 px-6 sm:px-7 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm sm:text-base shadow-2xl shadow-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <Play className="w-4 h-4 fill-black" />
-              <span>Play Now →</span>
+              <Play className="w-5 h-5 fill-black" />
+              <span>Play Solo vs AI</span>
             </Link>
-          </div>
-        </div>
 
-        {/* Mode 2: Online Multiplayer */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-[#0f1424] border-2 border-purple-500/40 shadow-2xl shadow-purple-950/30 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-purple-400 transition">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-extrabold border border-purple-500/30 flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5" /> ONLINE MODE
-              </span>
-            </div>
-
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <h2 className="text-2xl sm:text-3xl font-black text-white">Online Multiplayer</h2>
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-xs">
-                  Create a room or join with a code and play with friends in real time on any device.
-                </p>
-              </div>
-
-              {/* 3D Wireframe Globe Image */}
-              <SmartAssetImage
-                src="/assets/bhabhi/entry-globe.png"
-                alt="Online Globe"
-                className="w-24 h-24 shrink-0"
-                fallback={<OnlineMultiplayerIllustration className="w-24 h-24" />}
-              />
-            </div>
-
-            <div className="flex items-center gap-4 text-xs text-gray-400 pt-1 font-medium">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-purple-400" />
-                3 – 6 Players
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-purple-400" />
-                10 – 15 Min
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+            {/* Big Blue CTA (Host Custom Room) */}
             <button
               onClick={handleCreateRoom}
-              className="py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-extrabold text-sm flex items-center justify-center gap-1.5 transition shadow-xl shadow-purple-600/30 active:scale-[0.99]"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-cyan-950/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Host New Room</span>
+              <Plus className="w-5 h-5" />
+              <span>Create Private Room</span>
             </button>
 
+            {/* Join with Code Button */}
             <button
               onClick={() => {
                 soundManager.playSelect();
                 setIsJoinModalOpen(true);
               }}
-              className="py-3.5 rounded-2xl bg-[#12162a] hover:bg-[#1a203b] border border-white/15 text-white font-extrabold text-sm flex items-center justify-center gap-1.5 transition active:scale-[0.99]"
+              className="px-4 py-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition hover:scale-105 cursor-pointer flex items-center gap-1.5"
             >
-              <Hash className="w-4 h-4 text-purple-400" />
-              <span>Join with Room Code</span>
+              <Hash className="w-4 h-4 text-cyan-400" />
+              <span>Join with Code</span>
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Join Room Modal with 6 boxes */}
-      {isJoinModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-md bg-[#111827] border border-white/15 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-black text-white">Join Room</h3>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Enter the 6-character room code from your host
-                </p>
+      {/* =========================================================================
+          EPISODES / GAME MODES SECTION (Prime Video Style)
+          ========================================================================= */}
+      <section className="w-full space-y-4">
+        <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          Select Game Mode &amp; Channel
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Episode 1: Solo vs Smart AI Bots */}
+          <Link
+            href="/games/bhabhi/solo"
+            onClick={() => soundManager.playSelect()}
+            className="group p-6 sm:p-7 rounded-3xl bg-[#070b18] border-2 border-emerald-500/40 hover:border-emerald-400 shadow-xl transition-all hover:scale-[1.01] flex flex-col justify-between space-y-5"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1.5">
+                  <Bot className="w-3.5 h-3.5" /> EPISODE 1 • SINGLE PLAYER
+                </span>
+                <span className="text-xs text-zinc-400 font-semibold">Offline Ready</span>
               </div>
-              <button
-                onClick={() => setIsJoinModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5">
+                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition">
+                    Solo vs AI Bots
+                  </h3>
+                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                    Play against smart AI personalities (Kabir, Simran, Arjun). Practice your Thulla evasion tactics at your own pace.
+                  </p>
+                </div>
+                <div className="w-16 h-16 rounded-2xl bg-black/60 border border-emerald-500/40 p-1 shrink-0">
+                  <img
+                    src="/assets/bhabhi/solo-robot.png"
+                    alt="AI Bot"
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleJoinSubmit} className="space-y-6">
-              <div className="flex justify-center gap-2 sm:gap-3">
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <div className="text-xs text-zinc-400 flex items-center gap-3 font-semibold">
+                <span>👥 1 Human + 3 Bots</span>
+                <span>⏱️ Instant Start</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+                <span>Launch Solo</span>
+                <Play className="w-3.5 h-3.5 fill-emerald-400" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Episode 2: Custom Online Multiplayer Room */}
+          <div
+            onClick={handleCreateRoom}
+            className="group p-6 sm:p-7 rounded-3xl bg-[#070b18] border-2 border-cyan-500/40 hover:border-cyan-400 shadow-xl transition-all hover:scale-[1.01] flex flex-col justify-between space-y-5 cursor-pointer"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-extrabold border border-cyan-500/30 flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5" /> EPISODE 2 • LIVE ROOM
+                </span>
+                <span className="text-xs text-zinc-400 font-semibold">3 - 6 Players</span>
+              </div>
+
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5">
+                  <h3 className="text-2xl font-black text-white group-hover:text-cyan-300 transition">
+                    Host Private Room
+                  </h3>
+                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                    Create a private room, share a 6-letter room code with friends, and play in real time with audio commentary.
+                  </p>
+                </div>
+                <div className="w-16 h-16 rounded-2xl bg-black/60 border border-cyan-500/40 p-1 shrink-0">
+                  <img
+                    src="/assets/bhabhi/online-globe.png"
+                    alt="Multiplayer"
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <div className="text-xs text-zinc-400 flex items-center gap-3 font-semibold">
+                <span>🌐 WebRTC P2P</span>
+                <span>🔒 Private Lobby</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-400">
+                <span>Create Room</span>
+                <Play className="w-3.5 h-3.5 fill-cyan-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ad Banner Slot */}
+      <AdBannerSlot slotId="bhabhi-entry-leaderboard" format="leaderboard" />
+
+      {/* Join Room Code Modal */}
+      {isJoinModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          onClick={() => setIsJoinModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-3xl bg-[#090d1a] border border-white/20 p-6 sm:p-8 space-y-6 text-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsJoinModalOpen(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto">
+                <Hash className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white">Enter Room Code</h3>
+              <p className="text-xs text-zinc-400">
+                Enter the 6-letter room code shared by your friend
+              </p>
+            </div>
+
+            <form onSubmit={handleJoinSubmit} className="space-y-5">
+              <div className="flex justify-center gap-2">
                 {codeBoxes.map((box, idx) => (
                   <input
                     key={idx}
@@ -370,28 +418,18 @@ export default function BhabhiGameEntryPage() {
                     value={box}
                     onChange={(e) => handleCodeBoxChange(idx, e.target.value)}
                     onKeyDown={(e) => handleCodeBoxKeyDown(idx, e)}
-                    className="w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-mono font-black text-white bg-black/50 border-2 border-purple-500/40 rounded-2xl focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 focus:outline-none uppercase"
-                    autoFocus={idx === 0}
+                    className="w-11 h-14 text-center text-xl font-black text-white bg-black/60 border-2 border-white/20 focus:border-cyan-400 rounded-xl focus:outline-none uppercase"
                   />
                 ))}
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsJoinModalOpen(false)}
-                  className="flex-1 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={codeBoxes.join('').length < 4}
-                  className="flex-1 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white font-extrabold text-sm shadow-xl shadow-purple-600/30"
-                >
-                  Join Match
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={codeBoxes.join('').trim().length < 4}
+                className="w-full py-3.5 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] disabled:opacity-50 text-white font-extrabold text-sm shadow-xl shadow-cyan-950/40 transition cursor-pointer"
+              >
+                Join Room
+              </button>
             </form>
           </div>
         </div>
@@ -399,42 +437,53 @@ export default function BhabhiGameEntryPage() {
 
       {/* Rules Modal */}
       {isRulesModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-md bg-[#111827] border border-white/15 rounded-3xl p-6 space-y-4 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+          onClick={() => setIsRulesModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-xl rounded-3xl bg-[#090d1a] border border-white/20 p-6 sm:p-8 space-y-5 text-left shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-amber-400" />
-                <span>Bhabhi Rules & Guide</span>
+              <h3 className="text-xl font-black text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-cyan-400" />
+                <span>Bhabhi Rules &amp; Strategy</span>
               </h3>
               <button
                 onClick={() => setIsRulesModalOpen(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-white"
+                className="text-zinc-400 hover:text-white p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs text-gray-300 leading-relaxed">
+            <div className="space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
               <p>
-                <strong>1. Ace of Spades (A♠) Rule:</strong> Whoever holds the Ace of Spades must lead with it on the very first trick.
+                <strong>1. The Objective:</strong> You want to clear your hand as quickly as possible. The last remaining player with cards is crowned the Bhabhi (loser).
               </p>
               <p>
-                <strong>2. Follow Suit:</strong> All players must play a card of the lead suit if they have one.
+                <strong>2. The Opening Lead:</strong> The player holding the Ace of Spades (A♠) must lead it on the very first trick of the round.
               </p>
               <p>
-                <strong>3. Thulla (Defect / Penalty):</strong> If you do NOT hold the lead suit, you can throw ANY card. The player with the highest lead suit card must pick up the entire trick!
+                <strong>3. Following Suit:</strong> All players must follow the lead suit if they hold any card of that suit.
               </p>
               <p>
-                <strong>4. Objective:</strong> Get rid of all your cards. The last remaining player with cards in their hand becomes the <strong>Bhabhi</strong>!
+                <strong>4. The Thulla Penalty:</strong> If a player does NOT have any card of the lead suit, they can play any other card (a &quot;Thulla&quot;). The player who played the highest card of the original lead suit must pick up the entire discard pile!
+              </p>
+              <p>
+                <strong>5. Escape:</strong> Once all your cards are played, you escape safely!
               </p>
             </div>
 
-            <button
-              onClick={() => setIsRulesModalOpen(false)}
-              className="w-full py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs"
-            >
-              Understood! Let&apos;s Play
-            </button>
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setIsRulesModalOpen(false)}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
+              >
+                Got It
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -16,11 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Games.CoderTushar.in — Modern Browser Gaming Platform',
+  title: 'The Yaari — Multiplayer Party & Card Games Streaming Hub',
   description:
-    'Play classic card games and social multiplayer games in your browser. Solo vs smart AI bots or real-time multiplayer with friends. Flagship: Bhabhi (Thulla / Get Away).',
+    'The Yaari: Stream and play party games with friends in your browser. Play classic desi card game Bhabhi (Get Away), Undercover, Spyfall, and more. Solo vs smart AI bots or instant multiplayer rooms.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/assets/brand/the-yaari-icon.png',
+    apple: '/assets/brand/the-yaari-icon.png',
   },
 };
 

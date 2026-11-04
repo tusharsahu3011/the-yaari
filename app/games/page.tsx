@@ -1,29 +1,46 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { Gamepad2, Search, Sparkles, Filter, ArrowRight, Play, CheckCircle2, Clock, Users } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Gamepad2,
+  Search,
+  Sparkles,
+  Filter,
+  ArrowRight,
+  Play,
+  CheckCircle2,
+  Clock,
+  Users,
+  Tv,
+  Flame,
+  X,
+  Info,
+} from 'lucide-react';
 import {
   SmartAssetImage,
-  UndercoverIllustration,
-  SpyfallIllustration,
-  BhabhiCardIllustration,
   CatalogIconGraphic,
 } from '@/components/illustrations/GameIllustrations';
+import { AdBannerSlot } from '@/components/ads/AdBannerSlot';
+import { soundManager } from '@/lib/audio/sound-effects';
 
-interface GameItem {
+export interface GameItem {
   id: string;
   slug: string;
   title: string;
   genre: string;
-  category: 'All' | 'Card Games' | 'Social Bluff' | 'Party Rooms' | 'Word Games';
+  category: 'cards' | 'bluff' | 'words' | 'party';
+  categoryLabel: string;
   players: string;
   duration: string;
+  rating: string;
   description: string;
   image: string;
   href?: string;
   status: 'ready' | 'in_development';
   accentColor: string;
+  rankBadge?: string;
 }
 
 const ALL_GAMES: GameItem[] = [
@@ -31,79 +48,120 @@ const ALL_GAMES: GameItem[] = [
     id: 'undercover',
     slug: 'undercover',
     title: 'Undercover',
-    genre: 'Social Deduction • Group',
-    category: 'Social Bluff',
+    genre: 'Social Deduction • Group Bluffing',
+    category: 'bluff',
+    categoryLabel: 'Social Bluff',
     players: '3 - 20 Players',
     duration: '10 - 15 Min',
-    description: 'Civilians share a secret word, while the Undercover has a slightly different word, and Mr. White has no word at all! Pass & Play supported.',
+    rating: 'U/A 13+',
+    rankBadge: 'TOP 1 READY',
+    description:
+      'Civilians share a secret word, while the Undercover has a slightly different word, and Mr. White has no word at all! Pass & Play and online rooms supported.',
     image: '/assets/home/card-undercover.png',
     href: '/games/undercover',
     status: 'ready',
-    accentColor: '#8b5cf6',
+    accentColor: '#a855f7',
+  },
+  {
+    id: 'bhabhi',
+    slug: 'bhabhi',
+    title: 'Bhabhi (Get Away)',
+    genre: 'Desi Card Classic • Evasion',
+    category: 'cards',
+    categoryLabel: 'Card Games',
+    players: '3 - 6 Players',
+    duration: '10 - 15 Min',
+    rating: 'ALL AGES',
+    rankBadge: 'TOP 2 READY',
+    description:
+      'A classic evasion card game where the goal is simple — get rid of all your cards, avoid the Thulla penalty, or become the Bhabhi! Includes Solo AI bot mode.',
+    image: '/assets/home/card-bhabhi.png',
+    href: '/games/bhabhi',
+    status: 'ready',
+    accentColor: '#ec4899',
   },
   {
     id: 'spyfall',
     slug: 'spyfall',
     title: 'Spyfall',
-    genre: 'Interrogation • Bluffing',
-    category: 'Social Bluff',
+    genre: 'Interrogation • Hidden Location',
+    category: 'bluff',
+    categoryLabel: 'Social Bluff',
     players: '3 - 12 Players',
     duration: '8 - 12 Min',
-    description: 'Everyone is at a secret location with a role, except the Spy who has no idea where they are! Ask probing questions without giving it away.',
+    rating: 'U/A 13+',
+    rankBadge: 'TOP 3 READY',
+    description:
+      'Everyone is at a secret location with a role, except the Spy who has no idea where they are! Ask probing questions without giving the location away.',
     image: '/assets/home/card-spyfall.png',
     href: '/games/spyfall',
     status: 'ready',
     accentColor: '#f59e0b',
   },
   {
-    id: 'bhabhi',
-    slug: 'bhabhi',
-    title: 'Bhabhi (Get Away)',
-    genre: 'Card Game • Evasion',
-    category: 'Card Games',
+    id: 'teen-patti',
+    slug: 'teen-patti',
+    title: 'Teen Patti Flush',
+    genre: 'Card / Wagering • Bluffing',
+    category: 'cards',
+    categoryLabel: 'Card Games',
     players: '3 - 6 Players',
     duration: '10 - 15 Min',
-    description: 'A classic evasion card game where the goal is simple — get rid of all your cards, avoid the Thulla penalty, or become the Bhabhi!',
-    image: '/assets/home/card-bhabhi.png',
-    href: '/games/bhabhi',
-    status: 'ready',
+    rating: '18+',
+    rankBadge: 'COMING SOON',
+    description:
+      'The beloved three-card Indian poker game with Trail, Pure Sequence, Flush, and exciting Chaal / Seen betting rounds using virtual chips.',
+    image: '/assets/home/icon-teenpatti.png',
+    status: 'in_development',
     accentColor: '#10b981',
   },
   {
     id: 'decrypto',
     slug: 'decrypto',
     title: 'Decrypto',
-    genre: 'Code Transmission',
-    category: 'Word Games',
+    genre: 'Code Transmission • Encryption',
+    category: 'words',
+    categoryLabel: 'Word Games',
     players: '4 - 8 Players',
     duration: '20 - 30 Min',
-    description: 'Two teams compete to transmit coded messages without letting the opposing team intercept and decode them.',
+    rating: 'ALL AGES',
+    rankBadge: 'STRATEGY',
+    description:
+      'Two teams compete to transmit coded messages without letting the opposing team intercept and decode their keywords.',
     image: '/assets/home/icon-decrypto.png',
     status: 'in_development',
-    accentColor: '#a855f7',
+    accentColor: '#06b6d4',
   },
   {
     id: 'codenames',
     slug: 'codenames',
     title: 'Codenames',
-    genre: 'Word Association',
-    category: 'Word Games',
+    genre: 'Word Association • Spymaster',
+    category: 'words',
+    categoryLabel: 'Word Games',
     players: '4 - 12 Players',
     duration: '15 - 20 Min',
-    description: 'Spymasters give one-word clues that can point to multiple words on the board. Teammates try to guess words of the right color.',
+    rating: 'ALL AGES',
+    rankBadge: 'PARTY HIT',
+    description:
+      'Spymasters give one-word clues that point to multiple words on the board. Teammates try to guess words of the right color while avoiding the assassin.',
     image: '/assets/home/icon-codenames.png',
     status: 'in_development',
-    accentColor: '#6366f1',
+    accentColor: '#8b5cf6',
   },
   {
     id: 'avalon',
     slug: 'avalon',
     title: 'Avalon: Secret Identities',
-    genre: 'Hidden Loyalty',
-    category: 'Social Bluff',
+    genre: 'Hidden Loyalty • Arthurian Quest',
+    category: 'bluff',
+    categoryLabel: 'Social Bluff',
     players: '5 - 10 Players',
     duration: '25 - 35 Min',
-    description: 'The forces of good and evil battle to control the future of Arthurian Britain. Merlin knows the minions of Mordred, but can he guide his team without being assassinated?',
+    rating: 'U/A 13+',
+    rankBadge: 'DEDUCTION',
+    description:
+      'The forces of good and evil battle to control the future of Arthurian Britain. Merlin knows the minions of Mordred, but can he guide his team without being assassinated?',
     image: '/assets/home/icon-avalon.png',
     status: 'in_development',
     accentColor: '#eab308',
@@ -112,79 +170,102 @@ const ALL_GAMES: GameItem[] = [
     id: 'secret-chancellor',
     slug: 'secret-chancellor',
     title: 'Secret Chancellor',
-    genre: 'Political Deduction',
-    category: 'Social Bluff',
+    genre: 'Political Intrigue & Deception',
+    category: 'bluff',
+    categoryLabel: 'Social Bluff',
     players: '5 - 10 Players',
     duration: '30 - 45 Min',
-    description: 'A dramatic game of political intrigue and betrayal. Players are divided into liberals and fascists, but only the fascists know each other.',
+    rating: 'U/A 16+',
+    rankBadge: 'HIGH TENSION',
+    description:
+      'A dramatic game of political intrigue and betrayal. Players are divided into liberals and fascists, but only the fascists know each other.',
     image: '/assets/home/icon-chancellor.png',
     status: 'in_development',
-    accentColor: '#ef4444',
+    accentColor: '#f43f5e',
   },
   {
     id: 'werewolf',
     slug: 'werewolf',
     title: 'Ultimate Werewolf',
-    genre: 'Social Deduction',
-    category: 'Social Bluff',
+    genre: 'Village Social Deduction',
+    category: 'bluff',
+    categoryLabel: 'Social Bluff',
     players: '6 - 24 Players',
     duration: '20 - 40 Min',
-    description: 'Villagers and Werewolves face off in a struggle for survival. By night, wolves hunt; by day, the village gathers to lynch a suspect.',
+    rating: 'ALL AGES',
+    rankBadge: 'MASSIVE PARTY',
+    description:
+      'Villagers and Werewolves face off in a struggle for survival. By night, wolves hunt; by day, the village gathers to find the suspects.',
     image: '/assets/home/icon-werewolf.png',
     status: 'in_development',
-    accentColor: '#38bdf8',
+    accentColor: '#3b82f6',
   },
   {
     id: 'two-rooms',
     slug: 'two-rooms',
     title: 'Two Rooms and a Boom',
-    genre: 'Hostage Swaps',
-    category: 'Party Rooms',
+    genre: 'Hostage Swaps • Room Movement',
+    category: 'party',
+    categoryLabel: 'Party Rooms',
     players: '6 - 30 Players',
     duration: '10 - 15 Min',
-    description: 'Two teams separated into different physical rooms. Hostages are traded each round. Blue team protects the President; Red team detonates the Bomber.',
+    rating: 'ALL AGES',
+    rankBadge: 'FAST PACED',
+    description:
+      'Two teams separated into different physical rooms. Hostages are traded each round. Blue team protects the President; Red team detonates the Bomber.',
     image: '/assets/home/icon-tworooms.png',
     status: 'in_development',
-    accentColor: '#f97316',
+    accentColor: '#ef4444',
   },
   {
     id: 'wavelength',
     slug: 'wavelength',
     title: 'Wavelength',
-    genre: 'Mind Reading',
-    category: 'Party Rooms',
+    genre: 'Mind Reading • Spectrum',
+    category: 'words',
+    categoryLabel: 'Word Games',
     players: '4 - 12 Players',
     duration: '15 - 25 Min',
-    description: 'A telepathic party game where two teams compete to read each other\'s minds on a spectrum between two concepts.',
+    rating: 'ALL AGES',
+    rankBadge: 'VIBE CHECK',
+    description:
+      'A telepathic party game where two teams compete to read each other\'s minds on a spectrum between two concepts.',
     image: '/assets/home/icon-wavelength.png',
     status: 'in_development',
-    accentColor: '#ec4899',
-  },
-  {
-    id: 'teen-patti',
-    slug: 'teen-patti',
-    title: 'Teen Patti Flush',
-    genre: 'Card / Wagering',
-    category: 'Card Games',
-    players: '3 - 6 Players',
-    duration: '10 - 15 Min',
-    description: 'The beloved three-card Indian poker game with Trail, Pure Sequence, Flush, and exciting Chaal / Seen betting rounds.',
-    image: '/assets/home/icon-teenpatti.png',
-    status: 'in_development',
-    accentColor: '#dc2626',
+    accentColor: '#d946ef',
   },
 ];
 
-export default function GamesCataloguePage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'ready' | 'in_development'>('all');
+function GamesCatalogueContent() {
+  const searchParams = useSearchParams();
+  const catParam = searchParams.get('cat');
+
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'ready' | 'dev'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const categories = ['All', 'Card Games', 'Social Bluff', 'Party Rooms', 'Word Games'];
+  useEffect(() => {
+    if (catParam) {
+      if (['cards', 'bluff', 'words', 'party'].includes(catParam)) {
+        setSelectedCategory(catParam);
+      }
+    }
+  }, [catParam]);
+
+  const categories = [
+    { id: 'all', label: 'All Titles' },
+    { id: 'cards', label: '🃏 Card Games' },
+    { id: 'bluff', label: '🕵️ Social Bluff' },
+    { id: 'words', label: '🧠 Word Games' },
+    { id: 'party', label: '🎉 Party Rooms' },
+  ];
 
   const filteredGames = ALL_GAMES.filter((g) => {
-    const matchesCategory = selectedCategory === 'All' || g.category === selectedCategory;
-    const matchesStatus = selectedStatus === 'all' || g.status === selectedStatus;
+    const matchesCategory = selectedCategory === 'all' || g.category === selectedCategory;
+    const matchesStatus =
+      selectedStatus === 'all' ||
+      (selectedStatus === 'ready' && g.status === 'ready') ||
+      (selectedStatus === 'dev' && g.status === 'in_development');
     const matchesSearch =
       g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       g.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -192,216 +273,228 @@ export default function GamesCataloguePage() {
     return matchesCategory && matchesStatus && matchesSearch;
   });
 
-  const getFallbackGraphic = (game: GameItem) => {
-    if (game.id === 'undercover') return <UndercoverIllustration className="w-full h-full" />;
-    if (game.id === 'spyfall') return <SpyfallIllustration className="w-full h-full" />;
-    if (game.id === 'bhabhi') return <BhabhiCardIllustration className="w-full h-full" />;
-    return <CatalogIconGraphic gameId={game.id} className="w-full h-full" />;
-  };
-
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center select-none space-y-8">
-      {/* Title */}
-      <div className="text-center max-w-2xl space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-purple-300 text-xs font-black uppercase tracking-wider">
-          <Gamepad2 className="w-4 h-4 text-purple-400" />
-          <span>Complete Catalog ({ALL_GAMES.length} Games)</span>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 select-none">
+      {/* Prime Video OTT Browse Header */}
+      <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-[#070b18] via-[#091128] to-[#070b18] border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="space-y-3 max-w-xl text-left z-10">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30 flex items-center gap-1.5">
+              <Tv className="w-3.5 h-3.5 text-cyan-400" />
+              <span>THE YAARI BROWSE</span>
+            </span>
+            <span className="text-xs text-zinc-400 font-medium">• {ALL_GAMES.length} Titles</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+            Explore All Games & Shows
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            From classic desi card evasion in Bhabhi to psychological bluffing in Undercover and Spyfall.
+            Zero installs, stream right on your phone or PC with your yaars.
+          </p>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Game Catalogue
-        </h1>
-        <p className="text-sm sm:text-base text-gray-300">
-          Discover modern, instant browser-based games. Play pass-and-play party classics or live multiplayer rooms with your dost & yaar!
-        </p>
+
+        {/* Ambient Glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-600/15 blur-[120px] rounded-full pointer-events-none" />
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-[#0e1224] p-1.5 rounded-2xl border border-white/10">
+      {/* Filter and Search Navigation Bar (Prime Video Style) */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-[#070b18]/90 p-3 sm:p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+        {/* Category Filter Pills */}
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {categories.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                selectedCategory === cat
-                  ? 'bg-[#632df3] text-white shadow-md'
-                  : 'text-gray-400 hover:text-white'
+              key={cat.id}
+              onClick={() => {
+                soundManager.playSelect();
+                setSelectedCategory(cat.id);
+              }}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                selectedCategory === cat.id
+                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-950/40'
+                  : 'bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/5'
               }`}
             >
-              {cat}
+              <span>{cat.label}</span>
             </button>
           ))}
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        {/* Search Bar */}
+        <div className="relative w-full lg:w-80">
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search games or genres..."
+            placeholder="Search by title, genre, or keyword..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0e1224] border border-white/10 rounded-2xl pl-9 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-400"
+            className="w-full bg-black/50 border border-white/10 rounded-xl pl-10 pr-9 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-400"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Status Sub-Filters */}
-      <div className="w-full flex items-center justify-between flex-wrap gap-2 text-xs border-b border-white/10 pb-3">
+      {/* Sub-Filters: Status & Count */}
+      <div className="flex items-center justify-between flex-wrap gap-2 text-xs border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setSelectedStatus('all')}
-            className={`px-3 py-1 rounded-xl font-bold transition ${
+            onClick={() => {
+              soundManager.playSelect();
+              setSelectedStatus('all');
+            }}
+            className={`px-3 py-1 rounded-xl font-bold transition cursor-pointer ${
               selectedStatus === 'all'
                 ? 'bg-white/15 text-white'
-                : 'text-gray-400 hover:text-white'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             All ({ALL_GAMES.length})
           </button>
           <button
-            onClick={() => setSelectedStatus('ready')}
-            className={`px-3 py-1 rounded-xl font-bold transition flex items-center gap-1.5 ${
+            onClick={() => {
+              soundManager.playSelect();
+              setSelectedStatus('ready');
+            }}
+            className={`px-3 py-1 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer ${
               selectedStatus === 'ready'
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'text-gray-400 hover:text-emerald-300'
+                : 'text-zinc-400 hover:text-emerald-300'
             }`}
           >
             <span>● Ready to Play (3)</span>
           </button>
           <button
-            onClick={() => setSelectedStatus('in_development')}
-            className={`px-3 py-1 rounded-xl font-bold transition flex items-center gap-1.5 ${
-              selectedStatus === 'in_development'
+            onClick={() => {
+              soundManager.playSelect();
+              setSelectedStatus('dev');
+            }}
+            className={`px-3 py-1 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              selectedStatus === 'dev'
                 ? 'bg-purple-950/60 text-purple-300 border border-purple-500/40'
-                : 'text-gray-400 hover:text-purple-300'
+                : 'text-zinc-400 hover:text-purple-300'
             }`}
           >
-            <span>○ In Development (8)</span>
+            <span>○ Pipeline (8)</span>
           </button>
         </div>
 
-        <span className="text-gray-400 font-semibold text-[11px]">
-          Showing {filteredGames.length} of {ALL_GAMES.length}
+        <span className="text-zinc-400 font-semibold text-[11px]">
+          Showing {filteredGames.length} titles
         </span>
       </div>
 
-      {/* Games Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      {/* Prime Video 16:9 Movie Poster Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
         {filteredGames.map((game) => {
           const isReady = game.status === 'ready';
 
           return (
             <div
               key={game.id}
-              className="p-6 rounded-3xl bg-[#0e1224] border transition-all duration-300 flex flex-col justify-between space-y-4 group relative overflow-hidden hover:-translate-y-1"
-              style={{
-                borderColor: `${game.accentColor}40`,
-                boxShadow: `0 8px 28px -6px ${game.accentColor}28`,
+              className="group relative rounded-2xl overflow-hidden bg-[#070b18] border border-white/10 hover:border-cyan-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] flex flex-col justify-between cursor-pointer"
+              onClick={() => {
+                soundManager.playSelect();
+                if (isReady && game.href) {
+                  window.location.href = game.href;
+                }
               }}
             >
-              {/* Stretched Background Logo (Ambient Watermark) */}
-              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+              {/* 16:9 Poster Header */}
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black/60">
                 <img
                   src={game.image}
-                  alt=""
-                  aria-hidden="true"
-                  className="w-full h-full object-cover object-center opacity-[0.08] group-hover:opacity-[0.14] scale-105 group-hover:scale-110 transition-all duration-700"
+                  alt={game.title}
+                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-[#0e1224]/85 to-[#0e1224]/75" />
-              </div>
 
-              {/* Ambient Corner Glow */}
-              <div
-                className="absolute -top-14 -right-14 w-36 h-36 rounded-full blur-2xl opacity-25 group-hover:opacity-50 transition-opacity duration-500 pointer-events-none z-0"
-                style={{ backgroundColor: game.accentColor }}
-              />
+                {/* Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070b18] via-[#070b18]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
 
-              <div className="space-y-4 relative z-10">
-                {/* Header Badge */}
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                      isReady
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-purple-950/60 text-purple-300 border border-purple-500/30'
-                    }`}
-                  >
-                    {isReady ? 'READY TO PLAY' : 'IN DEVELOPMENT'}
+                {/* Top Left Badge */}
+                <div className="absolute top-2.5 left-2.5 z-10">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-black/80 text-white border border-white/20 backdrop-blur-md">
+                    {game.rankBadge || (isReady ? 'READY' : 'IN DEV')}
                   </span>
-                  <span className="text-xs text-gray-400 font-bold">{game.category}</span>
                 </div>
 
-                {/* Graphic + Title */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-black text-white group-hover:text-white transition">
-                      {game.title}
-                    </h3>
-                    <p
-                      className="text-xs font-semibold"
-                      style={{ color: game.accentColor }}
-                    >
-                      {game.genre}
-                    </p>
-                  </div>
+                {/* Top Right Rating Badge */}
+                <div className="absolute top-2.5 right-2.5 z-10">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/20 backdrop-blur-md">
+                    {game.rating}
+                  </span>
+                </div>
 
-                  {/* Logo Container with Rounded Border & Ambient Back-glow */}
-                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
-                    <div
-                      className="absolute inset-0 rounded-2xl blur-lg opacity-40 group-hover:opacity-80 group-hover:scale-115 transition-all duration-300 pointer-events-none"
-                      style={{ backgroundColor: game.accentColor }}
-                    />
-                    <div
-                      className="w-16 h-16 rounded-2xl overflow-hidden bg-black/60 border-2 p-1 relative z-10 flex items-center justify-center shadow-lg transition-colors duration-300"
-                      style={{ borderColor: `${game.accentColor}75` }}
-                    >
-                      <SmartAssetImage
-                        src={game.image}
-                        alt={game.title}
-                        className="w-full h-full rounded-[14px] overflow-hidden"
-                        fallback={getFallbackGraphic(game)}
-                      />
+                {/* Play Overlay on Hover */}
+                {isReady && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/40 backdrop-blur-[2px]">
+                    <div className="w-13 h-13 rounded-full bg-white text-black flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                      <Play className="w-6 h-6 fill-black ml-0.5" />
                     </div>
                   </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-xs text-gray-300 leading-relaxed font-normal">
-                  {game.description}
-                </p>
+                )}
               </div>
 
-              {/* Bottom Info Strip & Action */}
-              <div className="pt-3 border-t border-white/10 space-y-3 relative z-10">
-                <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-gray-400" /> {game.players}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-gray-400" /> {game.duration}
-                  </span>
+              {/* Card Body */}
+              <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-[#070b18]">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-black text-white group-hover:text-cyan-300 transition-colors">
+                      {game.title}
+                    </h3>
+                    <span
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded ${
+                        isReady
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}
+                    >
+                      {isReady ? 'READY TO PLAY' : 'IN PIPELINE'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400 font-medium line-clamp-2 mt-1">
+                    {game.description}
+                  </p>
                 </div>
 
-                {isReady && game.href ? (
-                  <Link
-                    href={game.href}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20 transition active:scale-[0.99]"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Play Now</span>
-                  </Link>
-                ) : (
-                  <div className="w-full py-2 rounded-xl bg-white/5 border border-white/5 text-gray-500 font-bold text-center text-xs">
-                    Coming Soon
-                  </div>
-                )}
+                {/* Footer Meta */}
+                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400 font-semibold">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-purple-400" />
+                    {game.players}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                    {game.duration}
+                  </span>
+                  <span className={isReady ? 'text-cyan-400' : 'text-zinc-500'}>
+                    {isReady ? '▶ Stream Now' : 'Details'}
+                  </span>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* In-Feed Ad Banner Slot */}
+      <AdBannerSlot slotId="catalog-infeed-sponsor" format="leaderboard" />
     </div>
+  );
+}
+
+export default function GamesCataloguePage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-zinc-500">Loading catalog...</div>}>
+      <GamesCatalogueContent />
+    </Suspense>
   );
 }

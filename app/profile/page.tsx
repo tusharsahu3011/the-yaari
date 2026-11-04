@@ -14,7 +14,11 @@ import {
   RotateCcw,
   Gamepad2,
   ArrowRight,
+  Tv,
+  Check,
+  Edit2,
 } from 'lucide-react';
+import { soundManager } from '@/lib/audio/sound-effects';
 
 const AVATAR_OPTIONS = [
   '😎', '🤠', '🧙‍♂️', '🦊', '🦁', '👑', '🚀', '🐼',
@@ -29,7 +33,7 @@ interface PlayerStats {
 }
 
 export default function ProfilePage() {
-  const [playerName, setPlayerName] = useState('Guest Player');
+  const [playerName, setPlayerName] = useState('Yaar_9410');
   const [playerAvatar, setPlayerAvatar] = useState('😎');
   const [favoritePersonality, setFavoritePersonality] = useState('desi_host');
   const [stats, setStats] = useState<PlayerStats>({
@@ -42,10 +46,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedName = localStorage.getItem('gameshub_player_name');
-      const storedAvatar = localStorage.getItem('gameshub_player_avatar');
-      const storedPersonality = localStorage.getItem('gameshub_fav_dealer');
-      const storedStats = localStorage.getItem('gameshub_player_stats');
+      const storedName =
+        localStorage.getItem('theyaari_player_name') || localStorage.getItem('gameshub_player_name');
+      const storedAvatar =
+        localStorage.getItem('theyaari_player_avatar') || localStorage.getItem('gameshub_player_avatar');
+      const storedPersonality =
+        localStorage.getItem('theyaari_fav_dealer') || localStorage.getItem('gameshub_fav_dealer');
+      const storedStats =
+        localStorage.getItem('theyaari_player_stats') || localStorage.getItem('gameshub_player_stats');
 
       if (storedName) setPlayerName(storedName);
       if (storedAvatar) setPlayerAvatar(storedAvatar);
@@ -58,195 +66,132 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (typeof window !== 'undefined') {
+  const handleSave = () => {
+    soundManager.playSelect();
+    try {
+      localStorage.setItem('theyaari_player_name', playerName.trim() || 'Player');
+      localStorage.setItem('theyaari_player_avatar', playerAvatar);
+      localStorage.setItem('theyaari_fav_dealer', favoritePersonality);
       localStorage.setItem('gameshub_player_name', playerName.trim() || 'Player');
-      localStorage.setItem('gameshub_player_avatar', playerAvatar);
-      localStorage.setItem('gameshub_fav_dealer', favoritePersonality);
       setSavedToast(true);
       setTimeout(() => setSavedToast(false), 2500);
-    }
+    } catch (e) {}
   };
 
   const escapeRate =
-    stats.gamesPlayed > 0
-      ? Math.round((stats.gamesEscaped / stats.gamesPlayed) * 100)
-      : 100;
+    stats.gamesPlayed > 0 ? Math.round((stats.gamesEscaped / stats.gamesPlayed) * 100) : 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center">
-      {/* Toast */}
-      {savedToast && (
-        <div className="fixed top-20 z-50 px-5 py-2.5 rounded-2xl bg-emerald-950 border border-emerald-500 text-emerald-200 text-xs font-bold shadow-2xl animate-bounce flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          Profile updated successfully!
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 select-none text-left">
+      {/* Prime Video "Who's Watching?" Header */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30">
+          <Tv className="w-3.5 h-3.5 text-cyan-400" />
+          <span>THE YAARI ACCOUNT &amp; PROFILES</span>
         </div>
-      )}
-
-      {/* Header */}
-      <div className="text-center max-w-xl mb-8">
-        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-2">
-          Player Profile & Stats
+        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          Who&apos;s Playing?
         </h1>
-        <p className="text-xs sm:text-sm text-gray-400">
-          Personalize your gaming identity across solo games and multiplayer rooms.
+        <p className="text-xs sm:text-sm text-zinc-400">
+          Manage your player identity, select your favorite avatar, and view your escape record.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-        {/* Left Column: Avatar & Profile Card (1 col) */}
-        <div className="md:col-span-1 flex flex-col items-center p-6 rounded-3xl bg-[#121626] border border-white/10 text-center space-y-4 shadow-xl">
-          <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-5xl shadow-lg shadow-purple-900/40 border-2 border-white/20">
-            {playerAvatar}
-            <span className="absolute -bottom-2 px-2 py-0.5 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase tracking-wider">
-              Level 3
-            </span>
-          </div>
-
-          <div className="space-y-1">
-            <h2 className="text-xl font-black text-white">{playerName}</h2>
-            <span className="inline-block px-2.5 py-0.5 rounded-full bg-purple-900/50 text-purple-300 text-[11px] font-semibold border border-purple-500/30">
-              ⚡ Escape Artist
-            </span>
-          </div>
-
-          <div className="w-full pt-4 border-t border-white/5 space-y-2 text-xs text-left">
-            <div className="flex justify-between text-gray-400">
-              <span>Account Type:</span>
-              <span className="text-emerald-400 font-bold">Guest (Local)</span>
-            </div>
-            <div className="flex justify-between text-gray-400">
-              <span>Escape Rate:</span>
-              <span className="text-white font-bold">{escapeRate}%</span>
-            </div>
-            <div className="flex justify-between text-gray-400">
-              <span>Preferred Dealer:</span>
-              <span className="text-purple-300 font-semibold capitalize">
-                {favoritePersonality.replace('_', ' ')}
-              </span>
+      {/* Profile Card & Avatar */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#070b18] border border-white/10 shadow-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
+          {/* Avatar Icon */}
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 p-1 shrink-0 shadow-2xl shadow-cyan-950/60">
+            <div className="w-full h-full bg-[#050813] rounded-full flex items-center justify-center text-5xl">
+              {playerAvatar}
             </div>
           </div>
 
-          <Link
-            href="/games/bhabhi/solo"
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow hover:brightness-110 transition"
-          >
-            <Gamepad2 className="w-4 h-4" />
-            Jump into Solo Match
-          </Link>
+          <div className="space-y-2 flex-1 text-center sm:text-left">
+            <div className="text-xs text-cyan-400 font-bold uppercase tracking-wider">
+              Profile Display Name
+            </div>
+            <input
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              maxLength={20}
+              placeholder="Enter your name"
+              className="text-2xl sm:text-3xl font-black text-white bg-black/50 border border-white/15 focus:border-cyan-400 rounded-2xl px-4 py-2 w-full focus:outline-none"
+            />
+            <p className="text-xs text-zinc-400">
+              Visible to all friends in private multiplayer rooms.
+            </p>
+          </div>
         </div>
 
-        {/* Right Column: Customization & Statistics (2 cols) */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Statistics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-2xl bg-[#121626] border border-white/10 flex flex-col">
-              <span className="text-[10px] text-gray-400 uppercase font-semibold">
-                Matches
-              </span>
-              <span className="text-2xl font-black text-white mt-1">
-                {stats.gamesPlayed}
-              </span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-[#121626] border border-emerald-500/30 flex flex-col">
-              <span className="text-[10px] text-emerald-400 uppercase font-semibold">
-                Escaped Safe
-              </span>
-              <span className="text-2xl font-black text-emerald-300 mt-1">
-                {stats.gamesEscaped}
-              </span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-[#121626] border border-amber-500/30 flex flex-col">
-              <span className="text-[10px] text-amber-400 uppercase font-semibold">
-                #1 First Escape
-              </span>
-              <span className="text-2xl font-black text-amber-300 mt-1">
-                {stats.rank1Escapes}
-              </span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-[#121626] border border-rose-500/30 flex flex-col">
-              <span className="text-[10px] text-rose-400 uppercase font-semibold">
-                Bhabhi (Losses)
-              </span>
-              <span className="text-2xl font-black text-rose-300 mt-1">
-                {stats.bhabhiCount}
-              </span>
-            </div>
-          </div>
-
-          {/* Edit Profile Form */}
-          <form
-            onSubmit={handleSave}
-            className="p-6 rounded-3xl bg-[#121626] border border-white/10 space-y-5 text-left shadow-xl"
-          >
-            <h3 className="font-extrabold text-base text-white">Edit Your Identity</h3>
-
-            {/* Display Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-300">
-                Display Name
-              </label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                maxLength={20}
-                className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-400"
-              />
-            </div>
-
-            {/* Avatar Selector */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-gray-300">
-                Choose Avatar
-              </label>
-              <div className="grid grid-cols-6 sm:grid-cols-9 gap-2">
-                {AVATAR_OPTIONS.map((av) => (
-                  <button
-                    type="button"
-                    key={av}
-                    onClick={() => setPlayerAvatar(av)}
-                    className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition ${
-                      playerAvatar === av
-                        ? 'bg-purple-600 text-white ring-2 ring-purple-400 scale-110 shadow-md shadow-purple-800/50'
-                        : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-                    }`}
-                  >
-                    {av}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Favorite Dealer Personality */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-300">
-                Default AI Dealer Personality
-              </label>
-              <select
-                value={favoritePersonality}
-                onChange={(e) => setFavoritePersonality(e.target.value)}
-                className="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-400"
+        {/* Choose Avatar Grid */}
+        <div className="space-y-3">
+          <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+            Choose Your Avatar
+          </label>
+          <div className="grid grid-cols-6 sm:grid-cols-9 gap-2.5">
+            {AVATAR_OPTIONS.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => {
+                  soundManager.playTap();
+                  setPlayerAvatar(emoji);
+                }}
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition cursor-pointer ${
+                  playerAvatar === emoji
+                    ? 'bg-cyan-500/30 border-2 border-cyan-400 scale-110 shadow-lg shadow-cyan-950/50'
+                    : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:scale-105'
+                }`}
               >
-                <option value="desi_host">👳‍♂️ Chacha Chaudhary (Desi Party Host)</option>
-                <option value="savage">🕶️ Viper (Savage & Roasting)</option>
-                <option value="dramatic">🧙‍♂️ The Grandmaster (Epic & Dramatic)</option>
-              </select>
-            </div>
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
 
-            {/* Save Button */}
-            <button
-              type="submit"
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-sm shadow-lg shadow-purple-900/30 hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Save Profile Changes
-            </button>
-          </form>
+        {/* Save Changes Button */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+          {savedToast ? (
+            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" /> Changes saved successfully!
+            </span>
+          ) : (
+            <span className="text-xs text-zinc-500">Auto-stored locally</span>
+          )}
+
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] text-white font-black text-xs shadow-lg shadow-cyan-950/40 transition hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Profile</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Lifetime Stats (Prime Video Stats Dashboard) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
+          <span className="text-xs text-zinc-400 font-semibold">Games Played</span>
+          <div className="text-2xl sm:text-3xl font-black text-white">{stats.gamesPlayed}</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
+          <span className="text-xs text-emerald-400 font-semibold">Escape Rate</span>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-400">{escapeRate}%</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
+          <span className="text-xs text-amber-400 font-semibold">Rank #1 Escapes</span>
+          <div className="text-2xl sm:text-3xl font-black text-amber-400">{stats.rank1Escapes}</div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
+          <span className="text-xs text-rose-400 font-semibold">Crowned Bhabhi</span>
+          <div className="text-2xl sm:text-3xl font-black text-rose-400">{stats.bhabhiCount}</div>
         </div>
       </div>
     </div>
   );
 }
-
