@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   Play,
   Users,
@@ -21,6 +20,14 @@ import {
   Tag,
   CircleDot,
 } from 'lucide-react';
+import {
+  SmartAssetImage,
+  HeroGameComposition,
+  UndercoverIllustration,
+  SpyfallIllustration,
+  BhabhiCardIllustration,
+  CatalogIconGraphic,
+} from '@/components/illustrations/GameIllustrations';
 
 interface GameDef {
   id: string;
@@ -59,7 +66,7 @@ const ALL_GAMES_CATALOG: GameDef[] = [
     players: '3 - 12 Players',
     duration: '8 - 12 Min',
     image: '/assets/home/card-spyfall.png',
-    href: '/games/undercover',
+    href: '/games/spyfall',
     accentColor: '#f59e0b',
   },
   {
@@ -216,15 +223,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Visual 3D Showcase (Image 5 exact 3D composition) */}
+          {/* Right Visual 3D Showcase (Image 5 exact 3D composition with fallback) */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-md h-64 sm:h-72 flex items-center justify-center">
-              <img
-                src="/assets/home/hero-3d.png"
-                alt="Games 3D Art Composition"
-                className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(139,92,246,0.35)]"
-              />
-            </div>
+            <SmartAssetImage
+              src="/assets/home/hero-3d.png"
+              alt="Games 3D Art Composition"
+              className="w-full max-w-md h-64 sm:h-72"
+              fallback={<HeroGameComposition className="w-full h-full" />}
+            />
           </div>
         </div>
       </section>
@@ -325,13 +331,12 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Undercover</h3>
                 <p className="text-xs text-gray-400">Social Deduction • Group</p>
               </div>
-              <div className="w-20 h-20 shrink-0">
-                <img
-                  src="/assets/home/featured-undercover.png"
-                  alt="Undercover"
-                  className="w-full h-full object-contain rounded-xl"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/home/card-undercover.png"
+                alt="Undercover"
+                className="w-20 h-20 shrink-0"
+                fallback={<UndercoverIllustration className="w-20 h-20" />}
+              />
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -361,13 +366,12 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Spyfall</h3>
                 <p className="text-xs text-gray-400">Interrogation • Bluffing</p>
               </div>
-              <div className="w-20 h-20 shrink-0">
-                <img
-                  src="/assets/home/featured-spyfall.png"
-                  alt="Spyfall"
-                  className="w-full h-full object-contain rounded-xl"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/home/card-spyfall.png"
+                alt="Spyfall"
+                className="w-20 h-20 shrink-0"
+                fallback={<SpyfallIllustration className="w-20 h-20" />}
+              />
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -376,7 +380,7 @@ export default function HomePage() {
                 <span>⏱️ 8 - 12 Min</span>
               </div>
               <Link
-                href="/games/undercover"
+                href="/games/spyfall"
                 className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-md shadow-amber-500/30 transition transform hover:scale-110 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-black ml-0.5" />
@@ -397,13 +401,12 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-white">Bhabhi (Get Away)</h3>
                 <p className="text-xs text-gray-400">Card Game • Evasion</p>
               </div>
-              <div className="w-20 h-20 shrink-0">
-                <img
-                  src="/assets/home/featured-bhabhi.png"
-                  alt="Bhabhi"
-                  className="w-full h-full object-contain rounded-xl"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/home/card-bhabhi.png"
+                alt="Bhabhi"
+                className="w-20 h-20 shrink-0"
+                fallback={<BhabhiCardIllustration className="w-20 h-20" />}
+              />
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -504,13 +507,12 @@ export default function HomePage() {
                       <p className="text-[11px] text-gray-400">{game.genre}</p>
                     </div>
 
-                    <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-black/30 border border-white/5">
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                    </div>
+                    <SmartAssetImage
+                      src={game.image}
+                      alt={game.title}
+                      className="w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-black/30 border border-white/5"
+                      fallback={<CatalogIconGraphic gameId={game.id} className="w-14 h-14" />}
+                    />
                   </div>
                 </div>
 

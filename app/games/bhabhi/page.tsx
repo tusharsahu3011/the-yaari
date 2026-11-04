@@ -22,6 +22,13 @@ import {
   User,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
+import {
+  SmartAssetImage,
+  SoloRobotIllustration,
+  OnlineMultiplayerIllustration,
+  EntryCardsAndChipsIllustration,
+  EntryPurpleCardsIllustration,
+} from '@/components/illustrations/GameIllustrations';
 
 export default function BhabhiGameEntryPage() {
   const router = useRouter();
@@ -139,19 +146,21 @@ export default function BhabhiGameEntryPage() {
       <div className="relative py-6 overflow-hidden rounded-3xl bg-gradient-to-b from-[#100d28]/60 to-transparent">
         {/* Left 3D Cards + Chips */}
         <div className="absolute left-2 top-1/2 -translate-y-1/2 w-44 sm:w-56 pointer-events-none hidden md:block opacity-90">
-          <img
+          <SmartAssetImage
             src="/assets/bhabhi/entry-cards-chips.png"
             alt="Playing Cards and Chips"
-            className="w-full h-auto object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+            className="w-full h-auto"
+            fallback={<EntryCardsAndChipsIllustration className="w-full h-36" />}
           />
         </div>
 
         {/* Right 3D Glowing Purple Cards */}
         <div className="absolute right-2 top-1/2 -translate-y-1/2 w-44 sm:w-56 pointer-events-none hidden md:block opacity-90">
-          <img
+          <SmartAssetImage
             src="/assets/bhabhi/entry-purple-cards.png"
             alt="Glowing Purple Cards"
-            className="w-full h-auto object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+            className="w-full h-auto"
+            fallback={<EntryPurpleCardsIllustration className="w-full h-36" />}
           />
         </div>
 
@@ -237,13 +246,12 @@ export default function BhabhiGameEntryPage() {
               </div>
 
               {/* 3D Robot Image */}
-              <div className="w-24 h-24 shrink-0 flex items-center justify-center">
-                <img
-                  src="/assets/bhabhi/solo-robot.png"
-                  alt="AI Robot"
-                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(16,185,129,0.3)] group-hover:scale-105 transition-transform"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/bhabhi/solo-robot.png"
+                alt="AI Robot"
+                className="w-24 h-24 shrink-0"
+                fallback={<SoloRobotIllustration className="w-24 h-24" />}
+              />
             </div>
 
             <div className="flex items-center gap-4 text-xs text-gray-400 pt-1 font-medium">
@@ -287,13 +295,12 @@ export default function BhabhiGameEntryPage() {
               </div>
 
               {/* 3D Wireframe Globe Image */}
-              <div className="w-24 h-24 shrink-0 flex items-center justify-center">
-                <img
-                  src="/assets/bhabhi/entry-globe.png"
-                  alt="Online Globe"
-                  className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(139,92,246,0.3)] group-hover:scale-105 transition-transform"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/bhabhi/entry-globe.png"
+                alt="Online Globe"
+                className="w-24 h-24 shrink-0"
+                fallback={<OnlineMultiplayerIllustration className="w-24 h-24" />}
+              />
             </div>
 
             <div className="flex items-center gap-4 text-xs text-gray-400 pt-1 font-medium">

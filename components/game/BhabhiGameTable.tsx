@@ -20,6 +20,11 @@ import {
 } from '@/game-engine/bhabhi';
 import { PlayingCard } from '@/components/cards/PlayingCard';
 import {
+  SmartAssetImage,
+  StylizedAvatar,
+  DiscardPileIllustration,
+} from '@/components/illustrations/GameIllustrations';
+import {
   Crown,
   Flame,
   RotateCcw,
@@ -300,10 +305,11 @@ export function BhabhiGameTable({
                     : 'border-purple-400/60 ring-2 ring-purple-500/20'
                 }`}
               >
-                <img
+                <SmartAssetImage
                   src="/assets/bhabhi/bot-avatar.png"
                   alt="Bot 1"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
+                  fallback={<StylizedAvatar variant="bot" className="w-full h-full" />}
                 />
               </div>
               <div className="mt-1 px-3 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1.5 shadow">
@@ -337,10 +343,11 @@ export function BhabhiGameTable({
                     : 'border-emerald-400/60 ring-2 ring-emerald-500/20'
                 }`}
               >
-                <img
+                <SmartAssetImage
                   src="/assets/bhabhi/bot-avatar.png"
                   alt="Bot 3"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
+                  fallback={<StylizedAvatar variant="bot" className="w-full h-full" />}
                 />
               </div>
               <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
@@ -422,10 +429,11 @@ export function BhabhiGameTable({
                     : 'border-amber-400/60 ring-2 ring-amber-500/20'
                 }`}
               >
-                <img
+                <SmartAssetImage
                   src="/assets/bhabhi/bot-avatar.png"
                   alt="Bot 2"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
+                  fallback={<StylizedAvatar variant="bot" className="w-full h-full" />}
                 />
               </div>
               <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#16122d] border border-white/10 text-xs font-bold text-white flex items-center gap-1 shadow">
@@ -443,10 +451,11 @@ export function BhabhiGameTable({
           {/* Discard Pile indicator with Spade artwork */}
           <div className="flex items-center gap-2.5">
             <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border border-purple-400/30 bg-[#16122d]">
-              <img
+              <SmartAssetImage
                 src="/assets/bhabhi/discard-pile.png"
                 alt="Discard Pile"
-                className="w-full h-full object-cover"
+                className="w-full h-full"
+                fallback={<DiscardPileIllustration className="w-full h-full" />}
               />
             </div>
             <div className="text-left">
@@ -466,10 +475,11 @@ export function BhabhiGameTable({
                   : 'border-emerald-500/60 ring-2 ring-emerald-500/30'
               }`}
             >
-              <img
+              <SmartAssetImage
                 src="/assets/bhabhi/avatar-you.png"
                 alt="You"
-                className="w-full h-full object-cover"
+                className="w-full h-full"
+                fallback={<StylizedAvatar variant="you" className="w-full h-full" />}
               />
             </div>
             <div>

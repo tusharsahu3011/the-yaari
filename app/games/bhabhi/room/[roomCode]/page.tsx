@@ -37,6 +37,12 @@ import { PlayingCard } from '@/components/cards/PlayingCard';
 import { Card, getSuitSymbol, getSuitName } from '@/game-engine/bhabhi';
 import { VoiceMeshManager } from '@/lib/webrtc/voice-manager';
 import { soundManager } from '@/lib/audio/sound-effects';
+import {
+  SmartAssetImage,
+  LobbyCardsIllustration,
+  CuteAIRobotIllustration,
+  StylizedAvatar,
+} from '@/components/illustrations/GameIllustrations';
 
 export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
   const [copied, setCopied] = useState(false);
@@ -314,13 +320,12 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           <div className="md:col-span-7 flex items-center gap-4">
             {/* 3D Lobby Cards Artwork */}
-            <div className="w-20 h-16 shrink-0 flex items-center justify-center">
-              <img
-                src="/assets/bhabhi/lobby-cards.png"
-                alt="Lobby Cards"
-                className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(139,92,246,0.3)]"
-              />
-            </div>
+            <SmartAssetImage
+              src="/assets/bhabhi/lobby-cards.png"
+              alt="Lobby Cards"
+              className="w-20 h-16 shrink-0"
+              fallback={<LobbyCardsIllustration className="w-20 h-16" />}
+            />
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 Room Lobby
@@ -386,10 +391,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="relative">
                           <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-emerald-400/60 shadow">
-                            <img
+                            <SmartAssetImage
                               src={player.avatar || '/assets/bhabhi/avatar-you.png'}
                               alt={player.name}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full"
+                              fallback={<StylizedAvatar variant={player.isBot ? 'bot' : 'you'} className="w-full h-full text-xs" />}
                             />
                           </div>
                           {player.isHost && (
@@ -766,13 +772,12 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
 
             {/* Top Center: AI Dealer on Pedestal + Speech Bubble (Image 1) */}
             <div className="w-full flex items-start justify-center gap-3 z-20 pt-1">
-              <div className="w-16 h-16 shrink-0 flex items-center justify-center filter drop-shadow-[0_8px_16px_rgba(234,179,8,0.4)]">
-                <img
-                  src="/assets/bhabhi/dealer-robot.png"
-                  alt="AI Dealer"
-                  className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(234,179,8,0.5)]"
-                />
-              </div>
+              <SmartAssetImage
+                src="/assets/bhabhi/dealer-robot.png"
+                alt="AI Dealer"
+                className="w-16 h-16 shrink-0 filter drop-shadow-[0_8px_16px_rgba(234,179,8,0.5)]"
+                fallback={<CuteAIRobotIllustration className="w-16 h-16" />}
+              />
 
               {/* Hinglish Speech Bubble */}
               <div className="max-w-xs sm:max-w-sm bg-[#160b33]/90 border border-purple-400/50 rounded-2xl p-2.5 px-3.5 text-[11px] text-purple-200 shadow-xl backdrop-blur-md">
@@ -798,10 +803,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                 </div>
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg ring-2 ring-amber-400/30">
-                    <img
+                    <SmartAssetImage
                       src="/assets/bhabhi/avatar-aman.png"
                       alt="Aman"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      fallback={<StylizedAvatar variant="aman" className="w-full h-full" />}
                     />
                   </div>
                   <Mic className="w-3.5 h-3.5 text-emerald-400 absolute -bottom-1 -right-1 bg-black/80 rounded-full p-0.5" />
@@ -824,10 +830,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                 </div>
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-400 shadow-lg ring-2 ring-purple-400/30">
-                    <img
+                    <SmartAssetImage
                       src="/assets/bhabhi/avatar-simran.png"
                       alt="Simran"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      fallback={<StylizedAvatar variant="simran" className="w-full h-full" />}
                     />
                   </div>
                   <Mic className="w-3.5 h-3.5 text-emerald-400 absolute -bottom-1 -right-1 bg-black/80 rounded-full p-0.5" />
@@ -853,10 +860,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                 </div>
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-cyan-400 shadow-lg ring-2 ring-cyan-400/30">
-                    <img
+                    <SmartAssetImage
                       src="/assets/bhabhi/avatar-rohan.png"
                       alt="Rohan"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      fallback={<StylizedAvatar variant="rohan" className="w-full h-full" />}
                     />
                   </div>
                   <Mic className="w-3.5 h-3.5 text-emerald-400 absolute -bottom-1 -right-1 bg-black/80 rounded-full p-0.5" />
@@ -931,10 +939,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
                 </div>
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-pink-400 shadow-lg ring-2 ring-pink-400/30">
-                    <img
+                    <SmartAssetImage
                       src="/assets/bhabhi/avatar-priya.png"
                       alt="Priya"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      fallback={<StylizedAvatar variant="priya" className="w-full h-full" />}
                     />
                   </div>
                   <Mic className="w-3.5 h-3.5 text-emerald-400 absolute -bottom-1 -right-1 bg-black/80 rounded-full p-0.5" />
@@ -950,10 +959,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
             <div className="w-full flex flex-col items-center z-20">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-400 shadow-lg ring-2 ring-emerald-400/40">
-                  <img
+                  <SmartAssetImage
                     src="/assets/bhabhi/avatar-you.png"
                     alt="You"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
+                    fallback={<StylizedAvatar variant="you" className="w-full h-full" />}
                   />
                 </div>
                 <div className="px-3 py-0.5 rounded-full bg-[#12162a] border border-white/10 text-xs font-bold text-white flex items-center gap-1.5 shadow">
@@ -1034,10 +1044,11 @@ export function BhabhiRoomClient({ roomCode }: { roomCode: string }) {
               {displayChat.map((msg: any) => (
                 <div key={msg.id} className="flex items-start gap-2">
                   <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-white/20">
-                    <img
+                    <SmartAssetImage
                       src={msg.avatar || msg.senderAvatar || '/assets/bhabhi/avatar-you.png'}
                       alt={msg.senderName}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      fallback={<StylizedAvatar variant="bot" className="w-full h-full text-[10px]" />}
                     />
                   </div>
                   <div>
