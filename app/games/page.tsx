@@ -254,10 +254,10 @@ function GamesCatalogueContent() {
 
   const categories = [
     { id: 'all', label: 'All Titles' },
-    { id: 'cards', label: '🃏 Card Games' },
-    { id: 'bluff', label: '🕵️ Social Bluff' },
-    { id: 'words', label: '🧠 Word Games' },
-    { id: 'party', label: '🎉 Party Rooms' },
+    { id: 'cards', label: 'Card Games' },
+    { id: 'bluff', label: 'Social Bluff' },
+    { id: 'words', label: 'Word Games' },
+    { id: 'party', label: 'Party Rooms' },
   ];
 
   const filteredGames = ALL_GAMES.filter((g) => {
@@ -274,20 +274,20 @@ function GamesCatalogueContent() {
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none">
+    <div className="w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 pt-24 sm:pt-28 pb-16 space-y-8 select-none">
       {/* Prime Video OTT Browse Header */}
-      <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-[#070b18] via-[#091128] to-[#070b18] border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="relative rounded-2xl p-6 sm:p-10 bg-gradient-to-r from-[#070b18] via-[#091128] to-[#070b18] border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-3 max-w-xl text-left z-10">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30 flex items-center gap-1.5">
-              <Tv className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="px-2.5 py-0.5 rounded-md bg-[#00a8e1]/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-[#00a8e1]/30 flex items-center gap-1.5">
+              <Tv className="w-3.5 h-3.5 text-[#00a8e1]" />
               <span>THE YAARI BROWSE</span>
             </span>
             <span className="text-xs text-zinc-400 font-medium">• {ALL_GAMES.length} Titles</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Explore All Games & Shows
+            Explore All Games &amp; Shows
           </h1>
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             From classic desi card evasion in Bhabhi to psychological bluffing in Undercover and Spyfall.
@@ -300,7 +300,7 @@ function GamesCatalogueContent() {
       </div>
 
       {/* Filter and Search Navigation Bar (Prime Video Style) */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-[#070b18]/90 p-3 sm:p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-[#091122]/90 p-3 sm:p-4 rounded-xl border border-white/10 backdrop-blur-md">
         {/* Category Filter Pills */}
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {categories.map((cat) => (
@@ -310,9 +310,9 @@ function GamesCatalogueContent() {
                 soundManager.playSelect();
                 setSelectedCategory(cat.id);
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
                 selectedCategory === cat.id
-                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-950/40'
+                  ? 'bg-white text-black shadow-lg'
                   : 'bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/5'
               }`}
             >
@@ -329,7 +329,7 @@ function GamesCatalogueContent() {
             placeholder="Search by title, genre, or keyword..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl pl-10 pr-9 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-400"
+            className="w-full bg-black/60 border border-white/10 rounded-lg pl-10 pr-9 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#00a8e1]"
           />
           {searchQuery && (
             <button

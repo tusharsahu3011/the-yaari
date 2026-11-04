@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Play,
@@ -11,9 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  TrendingUp,
   CheckCircle2,
-  Tv,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
 import { AdBannerSlot } from '@/components/ads/AdBannerSlot';
@@ -52,7 +50,7 @@ const ALL_GAMES: GameDef[] = [
     rating: 'U/A 13+',
     rankBadge: '#1 in India',
     topRank: 1,
-    badgeLabel: 'TOP 1 READY',
+    badgeLabel: 'NEW EPISODE',
     sponsorTag: 'FINALE PACK • PARTY HIT',
     description:
       'Spot the impostors before they deceive the entire room! Civilians get the real word, Undercover gets a closely related word, and Mr. White gets no word at all. Give one-word clues and vote out the deceivers.',
@@ -62,7 +60,7 @@ const ALL_GAMES: GameDef[] = [
       'Debate and vote out suspected impostors each round until Civilians or Impostors win.',
     ],
     image: '/assets/home/card-undercover.png',
-    heroBackdrop: '/assets/home/card-undercover.png',
+    heroBackdrop: '/assets/home/hero-undercover-wide.png',
     href: '/games/undercover',
     accentColor: '#a855f7',
   },
@@ -88,7 +86,7 @@ const ALL_GAMES: GameDef[] = [
       'Clear your cards to escape. The last remaining player is crowned the Bhabhi!',
     ],
     image: '/assets/home/card-bhabhi.png',
-    heroBackdrop: '/assets/home/card-bhabhi.png',
+    heroBackdrop: '/assets/home/hero-bhabhi-wide.png',
     href: '/games/bhabhi',
     accentColor: '#ec4899',
   },
@@ -114,7 +112,7 @@ const ALL_GAMES: GameDef[] = [
       'Vote to accuse the Spy or the Spy can guess the location to steal the win.',
     ],
     image: '/assets/home/card-spyfall.png',
-    heroBackdrop: '/assets/home/card-spyfall.png',
+    heroBackdrop: '/assets/home/hero-spyfall-wide.png',
     href: '/games/spyfall',
     accentColor: '#f59e0b',
   },
@@ -131,7 +129,7 @@ const ALL_GAMES: GameDef[] = [
     rating: '18+',
     rankBadge: 'COMING SOON',
     topRank: 4,
-    badgeLabel: 'NEW RELEASE',
+    badgeLabel: 'NEW SERIES',
     sponsorTag: 'FESTIVE SPECIAL',
     description:
       'Classic 3-card Indian poker with virtual chips. Play blind or seen, manage your stakes, and win with high card hands or brilliant bluffing.',
@@ -203,7 +201,7 @@ const ALL_GAMES: GameDef[] = [
     rating: 'U/A 13+',
     rankBadge: 'EPIC DEDUCTION',
     topRank: 7,
-    badgeLabel: 'HIGH DRAMA',
+    badgeLabel: 'TOP DRAMA',
     sponsorTag: 'ARTHURIAN LEGENDS',
     description:
       'Loyal Servants of Arthur battle the treacherous Minions of Mordred. Pass 3 holy quests to claim Camelot, or sow discord to see it fall.',
@@ -227,7 +225,7 @@ const ALL_GAMES: GameDef[] = [
     rating: 'U/A 16+',
     rankBadge: 'HIGH TENSION',
     topRank: 8,
-    badgeLabel: 'POLITICAL THRILLER',
+    badgeLabel: 'TOP SUSPENSE',
     sponsorTag: 'CABINET INTRIGUE',
     description:
       'Elected governments try to enact progressive policies while hidden fascists work in secret to appoint their secret chancellor.',
@@ -314,12 +312,190 @@ const ALL_GAMES: GameDef[] = [
   },
 ];
 
+// Reusable Prime Video Carousel Content Row
+function PrimeVideoCarouselRow({
+  title,
+  games,
+  showRanks = false,
+  onOpenInfo,
+}: {
+  title: string;
+  games: GameDef[];
+  showRanks?: boolean;
+  onOpenInfo: (game: GameDef) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [games]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    soundManager.playSelect();
+    if (!scrollRef.current) return;
+    const offset = scrollRef.current.clientWidth * 0.75;
+    scrollRef.current.scrollBy({
+      left: direction === 'left' ? -offset : offset,
+      behavior: 'smooth',
+    });
+    setTimeout(checkScroll, 350);
+  };
+
+  return (
+    <section className="relative w-full space-y-2 group/row text-left">
+      {/* Row Header (Clean, bold, pure Prime Video typography) */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white tracking-tight">
+          {title}
+        </h2>
+        <Link
+          href="/games"
+          onClick={() => soundManager.playSelect()}
+          className="text-xs font-bold text-[#00a8e1] hover:underline"
+        >
+          See more
+        </Link>
+      </div>
+
+      {/* Row Container with Navigation Chevrons */}
+      <div className="relative">
+        {/* Left Scroll Chevron Button */}
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            aria-label="Scroll left"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 sm:w-12 h-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all cursor-pointer backdrop-blur-sm"
+          >
+            <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+        )}
+
+        {/* Right Scroll Chevron Button */}
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            aria-label="Scroll right"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 sm:w-12 h-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all cursor-pointer backdrop-blur-sm"
+          >
+            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+        )}
+
+        {/* Horizontal Scrolling Card Track */}
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className="flex items-center gap-3 sm:gap-4 overflow-x-auto scrollbar-none scroll-smooth pb-3 pt-1 px-0.5"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {games.map((game, index) => {
+            const isReady = game.status === 'ready';
+
+            return (
+              <div
+                key={game.id}
+                className="group relative flex-none w-[240px] sm:w-[280px] lg:w-[320px] aspect-[16/9] rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/40 transition-all duration-300 shadow-xl hover:scale-[1.04] cursor-pointer"
+                onClick={() => {
+                  soundManager.playSelect();
+                  if (isReady && game.href) {
+                    window.location.href = game.href;
+                  } else {
+                    onOpenInfo(game);
+                  }
+                }}
+              >
+                {/* 16:9 Landscape Artwork */}
+                <img
+                  src={game.image}
+                  alt={game.title}
+                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
+                />
+
+                {/* Subtle vignette gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+
+                {/* Top Corner Badge (Exact Prime Video Screenshot Style: White Tag, Bold Black Text) */}
+                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
+                  {showRanks ? (
+                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm bg-white text-black shadow-md">
+                      #{index + 1} IN INDIA
+                    </span>
+                  ) : (
+                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm bg-white text-black shadow-md">
+                      {game.badgeLabel}
+                    </span>
+                  )}
+                </div>
+
+                {/* Top Right Quick Info Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    soundManager.playSelect();
+                    onOpenInfo(game);
+                  }}
+                  title="Game rules and details"
+                  className="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition hover:scale-110 cursor-pointer opacity-0 group-hover:opacity-100"
+                >
+                  <Info className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Center Play Button Overlay on Hover */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/35 backdrop-blur-[1px]">
+                  <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                    <Play className="w-5 h-5 fill-black ml-0.5" />
+                  </div>
+                </div>
+
+                {/* Bottom Card Title & Metadata Overlay */}
+                <div className="absolute bottom-0 inset-x-0 p-3 z-10 text-left space-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs sm:text-sm font-bold text-white truncate drop-shadow-md">
+                      {game.title}
+                    </h3>
+                    <span
+                      className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded shrink-0 ${
+                        isReady
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-zinc-800 text-zinc-400'
+                      }`}
+                    >
+                      {isReady ? 'FREE' : 'SOON'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-[10px] text-zinc-300 font-medium">
+                    <span>{game.players}</span>
+                    <span>•</span>
+                    <span>{game.duration}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [infoModalGame, setInfoModalGame] = useState<GameDef | null>(null);
 
-  // Featured playable games for Hero Billboard carousel
+  // Playable games for the Hero Billboard
   const heroGames = ALL_GAMES.filter((g) => g.status === 'ready');
   const activeHero = heroGames[currentSlide] || heroGames[0];
 
@@ -343,7 +519,7 @@ export default function HomePage() {
   };
 
   // Content Row Filter Collections
-  const topPicks = ALL_GAMES.filter((g) => g.status === 'ready');
+  const topPicks = ALL_GAMES.filter((g) => g.status === 'ready' || g.topRank <= 6);
   const top10Games = ALL_GAMES.filter((g) => g.topRank <= 10).sort(
     (a, b) => a.topRank - b.topRank
   );
@@ -355,12 +531,13 @@ export default function HomePage() {
     <div className="w-full bg-[#00050d] text-white select-none">
       {/* =========================================================================
           1. FULL-WIDTH CINEMATIC BILLBOARD CAROUSEL (Exact Prime Video Layout)
-          - Extends edge-to-edge under top navbar
+          - Extends 100% full width under top navbar
           - Clean dark vignette on left & bottom
           - Accurate buttons: White Play CTA, circular '+', circular 'ℹ'
+          - Chevrons on absolute far left & right edges
           ========================================================================= */}
       <section
-        className="relative w-full h-[540px] sm:h-[620px] lg:h-[700px] overflow-hidden group bg-[#00050d] flex items-end"
+        className="relative w-full h-[540px] sm:h-[620px] lg:h-[700px] xl:h-[740px] overflow-hidden group bg-[#00050d] flex items-end"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -377,43 +554,43 @@ export default function HomePage() {
               <img
                 src={game.heroBackdrop}
                 alt={game.title}
-                className="w-full h-full object-cover object-center sm:object-right transition-transform duration-1000 scale-100 group-hover:scale-105"
+                className="w-full h-full object-cover object-center lg:object-right transition-transform duration-1000 scale-100 group-hover:scale-105"
               />
 
-              {/* Seamless Prime Video Vignette Gradient Overlays */}
+              {/* Prime Video Seamless Vignette Gradient Overlays */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#00050d] via-[#00050d]/85 via-45% to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#00050d] via-[#00050d]/60 via-25% to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#00050d]/90 via-transparent to-transparent h-28" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#00050d] via-[#00050d]/60 via-20% to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#00050d]/90 via-transparent to-transparent h-24" />
 
-              {/* Ambient Spotlight Glow */}
+              {/* Ambient Spotlight Glow on Right */}
               <div
-                className="absolute top-1/2 right-12 -translate-y-1/2 w-[550px] h-[450px] blur-[150px] opacity-35 pointer-events-none rounded-full"
+                className="absolute top-1/2 right-12 -translate-y-1/2 w-[550px] h-[450px] blur-[160px] opacity-35 pointer-events-none rounded-full"
                 style={{ backgroundColor: game.accentColor }}
               />
             </div>
           );
         })}
 
-        {/* Side Chevrons (Far Left & Right Edges) */}
+        {/* Side Chevrons (Absolute Far Left & Right Screen Edges) */}
         <button
           onClick={handlePrevSlide}
-          aria-label="Previous Featured Game"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-20 sm:w-14 sm:h-24 rounded-r-lg bg-black/40 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105 cursor-pointer opacity-80 hover:opacity-100"
+          aria-label="Previous Featured Title"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-14 h-24 rounded-r-lg bg-black/40 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105 cursor-pointer opacity-80 hover:opacity-100"
         >
           <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
         </button>
 
         <button
           onClick={handleNextSlide}
-          aria-label="Next Featured Game"
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-20 sm:w-14 sm:h-24 rounded-l-lg bg-black/40 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105 cursor-pointer opacity-80 hover:opacity-100"
+          aria-label="Next Featured Title"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-14 h-24 rounded-l-lg bg-black/40 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105 cursor-pointer opacity-80 hover:opacity-100"
         >
           <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
         </button>
 
-        {/* Billboard Hero Content Area (Aligned to Left) */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pb-14 sm:pb-16 space-y-4 text-left">
-          {/* Top Brand Logo Tag (Like 'MX' in screenshot) */}
+        {/* Billboard Hero Content Area (Aligned to Left with Full Max Width) */}
+        <div className="relative z-20 w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 pb-14 sm:pb-16 space-y-4 text-left">
+          {/* Top Brand Network Tag (Mirrors 'MX' with cyan curve in screenshot) */}
           <div className="flex items-center gap-2">
             <div className="flex flex-col leading-none">
               <span className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-1">
@@ -436,7 +613,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Large Stylized Game Title Logo (With Ornamental Emblems) */}
+          {/* Large Stylized Game Title (Flanked by Diamond Emblems) */}
           <div className="space-y-1.5 pt-1">
             <div className="flex items-center gap-3">
               <span className="text-xl sm:text-2xl text-amber-400 font-serif">◈</span>
@@ -456,7 +633,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Trending Rank Pill (Prime Video '#2 in India' Exact Style) */}
+          {/* Trending Rank Tag (Exact Prime Video '#2 in India' Green Pill) */}
           <div className="flex items-center gap-2 pt-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#00d47b] bg-[#00d47b]/15 border border-[#00d47b]/30 px-2.5 py-0.5 rounded-full">
               <span className="w-4 h-4 rounded-full bg-[#00d47b]/30 flex items-center justify-center text-[11px] font-black">
@@ -473,7 +650,7 @@ export default function HomePage() {
               <Link
                 href={activeHero.href}
                 onClick={() => soundManager.playSelect()}
-                className="flex items-center gap-2.5 px-6 sm:px-8 py-3.5 rounded-md bg-white hover:bg-zinc-200 text-black font-black text-sm sm:text-base shadow-2xl transition hover:scale-105 active:scale-95 cursor-pointer"
+                className="flex items-center gap-2.5 px-7 sm:px-8 py-3.5 rounded-md bg-white hover:bg-zinc-200 text-black font-black text-sm sm:text-base shadow-2xl transition hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Play className="w-5 h-5 fill-black" />
                 <span>Play Now</span>
@@ -535,398 +712,58 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Main Content Rows Section */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
-        {/* Ad Container Placement 1 (Leaderboard) */}
+      {/* =========================================================================
+          2. MAIN CONTENT ROWS (Exact Prime Video Layout & Gutter Margins)
+          - Spans w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16
+          - All cards are 16:9 widescreen landscape
+          - Horizontal smooth scrolling carousels with chevrons
+          ========================================================================= */}
+      <div className="w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 py-8 space-y-10 sm:space-y-12">
+        {/* Ad Placement 1: Top Sponsored Banner */}
         <AdBannerSlot slotId="home-hero-leaderboard" format="leaderboard" />
 
-        {/* =========================================================================
-            2. ROW 1: TODAY'S TOP PICKS FOR YOU (16:9 Widescreen Posters)
-            Matches Prime Video screenshot row with top badges
-            ========================================================================= */}
-        <section className="w-full space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Today&apos;s top picks for you
-            </h2>
-            <Link
-              href="/games"
-              className="text-xs font-bold text-[#00a8e1] hover:text-cyan-300 transition"
-            >
-              See more
-            </Link>
-          </div>
+        {/* Row 1: Today's top picks for you */}
+        <PrimeVideoCarouselRow
+          title="Today's top picks for you"
+          games={topPicks}
+          onOpenInfo={(game) => setInfoModalGame(game)}
+        />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {topPicks.map((game) => (
-              <div
-                key={game.id}
-                className="group relative rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/30 transition-all duration-300 shadow-xl hover:scale-[1.03] flex flex-col cursor-pointer"
-                onClick={() => {
-                  soundManager.playSelect();
-                  if (game.href) window.location.href = game.href;
-                }}
-              >
-                {/* 16:9 Landscape Poster */}
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                  <img
-                    src={game.image}
-                    alt={game.title}
-                    className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070b18] via-[#070b18]/40 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
+        {/* Row 2: Top 10 Games in India Today */}
+        <PrimeVideoCarouselRow
+          title="Top 10 Games in India Today"
+          games={top10Games}
+          showRanks={true}
+          onOpenInfo={(game) => setInfoModalGame(game)}
+        />
 
-                  {/* Top Badge (Like 'NEW EPISODE', 'TOP DRAMA', 'TOP 10' in screenshot) */}
-                  <div className="absolute top-2.5 left-2.5 z-10">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm bg-black/80 text-white border border-white/20 backdrop-blur-md">
-                      {game.badgeLabel}
-                    </span>
-                  </div>
-
-                  {/* Info Button on Card */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      soundManager.playSelect();
-                      setInfoModalGame(game);
-                    }}
-                    className="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition hover:scale-110 cursor-pointer"
-                  >
-                    <Info className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Play Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/40 backdrop-blur-[2px]">
-                    <div className="w-13 h-13 rounded-full bg-white text-black flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                      <Play className="w-6 h-6 fill-black ml-0.5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Info */}
-                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-1.5 bg-[#070b18]">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
-                        {game.title}
-                      </h3>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        READY
-                      </span>
-                    </div>
-                    <p className="text-xs text-zinc-400 font-medium line-clamp-1 mt-0.5">
-                      {game.genre}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400 font-semibold">
-                    <span>👥 {game.players}</span>
-                    <span>⏱️ {game.duration}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* =========================================================================
-            3. ROW 2: SIGNATURE "TOP 10 IN INDIA TODAY" ROW
-            Features massive, iconic stylized rank numbers (1, 2, 3...)
-            ========================================================================= */}
-        <section className="w-full space-y-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Top 10 Games in India Today</span>
-              <span className="text-xs text-[#00a8e1] font-semibold bg-[#00a8e1]/10 px-2 py-0.5 rounded">
-                Daily Charts
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-            {top10Games.slice(0, 5).map((game) => {
-              const isReady = game.status === 'ready';
-
-              return (
-                <div
-                  key={game.id}
-                  className="group relative flex flex-col cursor-pointer"
-                  onClick={() => {
-                    soundManager.playSelect();
-                    if (isReady && game.href) {
-                      window.location.href = game.href;
-                    } else {
-                      setInfoModalGame(game);
-                    }
-                  }}
-                >
-                  <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-[#070b18] border border-white/10 group-hover:border-[#00a8e1] transition-all duration-300 shadow-xl group-hover:scale-105">
-                    <img
-                      src={game.image}
-                      alt={game.title}
-                      className="w-full h-full object-cover object-center"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-
-                    {/* Massive Stroke Rank Number in Foreground */}
-                    <div className="absolute bottom-1 left-2 z-10 pointer-events-none">
-                      <span className="text-6xl sm:text-7xl font-black text-white/90 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] stroke-black tracking-tighter">
-                        {game.topRank}
-                      </span>
-                    </div>
-
-                    <div className="absolute top-2 right-2 z-10">
-                      <span
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                          isReady
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-black/70 text-zinc-400'
-                        }`}
-                      >
-                        {isReady ? 'PLAY' : 'DEV'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 text-left space-y-0.5">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition truncate">
-                      {game.title}
-                    </h4>
-                    <p className="text-[11px] text-zinc-400 truncate">{game.genre}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Ad Container Placement 2 (Mid-Feed Sponsored) */}
+        {/* Ad Placement 2: Mid-Feed Sponsored Billboard */}
         <AdBannerSlot slotId="home-midfeed-sponsor" format="billboard" />
 
-        {/* =========================================================================
-            4. ROW 3: CARD CLASSICS & DESI HITS
-            ========================================================================= */}
-        <section className="w-full space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Card Classics &amp; Desi Hits
-            </h2>
-            <span className="text-xs text-zinc-400 font-medium">South Asian Favorites</span>
-          </div>
+        {/* Row 3: Card Classics & Desi Favorites */}
+        <PrimeVideoCarouselRow
+          title="Popular card games and South Asian classics"
+          games={cardGames}
+          onOpenInfo={(game) => setInfoModalGame(game)}
+        />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cardGames.map((game) => {
-              const isReady = game.status === 'ready';
+        {/* Row 4: Social Deduction & Psychological Bluff */}
+        <PrimeVideoCarouselRow
+          title="Social deduction and psychological bluffing"
+          games={bluffGames}
+          onOpenInfo={(game) => setInfoModalGame(game)}
+        />
 
-              return (
-                <div
-                  key={game.id}
-                  className="group relative rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-pink-500/50 transition-all duration-300 shadow-lg hover:scale-[1.02] flex flex-col justify-between p-4 cursor-pointer"
-                  onClick={() => {
-                    soundManager.playSelect();
-                    if (isReady && game.href) {
-                      window.location.href = game.href;
-                    } else {
-                      setInfoModalGame(game);
-                    }
-                  }}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                          isReady
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-zinc-800 text-zinc-400'
-                        }`}
-                      >
-                        {isReady ? 'READY TO PLAY' : 'IN PIPELINE'}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          soundManager.playSelect();
-                          setInfoModalGame(game);
-                        }}
-                        className="w-6 h-6 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center"
-                      >
-                        <Info className="w-3 h-3" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-lg overflow-hidden bg-black/60 border border-white/10 p-1 shrink-0">
-                        <img
-                          src={game.image}
-                          alt={game.title}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-white group-hover:text-pink-300 transition">
-                          {game.title}
-                        </h3>
-                        <p className="text-[11px] text-zinc-400">{game.genre}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400 font-semibold">
-                    <span>{game.players}</span>
-                    <span className="text-cyan-400">{isReady ? '▶ Stream' : 'Rules'}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* =========================================================================
-            5. ROW 4: SOCIAL DEDUCTION & PSYCHOLOGICAL BLUFF
-            ========================================================================= */}
-        <section className="w-full space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Social Deduction &amp; Psychological Bluff
-            </h2>
-            <span className="text-xs text-zinc-400 font-medium">{bluffGames.length} Titles</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {bluffGames.map((game) => {
-              const isReady = game.status === 'ready';
-
-              return (
-                <div
-                  key={game.id}
-                  className="group relative rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-lg hover:scale-[1.02] flex flex-col justify-between p-4 cursor-pointer"
-                  onClick={() => {
-                    soundManager.playSelect();
-                    if (isReady && game.href) {
-                      window.location.href = game.href;
-                    } else {
-                      setInfoModalGame(game);
-                    }
-                  }}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                          isReady
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-purple-950/50 text-purple-300 border border-purple-500/30'
-                        }`}
-                      >
-                        {game.badgeLabel}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          soundManager.playSelect();
-                          setInfoModalGame(game);
-                        }}
-                        className="w-6 h-6 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center"
-                      >
-                        <Info className="w-3 h-3" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-lg overflow-hidden bg-black/60 border border-white/10 p-1 shrink-0">
-                        <img
-                          src={game.image}
-                          alt={game.title}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition">
-                          {game.title}
-                        </h3>
-                        <p className="text-[11px] text-zinc-400 line-clamp-1">{game.genre}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400 font-semibold">
-                    <span>{game.players}</span>
-                    <span className="text-purple-400">{isReady ? '▶ Stream Now' : 'Details'}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* =========================================================================
-            6. ROW 5: WORD GAMES & MIND ASSOCIATION
-            ========================================================================= */}
-        <section className="w-full space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Word Games &amp; Mind Association
-            </h2>
-            <span className="text-xs text-zinc-400 font-medium">{wordGames.length} Titles</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {wordGames.map((game) => (
-              <div
-                key={game.id}
-                className="group relative rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-cyan-500/50 transition-all duration-300 shadow-lg hover:scale-[1.02] flex flex-col justify-between p-4 cursor-pointer"
-                onClick={() => {
-                  soundManager.playSelect();
-                  setInfoModalGame(game);
-                }}
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-cyan-950/50 text-cyan-300 border border-cyan-500/30">
-                      {game.badgeLabel}
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        soundManager.playSelect();
-                        setInfoModalGame(game);
-                      }}
-                      className="w-6 h-6 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center"
-                    >
-                      <Info className="w-3 h-3" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-black/60 border border-white/10 p-1 shrink-0">
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition">
-                        {game.title}
-                      </h3>
-                      <p className="text-[11px] text-zinc-400 line-clamp-1">{game.genre}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400 font-semibold">
-                  <span>{game.players}</span>
-                  <span className="text-cyan-400">Rules &amp; Specs</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Row 5: Word Games & Mind Association */}
+        <PrimeVideoCarouselRow
+          title="Word games and mind association"
+          games={wordGames}
+          onOpenInfo={(game) => setInfoModalGame(game)}
+        />
       </div>
 
       {/* =========================================================================
-          7. DETAILS & RULES MODAL
+          3. DETAILS & RULES MODAL (Cinema Overlay)
           ========================================================================= */}
       {infoModalGame && (
         <div
@@ -934,17 +771,17 @@ export default function HomePage() {
           onClick={() => setInfoModalGame(null)}
         >
           <div
-            className="relative w-full max-w-2xl rounded-xl bg-[#070b18] border border-white/20 shadow-2xl overflow-hidden text-left"
+            className="relative w-full max-w-2xl rounded-xl bg-[#091122] border border-white/20 shadow-2xl overflow-hidden text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-black/60">
+            <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/60">
               <img
                 src={infoModalGame.image}
                 alt={infoModalGame.title}
                 className="w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070b18] via-[#070b18]/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#070b18]/90 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#091122] via-[#091122]/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#091122]/90 via-transparent to-transparent" />
 
               <button
                 onClick={() => setInfoModalGame(null)}
