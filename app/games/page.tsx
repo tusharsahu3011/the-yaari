@@ -295,13 +295,19 @@ export default function GamesCataloguePage() {
           return (
             <div
               key={game.id}
-              className={`p-6 rounded-3xl bg-[#0e1224] border transition flex flex-col justify-between space-y-4 group relative overflow-hidden ${
-                isReady
-                  ? 'border-purple-500/30 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-950/40'
-                  : 'border-white/10 hover:border-white/20'
-              }`}
+              className="p-6 rounded-3xl bg-[#0e1224] border transition-all duration-300 flex flex-col justify-between space-y-4 group relative overflow-hidden hover:-translate-y-1"
+              style={{
+                borderColor: `${game.accentColor}40`,
+                boxShadow: `0 8px 28px -6px ${game.accentColor}28`,
+              }}
             >
-              <div className="space-y-4">
+              {/* Ambient Corner Glow */}
+              <div
+                className="absolute -top-14 -right-14 w-36 h-36 rounded-full blur-2xl opacity-20 group-hover:opacity-45 transition-opacity duration-500 pointer-events-none"
+                style={{ backgroundColor: game.accentColor }}
+              />
+
+              <div className="space-y-4 relative z-10">
                 {/* Header Badge */}
                 <div className="flex items-center justify-between">
                   <span
@@ -319,19 +325,31 @@ export default function GamesCataloguePage() {
                 {/* Graphic + Title */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1">
-                    <h3 className="text-xl font-black text-white group-hover:text-purple-300 transition">
+                    <h3 className="text-xl font-black text-white group-hover:text-white transition">
                       {game.title}
                     </h3>
-                    <p className="text-xs text-purple-400 font-semibold">{game.genre}</p>
+                    <p
+                      className="text-xs font-semibold"
+                      style={{ color: game.accentColor }}
+                    >
+                      {game.genre}
+                    </p>
                   </div>
 
-                  <div className="w-16 h-16 shrink-0 rounded-2xl overflow-hidden bg-black/40 border border-white/5 p-1 shadow-lg">
-                    <SmartAssetImage
-                      src={game.image}
-                      alt={game.title}
-                      className="w-full h-full"
-                      fallback={getFallbackGraphic(game)}
+                  {/* Logo Container with Ambient Back-glow */}
+                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                    <div
+                      className="absolute inset-0 rounded-2xl blur-lg opacity-35 group-hover:opacity-75 group-hover:scale-115 transition-all duration-300 pointer-events-none"
+                      style={{ backgroundColor: game.accentColor }}
                     />
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black/40 border border-white/10 p-1 relative z-10 flex items-center justify-center">
+                      <SmartAssetImage
+                        src={game.image}
+                        alt={game.title}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        fallback={getFallbackGraphic(game)}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -342,7 +360,7 @@ export default function GamesCataloguePage() {
               </div>
 
               {/* Bottom Info Strip & Action */}
-              <div className="pt-3 border-t border-white/5 space-y-3">
+              <div className="pt-3 border-t border-white/10 space-y-3 relative z-10">
                 <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
                   <span className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-gray-400" /> {game.players}

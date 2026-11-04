@@ -223,12 +223,13 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Visual 3D Showcase (Image 5 exact 3D composition with fallback) */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+          {/* Right Visual 3D Showcase (Image 5 exact 3D composition with ambient glow) */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end relative">
+            <div className="absolute inset-4 bg-gradient-to-r from-purple-600/30 via-pink-600/20 to-amber-500/25 blur-3xl rounded-full pointer-events-none" />
             <SmartAssetImage
               src="/assets/home/hero-3d.png"
               alt="Games 3D Art Composition"
-              className="w-full max-w-md h-64 sm:h-72"
+              className="w-full max-w-md h-64 sm:h-72 relative z-10 filter drop-shadow-[0_20px_35px_rgba(139,92,246,0.4)]"
               fallback={<HeroGameComposition className="w-full h-full" />}
             />
           </div>
@@ -317,36 +318,47 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Featured Card 1: Undercover */}
-          <div className="p-5 rounded-2xl bg-[#101428] border border-purple-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1c1236]/90 via-[#0f1326] to-[#070914] border-2 border-purple-500/40 hover:border-purple-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(168,85,247,0.25)] hover:shadow-[0_0_55px_rgba(168,85,247,0.45)] transition-all duration-300 group">
+            {/* Ambient Corner Glow */}
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-purple-500/25 blur-3xl pointer-events-none group-hover:bg-purple-500/40 transition-all duration-500" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-purple-700/15 blur-2xl pointer-events-none" />
+
+            <div className="flex items-center justify-between z-10">
+              <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> READY TO PLAY
               </span>
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h3 className="text-xl font-black text-white">Undercover</h3>
-                <p className="text-xs text-gray-400">Social Deduction • Group</p>
+            <div className="flex items-center justify-between gap-4 z-10">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black text-white group-hover:text-purple-300 transition-colors">
+                  Undercover
+                </h3>
+                <p className="text-xs font-semibold text-purple-300/80">Social Deduction • Group</p>
               </div>
-              <SmartAssetImage
-                src="/assets/home/card-undercover.png"
-                alt="Undercover"
-                className="w-20 h-20 shrink-0"
-                fallback={<UndercoverIllustration className="w-20 h-20" />}
-              />
+
+              {/* Logo with ambient back-glow */}
+              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-purple-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-purple-400/55 group-hover:scale-115 transition-all duration-500" />
+                <SmartAssetImage
+                  src="/assets/home/card-undercover.png"
+                  alt="Undercover"
+                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
+                  fallback={<UndercoverIllustration className="w-20 h-20" />}
+                />
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/10">
-              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 z-10">
+              <div className="text-xs text-gray-300 font-medium flex items-center gap-3">
                 <span>👥 3 - 20 Players</span>
                 <span>⏱️ 10 - 15 Min</span>
               </div>
               <Link
                 href="/games/undercover"
-                className="w-9 h-9 rounded-full bg-[#632df3] hover:bg-[#5224d8] text-white flex items-center justify-center shadow-md shadow-purple-600/40 transition transform hover:scale-110 active:scale-95"
+                className="w-10 h-10 rounded-full bg-[#632df3] hover:bg-[#743ef8] text-white flex items-center justify-center shadow-lg shadow-purple-600/40 transition transform hover:scale-110 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white ml-0.5" />
               </Link>
@@ -354,34 +366,45 @@ export default function HomePage() {
           </div>
 
           {/* Featured Card 2: Spyfall */}
-          <div className="p-5 rounded-2xl bg-[#101428] border border-amber-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#2a1708]/90 via-[#0f1326] to-[#070914] border-2 border-amber-500/40 hover:border-amber-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(245,158,11,0.25)] hover:shadow-[0_0_55px_rgba(245,158,11,0.45)] transition-all duration-300 group">
+            {/* Ambient Corner Glow */}
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-amber-500/25 blur-3xl pointer-events-none group-hover:bg-amber-500/40 transition-all duration-500" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-amber-700/15 blur-2xl pointer-events-none" />
+
+            <div className="flex items-center justify-between z-10">
+              <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> READY TO PLAY
               </span>
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h3 className="text-xl font-black text-white">Spyfall</h3>
-                <p className="text-xs text-gray-400">Interrogation • Bluffing</p>
+            <div className="flex items-center justify-between gap-4 z-10">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black text-white group-hover:text-amber-300 transition-colors">
+                  Spyfall
+                </h3>
+                <p className="text-xs font-semibold text-amber-300/80">Interrogation • Bluffing</p>
               </div>
-              <SmartAssetImage
-                src="/assets/home/card-spyfall.png"
-                alt="Spyfall"
-                className="w-20 h-20 shrink-0"
-                fallback={<SpyfallIllustration className="w-20 h-20" />}
-              />
+
+              {/* Logo with ambient back-glow */}
+              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-amber-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-amber-400/55 group-hover:scale-115 transition-all duration-500" />
+                <SmartAssetImage
+                  src="/assets/home/card-spyfall.png"
+                  alt="Spyfall"
+                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
+                  fallback={<SpyfallIllustration className="w-20 h-20" />}
+                />
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/10">
-              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 z-10">
+              <div className="text-xs text-gray-300 font-medium flex items-center gap-3">
                 <span>👥 3 - 12 Players</span>
                 <span>⏱️ 8 - 12 Min</span>
               </div>
               <Link
                 href="/games/spyfall"
-                className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-md shadow-amber-500/30 transition transform hover:scale-110 active:scale-95"
+                className="w-10 h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-lg shadow-amber-500/40 transition transform hover:scale-110 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-black ml-0.5" />
               </Link>
@@ -389,34 +412,45 @@ export default function HomePage() {
           </div>
 
           {/* Featured Card 3: Bhabhi (Get Away) */}
-          <div className="p-5 rounded-2xl bg-[#101428] border border-pink-500/40 relative overflow-hidden flex flex-col justify-between space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> READY TO PLAY
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#2b0c24]/90 via-[#0f1326] to-[#070914] border-2 border-pink-500/40 hover:border-pink-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(236,72,153,0.25)] hover:shadow-[0_0_55px_rgba(236,72,153,0.45)] transition-all duration-300 group">
+            {/* Ambient Corner Glow */}
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-pink-500/25 blur-3xl pointer-events-none group-hover:bg-pink-500/40 transition-all duration-500" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-pink-700/15 blur-2xl pointer-events-none" />
+
+            <div className="flex items-center justify-between z-10">
+              <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> READY TO PLAY
               </span>
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h3 className="text-xl font-black text-white">Bhabhi (Get Away)</h3>
-                <p className="text-xs text-gray-400">Card Game • Evasion</p>
+            <div className="flex items-center justify-between gap-4 z-10">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black text-white group-hover:text-pink-300 transition-colors">
+                  Bhabhi (Get Away)
+                </h3>
+                <p className="text-xs font-semibold text-pink-300/80">Card Game • Evasion</p>
               </div>
-              <SmartAssetImage
-                src="/assets/home/card-bhabhi.png"
-                alt="Bhabhi"
-                className="w-20 h-20 shrink-0"
-                fallback={<BhabhiCardIllustration className="w-20 h-20" />}
-              />
+
+              {/* Logo with ambient back-glow */}
+              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-pink-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-pink-400/55 group-hover:scale-115 transition-all duration-500" />
+                <SmartAssetImage
+                  src="/assets/home/card-bhabhi.png"
+                  alt="Bhabhi"
+                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
+                  fallback={<BhabhiCardIllustration className="w-20 h-20" />}
+                />
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/10">
-              <div className="text-[11px] text-gray-400 flex items-center gap-3">
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 z-10">
+              <div className="text-xs text-gray-300 font-medium flex items-center gap-3">
                 <span>👥 3 - 6 Players</span>
                 <span>⏱️ 10 - 15 Min</span>
               </div>
               <Link
                 href="/games/bhabhi"
-                className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-md shadow-amber-500/30 transition transform hover:scale-110 active:scale-95"
+                className="w-10 h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-lg shadow-amber-500/40 transition transform hover:scale-110 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-black ml-0.5" />
               </Link>
@@ -473,23 +507,29 @@ export default function HomePage() {
         </div>
 
         {/* 11 Games Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {filteredGames.map((game) => {
             const isReady = game.status === 'ready';
 
             return (
               <div
                 key={game.id}
-                className={`p-4 rounded-2xl bg-[#0e1224] border transition flex flex-col justify-between space-y-3 relative overflow-hidden group ${
-                  isReady
-                    ? 'border-purple-500/30 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/30'
-                    : 'border-white/10 hover:border-white/20'
-                }`}
+                className="p-5 rounded-2xl bg-[#0e1224] border transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group hover:-translate-y-1"
+                style={{
+                  borderColor: `${game.accentColor}35`,
+                  boxShadow: `0 8px 24px -6px ${game.accentColor}25`,
+                }}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
+                {/* Ambient Corner & Logo Glow */}
+                <div
+                  className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-20 group-hover:opacity-45 transition-opacity duration-500 pointer-events-none"
+                  style={{ backgroundColor: game.accentColor }}
+                />
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
                     <span
-                      className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                         isReady
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                           : 'bg-purple-950/60 text-purple-300 border border-purple-500/30'
@@ -499,24 +539,38 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition">
+                      <h3 className="text-base font-black text-white group-hover:text-white transition">
                         {game.title}
                       </h3>
-                      <p className="text-[11px] text-gray-400">{game.genre}</p>
+                      <p
+                        className="text-[11px] font-semibold mt-0.5"
+                        style={{ color: game.accentColor }}
+                      >
+                        {game.genre}
+                      </p>
                     </div>
 
-                    <SmartAssetImage
-                      src={game.image}
-                      alt={game.title}
-                      className="w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-black/30 border border-white/5"
-                      fallback={<CatalogIconGraphic gameId={game.id} className="w-14 h-14" />}
-                    />
+                    {/* Logo container with ambient underglow matching the logo */}
+                    <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                      <div
+                        className="absolute inset-0 rounded-2xl blur-lg opacity-35 group-hover:opacity-75 group-hover:scale-115 transition-all duration-300 pointer-events-none"
+                        style={{ backgroundColor: game.accentColor }}
+                      />
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black/40 border border-white/10 p-1 relative z-10 flex items-center justify-center">
+                        <SmartAssetImage
+                          src={game.image}
+                          alt={game.title}
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                          fallback={<CatalogIconGraphic gameId={game.id} className="w-14 h-14" />}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500">
+                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400 font-medium relative z-10">
                   <span>{game.players}</span>
                   <span>{game.duration}</span>
                 </div>
@@ -524,7 +578,7 @@ export default function HomePage() {
                 {isReady && game.href && (
                   <Link
                     href={game.href}
-                    className="absolute inset-0"
+                    className="absolute inset-0 z-20"
                     title={`Play ${game.title}`}
                   />
                 )}
