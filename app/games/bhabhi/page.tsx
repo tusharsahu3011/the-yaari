@@ -111,7 +111,7 @@ export default function BhabhiGameEntryPage() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 select-none">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none">
       {/* Prime Video Back Navigation Strip */}
       <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <Link

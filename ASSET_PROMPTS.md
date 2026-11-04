@@ -153,3 +153,4 @@ Aap in prompts ko kisi bhi AI image tool mein direct paste kar sakte hain:
 2. **Midjourney v6**: Prompt ke aage `--ar 16:9 --style raw --v 6.1` add karein.
 3. **DALL-E 3 / ChatGPT Plus**: Prompt direct paste karein aur "wide landscape format" specify karein.
 4. **Flux 1.1 Pro**: Seed + negative prompt ke sath generate karein.
+

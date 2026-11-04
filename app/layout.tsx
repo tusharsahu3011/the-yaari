@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'The Yaari — Multiplayer Party & Card Games Streaming Hub',
+  title: 'The Yaari by Coder Tushar — Stream & Play Multiplayer Party Games',
   description:
-    'The Yaari: Stream and play party games with friends in your browser. Play classic desi card game Bhabhi (Get Away), Undercover, Spyfall, and more. Solo vs smart AI bots or instant multiplayer rooms.',
+    'TheYaari by Coder Tushar: Prime Video style browser gaming hub. Stream and play classic desi card game Bhabhi (Get Away), Undercover, Spyfall, and more with dost & yaar.',
   icons: {
     icon: '/assets/brand/the-yaari-icon.png',
     apple: '/assets/brand/the-yaari-icon.png',
@@ -35,11 +35,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#090b11] text-gray-100 selection:bg-purple-600 selection:text-white">
-        <Suspense fallback={<div className="h-24 w-full" />}>
+      <body className="min-h-full flex flex-col bg-[#00050d] text-gray-100 selection:bg-[#00a8e1] selection:text-black">
+        <Suspense fallback={<div className="h-16 w-full bg-[#00050d]" />}>
           <Navbar />
         </Suspense>
-        <main className="flex-1 flex flex-col w-full pt-24 sm:pt-28">{children}</main>
+        <main className="flex-1 flex flex-col w-full">{children}</main>
         <Footer />
       </body>
     </html>

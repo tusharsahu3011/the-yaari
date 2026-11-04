@@ -274,7 +274,7 @@ function GamesCatalogueContent() {
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 select-none">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none">
       {/* Prime Video OTT Browse Header */}
       <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-[#070b18] via-[#091128] to-[#070b18] border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-3 max-w-xl text-left z-10">

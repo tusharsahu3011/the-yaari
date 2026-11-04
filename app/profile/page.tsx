@@ -82,7 +82,7 @@ export default function ProfilePage() {
     stats.gamesPlayed > 0 ? Math.round((stats.gamesEscaped / stats.gamesPlayed) * 100) : 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 select-none text-left">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none text-left">
       {/* Prime Video "Who's Watching?" Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30">

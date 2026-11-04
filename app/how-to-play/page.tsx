@@ -21,7 +21,7 @@ import { soundManager } from '@/lib/audio/sound-effects';
 
 export default function HowToPlayPage() {
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 flex flex-col items-center select-none text-left">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-10 flex flex-col items-center select-none text-left">
       {/* Prime Video Help & Rules Header */}
       <div className="w-full text-center max-w-2xl space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-cyan-300 text-xs font-bold">
