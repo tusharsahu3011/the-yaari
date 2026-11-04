@@ -18,23 +18,24 @@ export function SmartAssetImage({
   className = '',
   fallback,
 }: SmartAssetImageProps) {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className={`relative flex items-center justify-center select-none ${className}`}>
+        {fallback}
+      </div>
+    );
+  }
 
   return (
     <div className={`relative flex items-center justify-center select-none ${className}`}>
-      {!error && (
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-full object-contain transition-opacity duration-300 ${
-            loaded ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
-          }`}
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-        />
-      )}
-      {(!loaded || error) && fallback}
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-contain"
+        onError={() => setHasError(true)}
+      />
     </div>
   );
 }
