@@ -301,9 +301,20 @@ export default function GamesCataloguePage() {
                 boxShadow: `0 8px 28px -6px ${game.accentColor}28`,
               }}
             >
+              {/* Stretched Background Logo (Ambient Watermark) */}
+              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+                <img
+                  src={game.image}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-full h-full object-cover object-center opacity-[0.08] group-hover:opacity-[0.14] scale-105 group-hover:scale-110 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-[#0e1224]/85 to-[#0e1224]/75" />
+              </div>
+
               {/* Ambient Corner Glow */}
               <div
-                className="absolute -top-14 -right-14 w-36 h-36 rounded-full blur-2xl opacity-20 group-hover:opacity-45 transition-opacity duration-500 pointer-events-none"
+                className="absolute -top-14 -right-14 w-36 h-36 rounded-full blur-2xl opacity-25 group-hover:opacity-50 transition-opacity duration-500 pointer-events-none z-0"
                 style={{ backgroundColor: game.accentColor }}
               />
 
@@ -336,17 +347,20 @@ export default function GamesCataloguePage() {
                     </p>
                   </div>
 
-                  {/* Logo Container with Ambient Back-glow */}
+                  {/* Logo Container with Rounded Border & Ambient Back-glow */}
                   <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
                     <div
-                      className="absolute inset-0 rounded-2xl blur-lg opacity-35 group-hover:opacity-75 group-hover:scale-115 transition-all duration-300 pointer-events-none"
+                      className="absolute inset-0 rounded-2xl blur-lg opacity-40 group-hover:opacity-80 group-hover:scale-115 transition-all duration-300 pointer-events-none"
                       style={{ backgroundColor: game.accentColor }}
                     />
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black/40 border border-white/10 p-1 relative z-10 flex items-center justify-center">
+                    <div
+                      className="w-16 h-16 rounded-2xl overflow-hidden bg-black/60 border-2 p-1 relative z-10 flex items-center justify-center shadow-lg transition-colors duration-300"
+                      style={{ borderColor: `${game.accentColor}75` }}
+                    >
                       <SmartAssetImage
                         src={game.image}
                         alt={game.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full rounded-[14px] overflow-hidden"
                         fallback={getFallbackGraphic(game)}
                       />
                     </div>
@@ -354,7 +368,7 @@ export default function GamesCataloguePage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-gray-300 leading-relaxed">
+                <p className="text-xs text-gray-300 leading-relaxed font-normal">
                   {game.description}
                 </p>
               </div>

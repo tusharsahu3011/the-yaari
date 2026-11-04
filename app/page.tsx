@@ -183,55 +183,55 @@ export default function HomePage() {
   });
 
   return (
-    <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-8 py-6 space-y-10 max-w-7xl select-none">
-      {/* 1. Hero Section (Image 5 visual parity) */}
-      <section className="relative w-full rounded-3xl p-6 sm:p-10 lg:p-12 bg-gradient-to-br from-[#12162e] via-[#0d1022] to-[#070913] border border-white/10 shadow-2xl overflow-hidden">
-        {/* Ambient neon backdrop glow */}
-        <div className="absolute top-0 right-1/4 w-[450px] h-[350px] bg-purple-600/25 blur-[130px] pointer-events-none rounded-full" />
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 flex flex-col items-center select-none">
+      {/* 1. Hero Section (Option 2: Full Background Wallpaper Banner) */}
+      <section className="relative w-full rounded-3xl p-6 sm:p-10 lg:p-12 border border-white/10 shadow-2xl overflow-hidden group min-h-[380px] sm:min-h-[440px] flex items-center">
+        {/* Full Background Wallpaper Image */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+          <img
+            src="/assets/home/hero-3d.png"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center sm:object-right scale-105 group-hover:scale-110 transition-transform duration-700"
+          />
+          {/* Dark Contrast Gradient Overlay: Heavy on left for crisp typography, fading to transparent on right to reveal the full 3D art */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#070913] via-[#070913]/85 to-[#070913]/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070913] via-transparent to-transparent sm:hidden" />
+        </div>
+
+        {/* Ambient Neon Lighting orbs */}
+        <div className="absolute top-1/2 right-10 -translate-y-1/2 w-[450px] h-[360px] bg-gradient-to-r from-purple-600/30 via-pink-600/20 to-amber-500/20 blur-[130px] pointer-events-none rounded-full" />
         <div className="absolute bottom-0 left-10 w-[300px] h-[200px] bg-cyan-600/15 blur-[100px] pointer-events-none rounded-full" />
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left Text & CTA Column */}
-          <div className="lg:col-span-7 space-y-5 text-left">
-            <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black text-white tracking-tight leading-[1.1]">
-              Epic Party & Card Games for your{' '}
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
-                Dost & Yaar.
-              </span>
-            </h1>
+        {/* Text & Action Content sitting directly on the Wallpaper */}
+        <div className="relative z-10 max-w-xl lg:max-w-2xl space-y-5 text-left py-2 sm:py-6">
+          <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black text-white tracking-tight leading-[1.1] drop-shadow-md">
+            Epic Party & Card Games for your{' '}
+            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
+              Dost & Yaar.
+            </span>
+          </h1>
 
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-xl font-normal">
-              Bring the vibes! Play social deduction, word games, card classics and more — with friends on one device or online with custom rooms.
-            </p>
+          <p className="text-sm sm:text-base text-gray-200 leading-relaxed max-w-xl font-normal drop-shadow">
+            Bring the vibes! Play social deduction, word games, card classics and more — with friends on one device or online with custom rooms.
+          </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link
-                href="/games"
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-extrabold text-sm shadow-xl shadow-purple-600/40 transition transform active:scale-95"
-              >
-                <Play className="w-4 h-4 fill-white" />
-                <span>Browse All Games</span>
-              </Link>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Link
+              href="/games"
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#632df3] hover:bg-[#5224d8] text-white font-extrabold text-sm shadow-xl shadow-purple-600/40 transition transform active:scale-95"
+            >
+              <Play className="w-4 h-4 fill-white" />
+              <span>Browse All Games</span>
+            </Link>
 
-              <Link
-                href="/games/bhabhi"
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#12162a] hover:bg-white/10 border border-white/15 text-white font-bold text-sm transition"
-              >
-                <Users className="w-4 h-4 text-purple-400" />
-                <span>Create Room</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Visual 3D Showcase (Image 5 exact 3D composition with ambient glow) */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end relative">
-            <div className="absolute inset-4 bg-gradient-to-r from-purple-600/30 via-pink-600/20 to-amber-500/25 blur-3xl rounded-full pointer-events-none" />
-            <SmartAssetImage
-              src="/assets/home/hero-3d.png"
-              alt="Games 3D Art Composition"
-              className="w-full max-w-md h-64 sm:h-72 relative z-10 filter drop-shadow-[0_20px_35px_rgba(139,92,246,0.4)]"
-              fallback={<HeroGameComposition className="w-full h-full" />}
-            />
+            <Link
+              href="/games/bhabhi"
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#12162a]/90 hover:bg-white/10 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition"
+            >
+              <Users className="w-4 h-4 text-purple-400" />
+              <span>Create Room</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -321,9 +321,20 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Featured Card 1: Undercover */}
           <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1c1236]/90 via-[#0f1326] to-[#070914] border-2 border-purple-500/40 hover:border-purple-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(168,85,247,0.25)] hover:shadow-[0_0_55px_rgba(168,85,247,0.45)] transition-all duration-300 group">
+            {/* Stretched Background Logo (Ambient Watermark) */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+              <img
+                src="/assets/home/card-undercover.png"
+                alt=""
+                aria-hidden="true"
+                className="w-full h-full object-cover object-center opacity-[0.09] group-hover:opacity-[0.16] scale-105 group-hover:scale-110 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-transparent to-[#0e1224]/80" />
+            </div>
+
             {/* Ambient Corner Glow */}
-            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-purple-500/25 blur-3xl pointer-events-none group-hover:bg-purple-500/40 transition-all duration-500" />
-            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-purple-700/15 blur-2xl pointer-events-none" />
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-purple-500/25 blur-3xl pointer-events-none group-hover:bg-purple-500/40 transition-all duration-500 z-0" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-purple-700/15 blur-2xl pointer-events-none z-0" />
 
             <div className="flex items-center justify-between z-10">
               <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
@@ -339,15 +350,17 @@ export default function HomePage() {
                 <p className="text-xs font-semibold text-purple-300/80">Social Deduction • Group</p>
               </div>
 
-              {/* Logo with ambient back-glow */}
-              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                <div className="absolute inset-0 bg-purple-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-purple-400/55 group-hover:scale-115 transition-all duration-500" />
-                <SmartAssetImage
-                  src="/assets/home/card-undercover.png"
-                  alt="Undercover"
-                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
-                  fallback={<UndercoverIllustration className="w-20 h-20" />}
-                />
+              {/* Logo with rounded border & ambient back-glow */}
+              <div className="relative w-22 h-22 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-purple-500/40 blur-xl rounded-2xl pointer-events-none group-hover:bg-purple-400/60 group-hover:scale-115 transition-all duration-500" />
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-black/60 border-2 border-purple-400/60 p-1 relative z-10 shadow-2xl flex items-center justify-center group-hover:border-purple-300 transition-colors">
+                  <SmartAssetImage
+                    src="/assets/home/card-undercover.png"
+                    alt="Undercover"
+                    className="w-full h-full rounded-[14px] overflow-hidden"
+                    fallback={<UndercoverIllustration className="w-20 h-20" />}
+                  />
+                </div>
               </div>
             </div>
 
@@ -367,9 +380,20 @@ export default function HomePage() {
 
           {/* Featured Card 2: Spyfall */}
           <div className="p-6 rounded-3xl bg-gradient-to-br from-[#2a1708]/90 via-[#0f1326] to-[#070914] border-2 border-amber-500/40 hover:border-amber-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(245,158,11,0.25)] hover:shadow-[0_0_55px_rgba(245,158,11,0.45)] transition-all duration-300 group">
+            {/* Stretched Background Logo (Ambient Watermark) */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+              <img
+                src="/assets/home/card-spyfall.png"
+                alt=""
+                aria-hidden="true"
+                className="w-full h-full object-cover object-center opacity-[0.09] group-hover:opacity-[0.16] scale-105 group-hover:scale-110 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-transparent to-[#0e1224]/80" />
+            </div>
+
             {/* Ambient Corner Glow */}
-            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-amber-500/25 blur-3xl pointer-events-none group-hover:bg-amber-500/40 transition-all duration-500" />
-            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-amber-700/15 blur-2xl pointer-events-none" />
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-amber-500/25 blur-3xl pointer-events-none group-hover:bg-amber-500/40 transition-all duration-500 z-0" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-amber-700/15 blur-2xl pointer-events-none z-0" />
 
             <div className="flex items-center justify-between z-10">
               <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
@@ -385,15 +409,17 @@ export default function HomePage() {
                 <p className="text-xs font-semibold text-amber-300/80">Interrogation • Bluffing</p>
               </div>
 
-              {/* Logo with ambient back-glow */}
-              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                <div className="absolute inset-0 bg-amber-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-amber-400/55 group-hover:scale-115 transition-all duration-500" />
-                <SmartAssetImage
-                  src="/assets/home/card-spyfall.png"
-                  alt="Spyfall"
-                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
-                  fallback={<SpyfallIllustration className="w-20 h-20" />}
-                />
+              {/* Logo with rounded border & ambient back-glow */}
+              <div className="relative w-22 h-22 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-amber-500/40 blur-xl rounded-2xl pointer-events-none group-hover:bg-amber-400/60 group-hover:scale-115 transition-all duration-500" />
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-black/60 border-2 border-amber-400/60 p-1 relative z-10 shadow-2xl flex items-center justify-center group-hover:border-amber-300 transition-colors">
+                  <SmartAssetImage
+                    src="/assets/home/card-spyfall.png"
+                    alt="Spyfall"
+                    className="w-full h-full rounded-[14px] overflow-hidden"
+                    fallback={<SpyfallIllustration className="w-20 h-20" />}
+                  />
+                </div>
               </div>
             </div>
 
@@ -413,9 +439,20 @@ export default function HomePage() {
 
           {/* Featured Card 3: Bhabhi (Get Away) */}
           <div className="p-6 rounded-3xl bg-gradient-to-br from-[#2b0c24]/90 via-[#0f1326] to-[#070914] border-2 border-pink-500/40 hover:border-pink-400 relative overflow-hidden flex flex-col justify-between space-y-5 shadow-[0_0_35px_rgba(236,72,153,0.25)] hover:shadow-[0_0_55px_rgba(236,72,153,0.45)] transition-all duration-300 group">
+            {/* Stretched Background Logo (Ambient Watermark) */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+              <img
+                src="/assets/home/card-bhabhi.png"
+                alt=""
+                aria-hidden="true"
+                className="w-full h-full object-cover object-center opacity-[0.09] group-hover:opacity-[0.16] scale-105 group-hover:scale-110 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-transparent to-[#0e1224]/80" />
+            </div>
+
             {/* Ambient Corner Glow */}
-            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-pink-500/25 blur-3xl pointer-events-none group-hover:bg-pink-500/40 transition-all duration-500" />
-            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-pink-700/15 blur-2xl pointer-events-none" />
+            <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-pink-500/25 blur-3xl pointer-events-none group-hover:bg-pink-500/40 transition-all duration-500 z-0" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-pink-700/15 blur-2xl pointer-events-none z-0" />
 
             <div className="flex items-center justify-between z-10">
               <span className="text-[10px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
@@ -431,15 +468,17 @@ export default function HomePage() {
                 <p className="text-xs font-semibold text-pink-300/80">Card Game • Evasion</p>
               </div>
 
-              {/* Logo with ambient back-glow */}
-              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                <div className="absolute inset-0 bg-pink-500/35 blur-xl rounded-full pointer-events-none group-hover:bg-pink-400/55 group-hover:scale-115 transition-all duration-500" />
-                <SmartAssetImage
-                  src="/assets/home/card-bhabhi.png"
-                  alt="Bhabhi"
-                  className="w-full h-full relative z-10 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
-                  fallback={<BhabhiCardIllustration className="w-20 h-20" />}
-                />
+              {/* Logo with rounded border & ambient back-glow */}
+              <div className="relative w-22 h-22 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-pink-500/40 blur-xl rounded-2xl pointer-events-none group-hover:bg-pink-400/60 group-hover:scale-115 transition-all duration-500" />
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-black/60 border-2 border-pink-400/60 p-1 relative z-10 shadow-2xl flex items-center justify-center group-hover:border-pink-300 transition-colors">
+                  <SmartAssetImage
+                    src="/assets/home/card-bhabhi.png"
+                    alt="Bhabhi"
+                    className="w-full h-full rounded-[14px] overflow-hidden"
+                    fallback={<BhabhiCardIllustration className="w-20 h-20" />}
+                  />
+                </div>
               </div>
             </div>
 
@@ -520,9 +559,20 @@ export default function HomePage() {
                   boxShadow: `0 8px 24px -6px ${game.accentColor}25`,
                 }}
               >
+                {/* Stretched Background Logo (Ambient Watermark) */}
+                <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+                  <img
+                    src={game.image}
+                    alt=""
+                    aria-hidden="true"
+                    className="w-full h-full object-cover object-center opacity-[0.08] group-hover:opacity-[0.14] scale-105 group-hover:scale-110 transition-all duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e1224] via-[#0e1224]/85 to-[#0e1224]/75" />
+                </div>
+
                 {/* Ambient Corner & Logo Glow */}
                 <div
-                  className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-20 group-hover:opacity-45 transition-opacity duration-500 pointer-events-none"
+                  className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-25 group-hover:opacity-50 transition-opacity duration-500 pointer-events-none z-0"
                   style={{ backgroundColor: game.accentColor }}
                 />
 
@@ -552,25 +602,28 @@ export default function HomePage() {
                       </p>
                     </div>
 
-                    {/* Logo container with ambient underglow matching the logo */}
+                    {/* Logo container with visible rounded border & ambient underglow */}
                     <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
                       <div
-                        className="absolute inset-0 rounded-2xl blur-lg opacity-35 group-hover:opacity-75 group-hover:scale-115 transition-all duration-300 pointer-events-none"
+                        className="absolute inset-0 rounded-2xl blur-lg opacity-40 group-hover:opacity-80 group-hover:scale-115 transition-all duration-300 pointer-events-none"
                         style={{ backgroundColor: game.accentColor }}
                       />
-                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black/40 border border-white/10 p-1 relative z-10 flex items-center justify-center">
+                      <div
+                        className="w-16 h-16 rounded-2xl overflow-hidden bg-black/60 border-2 p-1 relative z-10 flex items-center justify-center shadow-lg transition-colors duration-300"
+                        style={{ borderColor: `${game.accentColor}75` }}
+                      >
                         <SmartAssetImage
                           src={game.image}
                           alt={game.title}
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                          fallback={<CatalogIconGraphic gameId={game.id} className="w-14 h-14" />}
+                          className="w-full h-full rounded-[14px] overflow-hidden"
+                          fallback={<CatalogIconGraphic gameId={game.id} className="w-12 h-12" />}
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400 font-medium relative z-10">
+                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-300 font-medium relative z-10">
                   <span>{game.players}</span>
                   <span>{game.duration}</span>
                 </div>

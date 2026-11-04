@@ -9,6 +9,7 @@ export interface SmartAssetImageProps {
   src: string;
   alt: string;
   className?: string;
+  imageClassName?: string;
   fallback: React.ReactNode;
 }
 
@@ -16,24 +17,25 @@ export function SmartAssetImage({
   src,
   alt,
   className = '',
+  imageClassName = '',
   fallback,
 }: SmartAssetImageProps) {
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
     return (
-      <div className={`relative flex items-center justify-center select-none ${className}`}>
+      <div className={`relative flex items-center justify-center select-none overflow-hidden ${className}`}>
         {fallback}
       </div>
     );
   }
 
   return (
-    <div className={`relative flex items-center justify-center select-none ${className}`}>
+    <div className={`relative flex items-center justify-center select-none overflow-hidden ${className}`}>
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-contain"
+        className={`w-full h-full object-cover rounded-[inherit] ${imageClassName}`}
         onError={() => setHasError(true)}
       />
     </div>
