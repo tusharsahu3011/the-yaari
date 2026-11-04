@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Play,
@@ -70,12 +70,12 @@ const ALL_GAMES: GameDef[] = [
     description:
       'Spot the impostors before they deceive the entire room! Civilians get the real word, Undercover gets a closely related word, and Mr. White gets no word at all. Give one-word clues and vote out the deceivers.',
     rulesSummary: [
-      'Each player receives a secret secret word (Civilians share one word, Undercovers share a similar word).',
+      'Each player receives a secret word (Civilians share one word, Undercovers share a similar word).',
       'Take turns describing your secret word with exactly one subtle clue.',
       'Debate and vote out suspected impostors each round until Civilians or Impostors win.',
     ],
     image: '/assets/home/card-undercover.png',
-    heroBackdrop: '/assets/home/hero-3d.png',
+    heroBackdrop: '/assets/home/card-undercover.png',
     href: '/games/undercover',
     accentColor: '#a855f7',
   },
@@ -98,7 +98,7 @@ const ALL_GAMES: GameDef[] = [
       'Clear your cards to escape. The last remaining player is crowned the Bhabhi!',
     ],
     image: '/assets/home/card-bhabhi.png',
-    heroBackdrop: '/assets/home/hero-3d.png',
+    heroBackdrop: '/assets/home/card-bhabhi.png',
     href: '/games/bhabhi',
     accentColor: '#ec4899',
   },
@@ -121,7 +121,7 @@ const ALL_GAMES: GameDef[] = [
       'Vote to accuse the Spy or the Spy can guess the location to steal the win.',
     ],
     image: '/assets/home/card-spyfall.png',
-    heroBackdrop: '/assets/home/hero-3d.png',
+    heroBackdrop: '/assets/home/card-spyfall.png',
     href: '/games/spyfall',
     accentColor: '#f59e0b',
   },
@@ -327,39 +327,52 @@ export default function HomePage() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 select-none">
       {/* =========================================================================
           1. OTT CINEMATIC BILLBOARD HERO CAROUSEL (Amazon Prime Video Style)
+          Both Background Wallpaper AND Game Logo dynamically change together!
           ========================================================================= */}
       <section
-        className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] group min-h-[440px] sm:min-h-[500px] lg:min-h-[540px] flex items-end bg-[#050811]"
+        className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] group min-h-[460px] sm:min-h-[520px] lg:min-h-[560px] flex items-end bg-[#050811]"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Dynamic Full-Bleed Backdrop Image */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
-          <img
-            src={activeHero.heroBackdrop || '/assets/home/hero-3d.png'}
-            alt={activeHero.title}
-            className="w-full h-full object-cover object-center sm:object-right transition-all duration-1000 scale-100 group-hover:scale-105"
-          />
+        {/* Dynamic Full-Bleed Backdrops Stack with Smooth Cross-Fade */}
+        {heroGames.map((game, idx) => {
+          const isActive = currentSlide === idx;
+          return (
+            <div
+              key={game.id}
+              className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none transition-opacity duration-700 ease-in-out ${
+                isActive ? 'opacity-100 z-0' : 'opacity-0 -z-10'
+              }`}
+            >
+              {/* Background Artwork */}
+              <img
+                src={game.heroBackdrop || game.image}
+                alt={game.title}
+                className="w-full h-full object-cover object-center sm:object-right transition-transform duration-1000 scale-100 group-hover:scale-105"
+              />
 
-          {/* Prime Video Cinematic Vignette Overlays:
-              - Left dark gradient mask for text readability
-              - Bottom fade into page background
-              - Ambient tinted spotlight glow matching game accent */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030610] via-[#030610]/85 via-45% to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#030610] via-[#030610]/70 via-30% to-transparent" />
-          <div
-            className="absolute inset-0 opacity-25 mix-blend-screen pointer-events-none transition-colors duration-1000"
-            style={{
-              background: `radial-gradient(circle at 75% 40%, ${activeHero.accentColor} 0%, transparent 60%)`,
-            }}
-          />
-        </div>
+              {/* Prime Video Vignette Gradient Overlays:
+                  - Left dark vignette for crisp text contrast
+                  - Bottom gradient blend into the page
+                  - Mobile ambient darkening */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#030610] via-[#030610]/85 via-50% to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#030610] via-[#030610]/70 via-30% to-transparent" />
+              <div className="absolute inset-0 bg-[#030610]/40 sm:hidden" />
+
+              {/* Ambient Spotlight Glow matching game's accent color */}
+              <div
+                className="absolute top-1/2 right-6 sm:right-16 -translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[450px] blur-[140px] opacity-35 pointer-events-none rounded-full"
+                style={{ backgroundColor: game.accentColor }}
+              />
+            </div>
+          );
+        })}
 
         {/* Floating Slide Navigation Chevrons (Left & Right) */}
         <button
           onClick={handlePrevSlide}
           aria-label="Previous Featured Game"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-xl opacity-80 hover:opacity-100"
+          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-xl opacity-80 hover:opacity-100 cursor-pointer"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -367,7 +380,7 @@ export default function HomePage() {
         <button
           onClick={handleNextSlide}
           aria-label="Next Featured Game"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-xl opacity-80 hover:opacity-100"
+          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-xl opacity-80 hover:opacity-100 cursor-pointer"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -394,15 +407,41 @@ export default function HomePage() {
             </span>
           </div>
 
-          {/* Large Game Title */}
-          <div className="space-y-1.5">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-[1.05]">
-              {activeHero.title}
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-300 font-medium line-clamp-2 max-w-xl leading-relaxed drop-shadow">
-              {activeHero.description}
-            </p>
+          {/* GAME OFFICIAL LOGO & TITLE (Changes dynamically with each slide!) */}
+          <div className="flex items-center gap-3.5 sm:gap-4.5 pt-1">
+            {/* 3D Game Logo Box with ambient glow and border matching active game */}
+            <div
+              className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-22 lg:h-22 rounded-2xl overflow-hidden bg-black/80 border-2 p-1.5 shrink-0 shadow-2xl transition-all duration-500 group-hover:scale-105"
+              style={{
+                borderColor: `${activeHero.accentColor}99`,
+                boxShadow: `0 0 35px ${activeHero.accentColor}55`,
+              }}
+            >
+              <img
+                src={activeHero.image}
+                alt={`${activeHero.title} Official Logo`}
+                className="w-full h-full object-cover rounded-xl transition-all duration-500"
+              />
+            </div>
+
+            {/* Stylized Title & Tag */}
+            <div className="space-y-0.5">
+              <div
+                className="text-[11px] sm:text-xs font-black uppercase tracking-widest flex items-center gap-1.5"
+                style={{ color: activeHero.accentColor }}
+              >
+                <span>✦ {activeHero.genre}</span>
+              </div>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-xl leading-[1.05]">
+                {activeHero.title}
+              </h1>
+            </div>
           </div>
+
+          {/* Description */}
+          <p className="text-xs sm:text-sm text-zinc-300 font-medium line-clamp-2 max-w-xl leading-relaxed drop-shadow">
+            {activeHero.description}
+          </p>
 
           {/* Quick Specs Pill: Players • Duration • Rating */}
           <div className="flex items-center gap-3 text-xs text-zinc-300 font-semibold pt-1">
@@ -440,7 +479,7 @@ export default function HomePage() {
               href={activeHero.href || '/games'}
               onClick={() => soundManager.playSelect()}
               title="Create Room"
-              className="w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg backdrop-blur-md"
+              className="w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg backdrop-blur-md cursor-pointer"
             >
               <Plus className="w-5 h-5" />
             </Link>
@@ -452,7 +491,7 @@ export default function HomePage() {
                 setInfoModalGame(activeHero);
               }}
               title="Game Rules & Details"
-              className="w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg backdrop-blur-md"
+              className="w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg backdrop-blur-md cursor-pointer"
             >
               <Info className="w-5 h-5" />
             </button>
@@ -475,10 +514,10 @@ export default function HomePage() {
                 setCurrentSlide(idx);
               }}
               aria-label={`Go to slide ${idx + 1}: ${game.title}`}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                 currentSlide === idx
-                  ? 'w-7 bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]'
-                  : 'w-2 bg-white/40 hover:bg-white/70'
+                  ? 'w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
+                  : 'w-2.5 bg-white/40 hover:bg-white/70'
               }`}
             />
           ))}
@@ -559,7 +598,7 @@ export default function HomePage() {
                       setInfoModalGame(game);
                     }}
                     title="View Rules & Info"
-                    className="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition hover:scale-110"
+                    className="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition hover:scale-110 cursor-pointer"
                   >
                     <Info className="w-3.5 h-3.5" />
                   </button>
