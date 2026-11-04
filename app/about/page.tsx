@@ -148,7 +148,7 @@ export default function AboutPage() {
 
             <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-1">
               <span className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">Design UI/UX</span>
-              <div className="text-sm sm:text-base font-black text-purple-400">Prime Video Clone</div>
+              <div className="text-sm sm:text-base font-black text-purple-400">Cinematic Web Platform</div>
             </div>
           </div>
         </div>

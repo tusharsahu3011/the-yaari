@@ -22,10 +22,10 @@ import {
 
 export const navLinks = [
   { label: 'Home', href: '/' },
-  { label: 'All Games', href: '/games' },
+  { label: 'Free to Play', href: '/games' },
   { label: 'Card Games', href: '/games?cat=cards' },
-  { label: 'Social Bluff', href: '/games?cat=bluff' },
-  { label: 'Word Games', href: '/games?cat=words' },
+  { label: 'Party Bluff', href: '/games?cat=bluff' },
+  { label: 'Mind & Words', href: '/games?cat=words' },
   { label: 'Live Rooms', href: '/games/bhabhi' },
 ] as const;
 
@@ -39,7 +39,7 @@ export function Navbar() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // Scroll listener for seamless Prime Video transparent-to-solid navbar transition
+  // Scroll listener for seamless transparent-to-solid navbar transition
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -101,13 +101,13 @@ export function Navbar() {
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-[#00050d]/95 backdrop-blur-md shadow-2xl shadow-black/80 border-b border-white/5'
-          : 'bg-gradient-to-b from-[#00050d] via-[#00050d]/70 to-transparent'
+          : 'bg-gradient-to-b from-[#00050d]/95 via-[#00050d]/60 to-transparent'
       }`}
     >
       <div className="w-full px-4 sm:px-8 lg:px-12 flex h-16 sm:h-[68px] items-center justify-between">
-        {/* Left Section: Brand Logo + Prime Video Tabs */}
+        {/* Left Section: Brand Logo + Navigation Tabs */}
         <div className="flex items-center gap-6 lg:gap-8">
-          {/* Prime Video Style "the yaari" Brand Mark */}
+          {/* "the yaari" Brand Mark with Signature Smile Curve */}
           <Link
             href="/"
             className="flex items-center gap-2.5 group shrink-0"
@@ -128,7 +128,6 @@ export function Navbar() {
               <span className="font-black text-lg sm:text-xl tracking-tight text-white group-hover:text-cyan-300 transition-colors">
                 the yaari
               </span>
-              {/* Signature Prime Video Cyan Smile Curve */}
               <svg
                 viewBox="0 0 72 8"
                 fill="none"
@@ -146,7 +145,7 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Prime Video Navigation Tabs (Exact matches to Prime Video header tabs) */}
+          {/* Navigation Tabs (Pixel-matched to Prime Video tabs) */}
           <nav className="hidden xl:flex items-center gap-1.5 text-xs lg:text-sm font-semibold">
             {navLinks.map((link) => {
               const active = isActive(link.href);
@@ -167,10 +166,10 @@ export function Navbar() {
               );
             })}
 
-            {/* Divider */}
+            {/* Subtle Divider */}
             <span className="text-zinc-600 px-1 font-light">|</span>
 
-            {/* About Link (TheYaari by Coder Tushar) */}
+            {/* About Link */}
             <Link
               href="/about"
               onClick={() => soundManager.playSelect()}
@@ -197,9 +196,9 @@ export function Navbar() {
           </nav>
         </div>
 
-        {/* Right Section: Search, Grid, Bookmark, Profile Avatar & Join Room CTA */}
+        {/* Right Section: Search, Grid, Bookmark, Profile & Join Room CTA */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* Search Icon (Prime Video) */}
+          {/* Search Icon */}
           <Link
             href="/games"
             onClick={() => soundManager.playSelect()}
@@ -249,7 +248,7 @@ export function Navbar() {
             )}
           </button>
 
-          {/* User Profile Avatar Pill (Prime Video User Avatar) */}
+          {/* User Profile Avatar */}
           <div className="relative">
             <button
               onClick={() => {

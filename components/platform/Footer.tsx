@@ -97,7 +97,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-1.5">
                 <Tv className="w-3.5 h-3.5 text-purple-400" />
-                Prime Video Clone UI/UX
+                Cinema-Grade Streaming Interface
               </li>
               <li className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5 text-emerald-400" />
@@ -127,7 +127,7 @@ export function Footer() {
 
         {/* Prime Video Style Legal Strip */}
         <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4">
-          <p>TheYaari by Coder Tushar • Prime Video Gaming Clone</p>
+          <p>TheYaari by Coder Tushar • Modern Social Gaming Platform</p>
           <div className="flex items-center gap-5 text-xs text-zinc-400">
             <Link href="/about" className="hover:text-cyan-400 transition font-bold text-white">
               About TheYaari

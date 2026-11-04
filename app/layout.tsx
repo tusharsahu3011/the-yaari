@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'The Yaari by Coder Tushar — Stream & Play Multiplayer Party Games',
   description:
-    'TheYaari by Coder Tushar: Prime Video style browser gaming hub. Stream and play classic desi card game Bhabhi (Get Away), Undercover, Spyfall, and more with dost & yaar.',
+    'TheYaari by Coder Tushar: Modern browser-based social gaming platform. Stream and play classic desi card game Bhabhi (Get Away), Undercover, Spyfall, and more with dost & yaar.',
   icons: {
     icon: '/assets/brand/the-yaari-icon.png',
     apple: '/assets/brand/the-yaari-icon.png',
