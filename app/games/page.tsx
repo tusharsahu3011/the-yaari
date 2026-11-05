@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Gamepad2,
   Search,
@@ -238,6 +238,7 @@ const ALL_GAMES: GameItem[] = [
 
 function GamesCatalogueContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const catParam = searchParams.get('cat');
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -249,6 +250,8 @@ function GamesCatalogueContent() {
       if (['cards', 'bluff', 'words', 'party'].includes(catParam)) {
         setSelectedCategory(catParam);
       }
+    } else {
+      setSelectedCategory('all');
     }
   }, [catParam]);
 
@@ -309,6 +312,9 @@ function GamesCatalogueContent() {
               onClick={() => {
                 soundManager.playSelect();
                 setSelectedCategory(cat.id);
+                router.replace(cat.id === 'all' ? '/games' : `/games?cat=${cat.id}`, {
+                  scroll: false,
+                });
               }}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
                 selectedCategory === cat.id

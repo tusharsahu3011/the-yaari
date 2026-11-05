@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { soundManager } from '@/lib/audio/sound-effects';
 import {
   Search,
@@ -21,7 +21,12 @@ import {
   BookOpen,
   Sparkles,
   Users,
+  Shield,
+  LogOut,
+  ExternalLink,
 } from 'lucide-react';
+import { coderTusharAuth, AuthState } from '@/lib/auth/codertushar-auth';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export const primaryNavLinks = [
   { label: 'Home', href: '/' },
@@ -40,22 +45,34 @@ export const secondaryNavLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [playerName, setPlayerName] = useState('Yaar_9410');
+  const [authState, setAuthState] = useState<AuthState>(coderTusharAuth.getState());
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isGridDropdownOpen, setIsGridDropdownOpen] = useState(false);
   const [isBookmarkDropdownOpen, setIsBookmarkDropdownOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Subscribe to CoderTushar Auth state
+  useEffect(() => {
+    const unsub = coderTusharAuth.subscribe((st) => {
+      setAuthState(st);
+      setNameInput(st.user.displayName || 'Yaar');
+    });
+    return unsub;
+  }, []);
 
   // Scroll listener for seamless transparent-to-solid navbar transition
   useEffect(() => {
@@ -64,24 +81,6 @@ export function Navbar() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Sync saved player name
-  useEffect(() => {
-    try {
-      const saved =
-        localStorage.getItem('theyaari_player_name') || localStorage.getItem('gameshub_player_name');
-      if (saved) {
-        setPlayerName(saved);
-        setNameInput(saved);
-      } else {
-        const randId = Math.floor(1000 + Math.random() * 9000);
-        const autoName = `Yaar_${randId}`;
-        setPlayerName(autoName);
-        setNameInput(autoName);
-        localStorage.setItem('theyaari_player_name', autoName);
-      }
-    } catch { }
   }, []);
 
   // Keyboard escape listener
@@ -94,6 +93,7 @@ export function Navbar() {
         setIsBookmarkDropdownOpen(false);
         setSearchOpen(false);
         setIsJoinModalOpen(false);
+        setIsAuthModalOpen(false);
       }
     };
     window.addEventListener('keydown', onKeyDown);
@@ -109,12 +109,8 @@ export function Navbar() {
   const handleSaveName = () => {
     if (!nameInput.trim()) return;
     const clean = nameInput.trim();
-    setPlayerName(clean);
     setIsEditingName(false);
-    try {
-      localStorage.setItem('theyaari_player_name', clean);
-      localStorage.setItem('gameshub_player_name', clean);
-    } catch { }
+    coderTusharAuth.updateGuestProfile(clean);
     soundManager.playSelect();
   };
 
@@ -137,11 +133,36 @@ export function Navbar() {
     router.push(`/games/bhabhi?room=${code}`);
   };
 
+  /**
+   * Precise active link logic to prevent multiple highlighted links on /games:
+   * - '/' only matches '/'
+   * - '/games/bhabhi' matches when path starts with '/games/bhabhi'
+   * - '/games' (Free to Play) ONLY matches when on '/games' AND no ?cat= query param exists
+   * - '/games?cat=...' ONLY matches when on '/games' AND that exact ?cat= param matches
+   */
   const isLinkActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    if (href.includes('?')) {
-      return pathname === href.split('?')[0];
+    if (href === '/') {
+      return pathname === '/';
     }
+
+    if (href.startsWith('/games/bhabhi')) {
+      return pathname.startsWith('/games/bhabhi');
+    }
+
+    if (href.startsWith('/games')) {
+      if (pathname !== '/games') return false;
+
+      const catInHref = href.includes('?cat=') ? href.split('?cat=')[1] : null;
+      const currentCat = searchParams?.get('cat');
+
+      if (catInHref) {
+        return currentCat === catInHref;
+      }
+
+      // Plain '/games' (Free to Play) is only active when no category is selected
+      return !currentCat || currentCat === 'all';
+    }
+
     return pathname.startsWith(href);
   };
 
@@ -209,7 +230,7 @@ export function Navbar() {
               {/* Vertical divider */}
               <span className="h-4 w-px bg-white/20 mx-1 hidden lg:block" />
 
-              {/* Secondary Links (Subscriptions / Store equivalents) */}
+              {/* Secondary Links */}
               <div className="hidden lg:flex items-center gap-1">
                 <Link
                   href="/games"
@@ -369,7 +390,7 @@ export function Navbar() {
               )}
             </div>
 
-            {/* User Profile Avatar Dropdown */}
+            {/* User Profile Avatar Dropdown (CoderTushar Account Ready) */}
             <div className="relative">
               <button
                 onClick={() => {
@@ -378,12 +399,16 @@ export function Navbar() {
                   setIsGridDropdownOpen(false);
                   setIsBookmarkDropdownOpen(false);
                 }}
-                title="Player Profile"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-white/30 hover:border-white transition flex items-center justify-center cursor-pointer bg-zinc-800"
+                title={authState.isAuthenticated ? 'CoderTushar Account' : 'Player Profile'}
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden transition flex items-center justify-center cursor-pointer bg-zinc-800 ${
+                  authState.isAuthenticated
+                    ? 'border-2 border-[#00a8e1] shadow-[0_0_10px_rgba(0,168,225,0.6)]'
+                    : 'border border-white/30 hover:border-white'
+                }`}
               >
                 <img
-                  src="/assets/bhabhi/avatar-you.png"
-                  alt={playerName}
+                  src={authState.user.avatar || '/assets/bhabhi/avatar-you.png'}
+                  alt={authState.user.displayName}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
@@ -393,56 +418,118 @@ export function Navbar() {
               </button>
 
               {isProfileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-xl bg-[#091122] border border-white/15 shadow-2xl p-4 z-50 space-y-4 text-left">
-                  {/* Player Name Edit */}
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                      Player Identity
-                    </span>
-                    {isEditingName ? (
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="text"
-                          value={nameInput}
-                          maxLength={16}
-                          onChange={(e) => setNameInput(e.target.value)}
-                          className="flex-1 bg-black/60 border border-cyan-400 rounded-md px-2.5 py-1 text-xs text-white focus:outline-none"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleSaveName();
-                            if (e.key === 'Escape') setIsEditingName(false);
-                          }}
+                <div className="absolute right-0 mt-2 w-80 rounded-xl bg-[#091122] border border-white/15 shadow-2xl p-4 z-50 space-y-4 text-left animate-fade-in">
+                  {/* Account Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-9 h-9 rounded-full overflow-hidden border border-white/20 shrink-0 bg-zinc-800">
+                        <img
+                          src={authState.user.avatar || '/assets/bhabhi/avatar-you.png'}
+                          alt={authState.user.displayName}
+                          className="w-full h-full object-cover"
                         />
-                        <button
-                          onClick={handleSaveName}
-                          className="p-1 rounded bg-[#00a8e1] text-white hover:bg-cyan-500"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setIsEditingName(false)}
-                          className="p-1 rounded bg-zinc-800 text-zinc-300 hover:text-white"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
                       </div>
-                    ) : (
-                      <div className="flex items-center justify-between bg-black/40 px-3 py-2 rounded-lg border border-white/10">
-                        <span className="text-sm font-bold text-white truncate">{playerName}</span>
-                        <button
-                          onClick={() => {
-                            soundManager.playSelect();
-                            setIsEditingName(true);
-                          }}
-                          className="text-zinc-400 hover:text-cyan-300 p-1"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
+                      <div className="min-w-0 leading-tight">
+                        <div className="font-extrabold text-sm text-white truncate flex items-center gap-1.5">
+                          <span>{authState.user.displayName}</span>
+                          {authState.isAuthenticated && (
+                            <span className="w-2 h-2 rounded-full bg-[#00a8e1]" title="Verified CoderTushar Account" />
+                          )}
+                        </div>
+                        <div className="text-[11px] text-zinc-400 truncate">
+                          {authState.isAuthenticated
+                            ? authState.user.email || `@${authState.user.username}`
+                            : 'Guest Yaar'}
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setIsProfileDropdownOpen(false);
+                        setIsAuthModalOpen(true);
+                      }}
+                      className="px-2.5 py-1 rounded-md bg-[#00a8e1]/20 hover:bg-[#00a8e1]/30 text-cyan-300 border border-[#00a8e1]/30 text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                    >
+                      {authState.isAuthenticated ? 'Manage' : 'Sign In'}
+                    </button>
                   </div>
 
-                  {/* Audio Toggle */}
+                  {/* CoderTushar Account Status Banner */}
+                  {!authState.isAuthenticated && (
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-[#0c1833] to-[#091122] border border-[#00a8e1]/30 space-y-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                        <Sparkles className="w-3.5 h-3.5 text-[#00a8e1]" />
+                        <span>Link CoderTushar Account</span>
+                      </div>
+                      <p className="text-[11px] text-zinc-300 leading-relaxed">
+                        Sign in with your <strong>codertushar.in</strong> account to save match wins, ELO ratings, and cloud progress.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setIsProfileDropdownOpen(false);
+                          coderTusharAuth.loginWithCoderTushar();
+                        }}
+                        className="w-full py-1.5 rounded-md bg-[#00a8e1] hover:bg-[#0094c7] text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                      >
+                        Sign In with CoderTushar
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Player Name Edit (For Guest) */}
+                  {!authState.isAuthenticated && (
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Guest Player Tag
+                      </span>
+                      {isEditingName ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={nameInput}
+                            maxLength={16}
+                            onChange={(e) => setNameInput(e.target.value)}
+                            className="flex-1 bg-black/60 border border-cyan-400 rounded-md px-2.5 py-1 text-xs text-white focus:outline-none"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveName();
+                              if (e.key === 'Escape') setIsEditingName(false);
+                            }}
+                          />
+                          <button
+                            onClick={handleSaveName}
+                            className="p-1 rounded bg-[#00a8e1] text-white hover:bg-cyan-500"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setIsEditingName(false)}
+                            className="p-1 rounded bg-zinc-800 text-zinc-300 hover:text-white"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between bg-black/40 px-3 py-2 rounded-lg border border-white/10">
+                          <span className="text-sm font-bold text-white truncate">
+                            {authState.user.displayName}
+                          </span>
+                          <button
+                            onClick={() => {
+                              soundManager.playSelect();
+                              setIsEditingName(true);
+                            }}
+                            className="text-zinc-400 hover:text-cyan-300 p-1"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Sound FX Audio Toggle */}
                   <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
                     <span className="text-zinc-300">Sound Effects</span>
                     <button
@@ -464,23 +551,46 @@ export function Navbar() {
                     </button>
                   </div>
 
-                  {/* Links */}
+                  {/* Navigation Links */}
                   <div className="pt-2 border-t border-white/10 space-y-1">
                     <Link
-                      href="/about"
+                      href="/profile"
                       onClick={() => setIsProfileDropdownOpen(false)}
-                      className="block text-xs text-zinc-300 hover:text-white py-1"
+                      className="block text-xs font-semibold text-zinc-300 hover:text-white py-1"
                     >
-                      About TheYaari
+                      Who&apos;s Playing? (Profile Manager)
                     </Link>
                     <Link
                       href="/how-to-play"
                       onClick={() => setIsProfileDropdownOpen(false)}
-                      className="block text-xs text-zinc-300 hover:text-white py-1"
+                      className="block text-xs font-semibold text-zinc-300 hover:text-white py-1"
                     >
-                      Game Rules &amp; FAQ
+                      Game Rules &amp; Strategy FAQ
+                    </Link>
+                    <Link
+                      href="/about"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                      className="block text-xs font-semibold text-zinc-300 hover:text-white py-1"
+                    >
+                      About TheYaari by Coder Tushar
                     </Link>
                   </div>
+
+                  {/* Sign Out Option */}
+                  {authState.isAuthenticated && (
+                    <div className="pt-2 border-t border-white/10">
+                      <button
+                        onClick={() => {
+                          setIsProfileDropdownOpen(false);
+                          coderTusharAuth.logout();
+                        }}
+                        className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-rose-400 hover:text-rose-300 py-1 transition cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out from CoderTushar</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -534,6 +644,15 @@ export function Navbar() {
             </div>
 
             <div className="pt-2 border-t border-white/10 space-y-1">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsAuthModalOpen(true);
+                }}
+                className="w-full text-left px-3 py-1.5 text-xs font-bold text-[#00a8e1]"
+              >
+                {authState.isAuthenticated ? 'CoderTushar Account Settings' : 'Sign In with CoderTushar'}
+              </button>
               <Link
                 href="/how-to-play"
                 onClick={() => setMobileMenuOpen(false)}
@@ -616,6 +735,9 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {/* CoderTushar Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </>
   );
 }

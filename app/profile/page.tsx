@@ -13,69 +13,53 @@ import {
   Save,
   RotateCcw,
   Sparkles,
+  ExternalLink,
+  LogOut,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
+import {
+  coderTusharAuth,
+  AuthState,
+  getCoderTusharBaseUrl,
+} from '@/lib/auth/codertushar-auth';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 const AVATAR_OPTIONS = [
   '😎', '🤠', '🧙‍♂️', '🦊', '🦁', '👑', '🚀', '🐼',
   '🥷', '👾', '🐯', '🦄', '⚡', '💎', '🎲', '🎯', '🃏', '🔥'
 ];
 
-interface PlayerStats {
-  gamesPlayed: number;
-  gamesEscaped: number;
-  rank1Escapes: number;
-  bhabhiCount: number;
-}
-
 export default function ProfilePage() {
+  const [authState, setAuthState] = useState<AuthState>(coderTusharAuth.getState());
   const [playerName, setPlayerName] = useState('Yaar_9410');
   const [playerAvatar, setPlayerAvatar] = useState('😎');
-  const [favoritePersonality, setFavoritePersonality] = useState('desi_host');
-  const [stats, setStats] = useState<PlayerStats>({
-    gamesPlayed: 14,
-    gamesEscaped: 12,
-    rank1Escapes: 7,
-    bhabhiCount: 2,
-  });
   const [savedToast, setSavedToast] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedName =
-        localStorage.getItem('theyaari_player_name') || localStorage.getItem('gameshub_player_name');
-      const storedAvatar =
-        localStorage.getItem('theyaari_player_avatar') || localStorage.getItem('gameshub_player_avatar');
-      const storedPersonality =
-        localStorage.getItem('theyaari_fav_dealer') || localStorage.getItem('gameshub_fav_dealer');
-      const storedStats =
-        localStorage.getItem('theyaari_player_stats') || localStorage.getItem('gameshub_player_stats');
-
-      if (storedName) setPlayerName(storedName);
-      if (storedAvatar) setPlayerAvatar(storedAvatar);
-      if (storedPersonality) setFavoritePersonality(storedPersonality);
-      if (storedStats) {
-        try {
-          setStats(JSON.parse(storedStats));
-        } catch (e) {}
+    const unsub = coderTusharAuth.subscribe((st) => {
+      setAuthState(st);
+      if (st.user?.displayName) {
+        setPlayerName(st.user.displayName);
       }
-    }
+      if (st.user?.avatar) {
+        setPlayerAvatar(st.user.avatar);
+      }
+    });
+    return unsub;
   }, []);
 
   const handleSave = () => {
     soundManager.playSelect();
-    try {
-      localStorage.setItem('theyaari_player_name', playerName.trim() || 'Player');
-      localStorage.setItem('theyaari_player_avatar', playerAvatar);
-      localStorage.setItem('theyaari_fav_dealer', favoritePersonality);
-      localStorage.setItem('gameshub_player_name', playerName.trim() || 'Player');
-      setSavedToast(true);
-      setTimeout(() => setSavedToast(false), 2500);
-    } catch (e) {}
+    coderTusharAuth.updateGuestProfile(playerName.trim() || 'Player', playerAvatar);
+    setSavedToast(true);
+    setTimeout(() => setSavedToast(false), 2500);
   };
 
-  const escapeRate =
-    stats.gamesPlayed > 0 ? Math.round((stats.gamesEscaped / stats.gamesPlayed) * 100) : 0;
+  const gamesPlayed = authState.stats.gamesPlayed;
+  const wins = authState.stats.wins;
+  const winRate = authState.stats.winRate;
+  const baseUrl = getCoderTusharBaseUrl();
 
   return (
     <div className="w-full bg-[#00050d] text-white select-none pt-24 sm:pt-28 pb-16">
@@ -90,17 +74,84 @@ export default function ProfilePage() {
             Who&apos;s Playing?
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400">
-            Manage your player display name, choose your favorite avatar, and view your escape record.
+            Manage your player display name, connect your CoderTushar account, and view your stats.
           </p>
         </div>
 
         {/* Profile Card & Avatar Tile */}
         <div className="max-w-3xl mx-auto p-6 sm:p-10 rounded-2xl bg-[#091122] border border-white/10 shadow-2xl space-y-8 text-left">
+          {/* CoderTushar Account Connection Banner */}
+          {authState.isAuthenticated ? (
+            <div className="p-4 rounded-xl bg-black/50 border border-[#00a8e1]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-[#00a8e1] text-black font-black flex items-center justify-center text-xs">
+                  CT
+                </span>
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Connected to CoderTushar Account</span>
+                    <span className="w-2 h-2 rounded-full bg-[#00a8e1]" />
+                  </div>
+                  <div className="text-[11px] text-zinc-400">
+                    Logged in as <strong>{authState.user.email || authState.user.username}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href={`${baseUrl}/dashboard`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition border border-white/10"
+                >
+                  <span>Dashboard</span>
+                  <ExternalLink className="w-3 h-3 text-zinc-400" />
+                </a>
+
+                <button
+                  onClick={() => coderTusharAuth.logout()}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold transition border border-rose-500/30"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-[#0c1833] to-[#091122] border border-[#00a8e1]/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-1 text-center sm:text-left">
+                <div className="text-xs font-bold text-white flex items-center justify-center sm:justify-start gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#00a8e1]" />
+                  <span>Use your CoderTushar.in Account</span>
+                </div>
+                <p className="text-[11px] text-zinc-300 leading-relaxed">
+                  Sign in once to sync stats, achievements, and player identity across codertushar.in.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-5 py-2 rounded-md bg-[#00a8e1] hover:bg-[#0094c7] text-white text-xs font-black shadow-lg transition active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                Sign In with CoderTushar
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
             {/* Avatar Tile */}
             <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-[#00a8e1] to-[#8b5cf6] p-1 shrink-0 shadow-2xl shadow-cyan-950/60">
               <div className="w-full h-full bg-[#050813] rounded-xl flex items-center justify-center text-5xl">
-                {playerAvatar}
+                {playerAvatar.length <= 4 ? (
+                  <span>{playerAvatar}</span>
+                ) : (
+                  <img
+                    src={playerAvatar}
+                    alt={playerName}
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                )}
               </div>
             </div>
 
@@ -157,31 +208,31 @@ export default function ProfilePage() {
                 <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
                   Games Played
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-white">{stats.gamesPlayed}</div>
+                <div className="text-xl sm:text-2xl font-black text-white">{gamesPlayed}</div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
                 <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  Escape Rate
+                  Win Rate
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-emerald-400">{escapeRate}%</div>
+                <div className="text-xl sm:text-2xl font-black text-emerald-400">{winRate}%</div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
                 <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  Rank 1 Escapes
+                  Wins
                 </span>
                 <div className="text-xl sm:text-2xl font-black text-amber-400">
-                  {stats.rank1Escapes}
+                  {wins}
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
                 <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  Bhabhi Count
+                  Rating (MMR)
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-rose-400">
-                  {stats.bhabhiCount}
+                <div className="text-xl sm:text-2xl font-black text-[#00a8e1]">
+                  {authState.stats.rating || 1200}
                 </div>
               </div>
             </div>
@@ -193,7 +244,7 @@ export default function ProfilePage() {
               href="/"
               className="text-xs font-bold text-zinc-400 hover:text-white transition"
             >
-              Cancel
+              Back to Home
             </Link>
 
             <button
@@ -214,6 +265,9 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
