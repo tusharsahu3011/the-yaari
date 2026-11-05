@@ -21,8 +21,8 @@ import { soundManager } from '@/lib/audio/sound-effects';
 
 export default function AboutPage() {
   return (
-    <div className="w-full bg-[#00050d] text-white pt-20 sm:pt-24 pb-16 select-none">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 text-left">
+    <div className="w-full bg-[#00050d] text-white pt-24 sm:pt-28 pb-16 select-none">
+      <div className="w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 space-y-12 text-left">
         {/* Prime Video Studio Banner */}
         <div className="relative rounded-3xl p-6 sm:p-12 overflow-hidden bg-gradient-to-r from-[#070b18] via-[#09142e] to-[#070b18] border border-white/10 shadow-2xl">
           {/* Ambient Glow */}

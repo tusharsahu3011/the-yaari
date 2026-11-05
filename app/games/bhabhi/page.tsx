@@ -6,11 +6,6 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   BookOpen,
-  Settings,
-  Sparkles,
-  Crown,
-  Edit2,
-  Check,
   Bot,
   Radio,
   Play,
@@ -19,20 +14,14 @@ import {
   X,
   Users,
   Clock,
-  User,
   Tv,
   TrendingUp,
   Shield,
-  Volume2,
+  Check,
+  Edit2,
+  Info,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
-import {
-  SmartAssetImage,
-  SoloRobotIllustration,
-  OnlineMultiplayerIllustration,
-  EntryCardsAndChipsIllustration,
-  EntryPurpleCardsIllustration,
-} from '@/components/illustrations/GameIllustrations';
 import { AdBannerSlot } from '@/components/ads/AdBannerSlot';
 
 export default function BhabhiGameEntryPage() {
@@ -111,99 +100,94 @@ export default function BhabhiGameEntryPage() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none">
-      {/* Prime Video Back Navigation Strip */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/10">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-xs font-bold text-zinc-300 hover:text-white transition px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>The Yaari Stream</span>
-        </Link>
-
-        <div className="flex items-center gap-2">
-          <span className="text-amber-400 font-black text-sm">🃏</span>
-          <span className="font-extrabold text-sm text-white">Bhabhi</span>
-          <span className="text-xs text-zinc-400 font-semibold">(Get Away)</span>
-        </div>
-
-        <button
-          onClick={() => {
-            soundManager.playSelect();
-            setIsRulesModalOpen(true);
-          }}
-          className="flex items-center gap-1.5 text-xs font-bold text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition cursor-pointer"
-        >
-          <BookOpen className="w-4 h-4 text-cyan-400" />
-          <span>Rules Guide</span>
-        </button>
-      </div>
-
+    <div className="w-full bg-[#00050d] text-white select-none">
       {/* =========================================================================
-          PRIME VIDEO STYLE MOVIE/SHOW HERO DETAIL BILLBOARD
+          1. CINEMATIC DETAIL HERO BILLBOARD (Prime Video Movie/Series Page)
           ========================================================================= */}
-      <section className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] min-h-[420px] sm:min-h-[480px] flex items-end bg-[#050811] p-6 sm:p-10 lg:p-12">
-        {/* Full-Bleed 3D Backdrop Artwork */}
+      <section className="relative w-full min-h-[500px] sm:min-h-[580px] lg:min-h-[640px] flex items-end overflow-hidden group bg-[#00050d] pt-20">
+        {/* Full-Bleed 16:9 Widescreen Backdrop */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
           <img
-            src="/assets/home/card-bhabhi.png"
+            src="/assets/home/hero-bhabhi-wide.png"
             alt="Bhabhi Get Away Artwork"
-            className="w-full h-full object-cover object-center sm:object-right scale-100"
+            className="w-full h-full object-cover object-center lg:object-right scale-100"
           />
           {/* Prime Video Vignettes */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030610] via-[#030610]/90 via-55% to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#030610] via-[#030610]/70 via-30% to-transparent" />
-          {/* Ambient Pink Glow */}
-          <div className="absolute top-1/2 right-10 -translate-y-1/2 w-[450px] h-[400px] bg-pink-600/20 blur-[130px] rounded-full pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00050d] via-[#00050d]/85 via-50% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#00050d] via-[#00050d]/60 via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#00050d]/90 via-transparent to-transparent h-24" />
+
+          {/* Ambient Glow */}
+          <div className="absolute top-1/2 right-12 -translate-y-1/2 w-[550px] h-[450px] bg-pink-600/20 blur-[150px] rounded-full pointer-events-none" />
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 w-full space-y-4 max-w-2xl text-left">
-          {/* Meta Tags */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30 flex items-center gap-1.5">
-              <Tv className="w-3.5 h-3.5 text-cyan-400" />
-              <span>THE YAARI ORIGINAL</span>
+        {/* Hero Content Area */}
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 pb-12 sm:pb-16 text-left space-y-4">
+          {/* Back Link */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-400 hover:text-white transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to The Yaari Home</span>
+          </Link>
+
+          {/* Network Tag (Like 'TY' with smile curve) */}
+          <div className="flex items-center gap-2">
+            <span className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-1">
+              <span>TY</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00a8e1]" />
             </span>
-            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>#1 IN CARD GAMES</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+              ORIGINAL GAME
             </span>
-            <span className="text-xs text-zinc-400">•</span>
-            <span className="text-xs text-zinc-300 font-semibold">South Asian Card Classic</span>
           </div>
 
-          {/* Title with Logo Box */}
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-black/80 border-2 border-pink-500/60 p-1 shrink-0 shadow-2xl shadow-pink-950/60">
-              <img
-                src="/assets/home/card-bhabhi.png"
-                alt="Bhabhi Logo"
-                className="w-full h-full object-cover rounded-xl"
-              />
-            </div>
-            <div>
-              <div className="text-xs font-black text-pink-400 uppercase tracking-widest">
-                <span>♠ EVASION CLASSIC</span>
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Bhabhi</span> <span className="text-pink-400 text-2xl sm:text-4xl">(Get Away)</span>
+          {/* Game Title */}
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-3">
+              <span className="text-xl sm:text-2xl text-amber-400 font-serif">◈</span>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase drop-shadow-2xl">
+                Bhabhi (Get Away)
               </h1>
+              <span className="text-xl sm:text-2xl text-amber-400 font-serif">◈</span>
+            </div>
+
+            {/* Badges Strip */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-black uppercase tracking-wider text-zinc-300">
+              <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">
+                ROYAL DESI CLASSIC
+              </span>
+              <span className="text-zinc-500">•</span>
+              <span>3 - 6 PLAYERS</span>
+              <span className="text-zinc-500">•</span>
+              <span>10 - 15 MIN</span>
+              <span className="text-zinc-500">•</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/10 text-white">ALL AGES</span>
+            </div>
+          </div>
+
+          {/* Trending Rank Tag */}
+          <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#00d47b] bg-[#00d47b]/15 border border-[#00d47b]/30 px-2.5 py-0.5 rounded-full">
+              <span className="w-4 h-4 rounded-full bg-[#00d47b]/30 flex items-center justify-center text-[11px] font-black">
+                ↗
+              </span>
+              <span>#2 in India Today</span>
             </div>
           </div>
 
           {/* Synopsis */}
-          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">
-            Clear your cards as fast as possible by following lead suits. If a player fails to follow suit,
-            a high-stakes <strong>&quot;Thulla&quot;</strong> penalty is triggered and the highest card holder picks up the
-            pile! The last remaining player is crowned the Bhabhi.
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-2xl font-normal">
+            The legendary South Asian card evasion game! Clear your hand as fast as possible by following lead suits.
+            If a player cannot follow suit, a high-stakes <strong>&quot;Thulla&quot;</strong> penalty is triggered and the highest card holder
+            must pick up the entire discard pile! Clear all cards to escape — the last remaining player is crowned the Bhabhi.
           </p>
 
-          {/* Player Identity Pill */}
+          {/* Player Identity Strip */}
           <div className="flex items-center gap-3 pt-1">
-            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#0a0e1c] border border-white/10 text-xs">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 text-[11px] font-bold text-white">
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#091122] border border-white/15 text-xs">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-tr from-[#00a8e1] to-[#8b5cf6] text-[10px] font-bold text-white">
                 {playerName.charAt(0).toUpperCase()}
               </span>
               {!isEditingName ? (
@@ -212,7 +196,7 @@ export default function BhabhiGameEntryPage() {
                   <strong className="text-white font-bold">{playerName}</strong>
                   <button
                     onClick={() => setIsEditingName(true)}
-                    className="text-cyan-400 hover:text-cyan-300 p-0.5 cursor-pointer"
+                    className="text-[#00a8e1] hover:underline p-0.5 cursor-pointer"
                     title="Change username"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -225,12 +209,12 @@ export default function BhabhiGameEntryPage() {
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
                     maxLength={18}
-                    className="bg-black/60 border border-cyan-400 rounded px-2 py-0.5 text-xs text-white focus:outline-none"
+                    className="bg-black/60 border border-[#00a8e1] rounded px-2 py-0.5 text-xs text-white focus:outline-none"
                     autoFocus
                   />
                   <button
                     onClick={handleSaveName}
-                    className="p-1 rounded bg-cyan-500 text-black font-bold text-[10px] cursor-pointer"
+                    className="p-1 rounded bg-[#00a8e1] text-white font-bold text-[10px] cursor-pointer"
                   >
                     <Check className="w-3 h-3 stroke-[3]" />
                   </button>
@@ -239,22 +223,22 @@ export default function BhabhiGameEntryPage() {
             </div>
           </div>
 
-          {/* Prime Video Action Buttons */}
+          {/* Action Buttons Row */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            {/* Big White Button */}
+            {/* Big White Button: Solo Mode */}
             <Link
               href="/games/bhabhi/solo"
               onClick={() => soundManager.playSelect()}
-              className="flex items-center gap-2.5 px-6 sm:px-7 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm sm:text-base shadow-2xl shadow-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2.5 px-7 py-3 rounded-md bg-white hover:bg-zinc-200 text-black font-black text-sm shadow-2xl transition hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Play className="w-5 h-5 fill-black" />
               <span>Play Solo vs AI</span>
             </Link>
 
-            {/* Big Blue CTA (Host Custom Room) */}
+            {/* Blue CTA: Create Multiplayer Room */}
             <button
               onClick={handleCreateRoom}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-cyan-950/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-6 py-3 rounded-md bg-[#00a8e1] hover:bg-[#0094c7] text-white font-black text-sm shadow-lg transition hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Plus className="w-5 h-5" />
               <span>Create Private Room</span>
@@ -266,126 +250,248 @@ export default function BhabhiGameEntryPage() {
                 soundManager.playSelect();
                 setIsJoinModalOpen(true);
               }}
-              className="px-4 py-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/90 border border-white/20 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition hover:scale-105 cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-3 rounded-md bg-zinc-900/80 hover:bg-zinc-800 border border-white/30 text-white font-bold text-sm backdrop-blur-md transition hover:scale-105 cursor-pointer flex items-center gap-2"
             >
-              <Hash className="w-4 h-4 text-cyan-400" />
+              <Hash className="w-4 h-4 text-[#00a8e1]" />
               <span>Join with Code</span>
+            </button>
+
+            {/* Rules Button */}
+            <button
+              onClick={() => {
+                soundManager.playSelect();
+                setIsRulesModalOpen(true);
+              }}
+              className="w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-white/30 text-white flex items-center justify-center transition hover:scale-110 cursor-pointer"
+              title="Rules Guide"
+            >
+              <BookOpen className="w-5 h-5 text-cyan-400" />
             </button>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          EPISODES / GAME MODES SECTION (Prime Video Style)
+          2. GAME MODES & CHANNELS (Prime Video Episode Card Format)
           ========================================================================= */}
-      <section className="w-full space-y-4">
-        <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-          Select Game Mode &amp; Channel
-        </h2>
+      <div className="w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 py-10 space-y-12 text-left">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Select Game Mode
+            </h2>
+            <span className="text-xs text-zinc-400 font-medium">Free To Play • No Downloads</span>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Episode 1: Solo vs Smart AI Bots */}
-          <Link
-            href="/games/bhabhi/solo"
-            onClick={() => soundManager.playSelect()}
-            className="group p-6 sm:p-7 rounded-3xl bg-[#070b18] border-2 border-emerald-500/40 hover:border-emerald-400 shadow-xl transition-all hover:scale-[1.01] flex flex-col justify-between space-y-5"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30 flex items-center gap-1.5">
-                  <Bot className="w-3.5 h-3.5" /> EPISODE 1 • SINGLE PLAYER
-                </span>
-                <span className="text-xs text-zinc-400 font-semibold">Offline Ready</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mode 1: Solo vs Smart AI Bots */}
+            <Link
+              href="/games/bhabhi/solo"
+              onClick={() => soundManager.playSelect()}
+              className="group p-6 sm:p-7 rounded-xl bg-[#091122] border border-white/10 hover:border-emerald-400 transition-all duration-300 shadow-xl hover:scale-[1.02] flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs px-2.5 py-0.5 rounded-sm bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 flex items-center gap-1.5">
+                    <Bot className="w-3.5 h-3.5" />
+                    <span>SINGLE PLAYER</span>
+                  </span>
+                  <span className="text-xs text-zinc-400 font-medium">Instant Start</span>
+                </div>
+
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1.5">
+                    <h3 className="text-xl font-bold text-white group-hover:text-emerald-300 transition">
+                      Solo vs AI Bots
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
+                      Play against intelligent AI bot personalities (Kabir, Simran, Arjun) with witty desi commentary.
+                      Perfect for practicing your Thulla timing and escape strategies.
+                    </p>
+                  </div>
+                  <div className="w-16 h-16 rounded-lg bg-black/60 border border-white/10 p-1 shrink-0 overflow-hidden">
+                    <img
+                      src="/assets/bhabhi/solo-robot.png"
+                      alt="AI Bot"
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1.5">
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition">
-                    Solo vs AI Bots
-                  </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                    Play against smart AI personalities (Kabir, Simran, Arjun). Practice your Thulla evasion tactics at your own pace.
-                  </p>
-                </div>
-                <div className="w-16 h-16 rounded-2xl bg-black/60 border border-emerald-500/40 p-1 shrink-0">
-                  <img
-                    src="/assets/bhabhi/solo-robot.png"
-                    alt="AI Bot"
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-              <div className="text-xs text-zinc-400 flex items-center gap-3 font-semibold">
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400 font-semibold">
                 <span>👥 1 Human + 3 Bots</span>
-                <span>⏱️ Instant Start</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                <span>Launch Solo</span>
-                <Play className="w-3.5 h-3.5 fill-emerald-400" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Episode 2: Custom Online Multiplayer Room */}
-          <div
-            onClick={handleCreateRoom}
-            className="group p-6 sm:p-7 rounded-3xl bg-[#070b18] border-2 border-cyan-500/40 hover:border-cyan-400 shadow-xl transition-all hover:scale-[1.01] flex flex-col justify-between space-y-5 cursor-pointer"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-extrabold border border-cyan-500/30 flex items-center gap-1.5">
-                  <Radio className="w-3.5 h-3.5" /> EPISODE 2 • LIVE ROOM
+                <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                  <span>Launch Match</span>
+                  <Play className="w-3.5 h-3.5 fill-emerald-400" />
                 </span>
-                <span className="text-xs text-zinc-400 font-semibold">3 - 6 Players</span>
+              </div>
+            </Link>
+
+            {/* Mode 2: Custom Online Multiplayer Room */}
+            <div
+              onClick={handleCreateRoom}
+              className="group p-6 sm:p-7 rounded-xl bg-[#091122] border border-white/10 hover:border-[#00a8e1] transition-all duration-300 shadow-xl hover:scale-[1.02] flex flex-col justify-between space-y-4 cursor-pointer"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#00a8e1]/20 text-cyan-300 font-bold border border-[#00a8e1]/30 flex items-center gap-1.5">
+                    <Radio className="w-3.5 h-3.5" />
+                    <span>MULTIPLAYER LIVE ROOM</span>
+                  </span>
+                  <span className="text-xs text-zinc-400 font-medium">3 - 6 Players</span>
+                </div>
+
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1.5">
+                    <h3 className="text-xl font-bold text-white group-hover:text-cyan-300 transition">
+                      Host Private Room
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
+                      Create an encrypted private room, share a 6-letter room code with friends, and enjoy real-time card plays with audio effects.
+                    </p>
+                  </div>
+                  <div className="w-16 h-16 rounded-lg bg-black/60 border border-white/10 p-1 shrink-0 overflow-hidden">
+                    <img
+                      src="/assets/bhabhi/online-globe.png"
+                      alt="Multiplayer"
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1.5">
-                  <h3 className="text-2xl font-black text-white group-hover:text-cyan-300 transition">
-                    Host Private Room
-                  </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                    Create a private room, share a 6-letter room code with friends, and play in real time with audio commentary.
-                  </p>
-                </div>
-                <div className="w-16 h-16 rounded-2xl bg-black/60 border border-cyan-500/40 p-1 shrink-0">
-                  <img
-                    src="/assets/bhabhi/online-globe.png"
-                    alt="Multiplayer"
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-              <div className="text-xs text-zinc-400 flex items-center gap-3 font-semibold">
-                <span>🌐 WebRTC P2P</span>
-                <span>🔒 Private Lobby</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-400">
-                <span>Create Room</span>
-                <Play className="w-3.5 h-3.5 fill-cyan-400" />
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400 font-semibold">
+                <span>🌐 Serverless Sync</span>
+                <span className="text-[#00a8e1] flex items-center gap-1 font-bold">
+                  <span>Create Table</span>
+                  <Play className="w-3.5 h-3.5 fill-[#00a8e1]" />
+                </span>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Ad Banner Slot */}
-      <AdBannerSlot slotId="bhabhi-entry-leaderboard" format="leaderboard" />
+        {/* Ad Placement */}
+        <AdBannerSlot slotId="bhabhi-entry-leaderboard" format="leaderboard" />
+
+        {/* =========================================================================
+            3. MORE TITLES YOU'LL LOVE (16:9 Carousel Row)
+            ========================================================================= */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              More Titles You&apos;ll Love
+            </h2>
+            <Link href="/games" className="text-xs font-bold text-[#00a8e1] hover:underline">
+              See more
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/games/undercover"
+              className="group aspect-[16/9] rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/40 transition-all duration-300 relative shadow-xl hover:scale-[1.03]"
+            >
+              <img
+                src="/assets/home/hero-undercover-wide.png"
+                alt="Undercover"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute top-2.5 left-2.5">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-white text-black">
+                  NEW EPISODE
+                </span>
+              </div>
+              <div className="absolute bottom-2.5 left-3 right-3 text-left">
+                <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                  Undercover
+                </h4>
+                <p className="text-[10px] text-zinc-400">Social Deduction • 3-20 Players</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/games/spyfall"
+              className="group aspect-[16/9] rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/40 transition-all duration-300 relative shadow-xl hover:scale-[1.03]"
+            >
+              <img
+                src="/assets/home/hero-spyfall-wide.png"
+                alt="Spyfall"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute top-2.5 left-2.5">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-white text-black">
+                  TOP SUSPENSE
+                </span>
+              </div>
+              <div className="absolute bottom-2.5 left-3 right-3 text-left">
+                <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                  Spyfall
+                </h4>
+                <p className="text-[10px] text-zinc-400">Interrogation • 3-12 Players</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/games"
+              className="group aspect-[16/9] rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/40 transition-all duration-300 relative shadow-xl hover:scale-[1.03]"
+            >
+              <img
+                src="/assets/home/icon-teenpatti.png"
+                alt="Teen Patti Flush"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute top-2.5 left-2.5">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-white text-black">
+                  NEW SERIES
+                </span>
+              </div>
+              <div className="absolute bottom-2.5 left-3 right-3 text-left">
+                <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                  Teen Patti Flush
+                </h4>
+                <p className="text-[10px] text-zinc-400">Card Classic • In Pipeline</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/games"
+              className="group aspect-[16/9] rounded-lg overflow-hidden bg-[#070b18] border border-white/10 hover:border-white/40 transition-all duration-300 relative shadow-xl hover:scale-[1.03]"
+            >
+              <img
+                src="/assets/home/icon-codenames.png"
+                alt="Codenames"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute top-2.5 left-2.5">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-white text-black">
+                  PARTY HIT
+                </span>
+              </div>
+              <div className="absolute bottom-2.5 left-3 right-3 text-left">
+                <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                  Codenames
+                </h4>
+                <p className="text-[10px] text-zinc-400">Word Association • 4-12 Players</p>
+              </div>
+            </Link>
+          </div>
+        </section>
+      </div>
 
       {/* Join Room Code Modal */}
       {isJoinModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
           onClick={() => setIsJoinModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-md rounded-3xl bg-[#090d1a] border border-white/20 p-6 sm:p-8 space-y-6 text-center shadow-2xl"
+            className="relative w-full max-w-md rounded-xl bg-[#091122] border border-white/20 p-6 sm:p-8 space-y-6 text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -396,12 +502,12 @@ export default function BhabhiGameEntryPage() {
             </button>
 
             <div className="space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-xl bg-[#00a8e1]/20 border border-[#00a8e1]/30 text-[#00a8e1] flex items-center justify-center mx-auto">
                 <Hash className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white">Enter Room Code</h3>
+              <h3 className="text-xl font-bold text-white">Enter Room Code</h3>
               <p className="text-xs text-zinc-400">
-                Enter the 6-letter room code shared by your friend
+                Enter the 6-letter room code shared by your friend to join the table.
               </p>
             </div>
 
@@ -418,7 +524,7 @@ export default function BhabhiGameEntryPage() {
                     value={box}
                     onChange={(e) => handleCodeBoxChange(idx, e.target.value)}
                     onKeyDown={(e) => handleCodeBoxKeyDown(idx, e)}
-                    className="w-11 h-14 text-center text-xl font-black text-white bg-black/60 border-2 border-white/20 focus:border-cyan-400 rounded-xl focus:outline-none uppercase"
+                    className="w-11 h-14 text-center text-xl font-black text-white bg-black/60 border border-white/20 focus:border-[#00a8e1] rounded-lg focus:outline-none uppercase"
                   />
                 ))}
               </div>
@@ -426,7 +532,7 @@ export default function BhabhiGameEntryPage() {
               <button
                 type="submit"
                 disabled={codeBoxes.join('').trim().length < 4}
-                className="w-full py-3.5 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] disabled:opacity-50 text-white font-extrabold text-sm shadow-xl shadow-cyan-950/40 transition cursor-pointer"
+                className="w-full py-3 rounded-md bg-[#00a8e1] hover:bg-[#0094c7] disabled:opacity-50 text-white font-bold text-sm shadow-xl transition cursor-pointer"
               >
                 Join Room
               </button>
@@ -435,19 +541,19 @@ export default function BhabhiGameEntryPage() {
         </div>
       )}
 
-      {/* Rules Modal */}
+      {/* Rules Guide Modal */}
       {isRulesModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
           onClick={() => setIsRulesModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-xl rounded-3xl bg-[#090d1a] border border-white/20 p-6 sm:p-8 space-y-5 text-left shadow-2xl"
+            className="relative w-full max-w-xl rounded-xl bg-[#091122] border border-white/20 p-6 sm:p-8 space-y-5 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h3 className="text-xl font-black text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-cyan-400" />
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-[#00a8e1]" />
                 <span>Bhabhi Rules &amp; Strategy</span>
               </h3>
               <button
@@ -479,7 +585,7 @@ export default function BhabhiGameEntryPage() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setIsRulesModalOpen(false)}
-                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
+                className="px-5 py-2 rounded-md bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
               >
                 Got It
               </button>

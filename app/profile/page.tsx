@@ -4,19 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   User,
-  Crown,
-  Trophy,
-  Flame,
-  CheckCircle2,
-  Shield,
-  Sparkles,
-  Save,
-  RotateCcw,
-  Gamepad2,
-  ArrowRight,
   Tv,
   Check,
   Edit2,
+  Trophy,
+  Flame,
+  Shield,
+  Save,
+  RotateCcw,
+  Sparkles,
 } from 'lucide-react';
 import { soundManager } from '@/lib/audio/sound-effects';
 
@@ -82,115 +78,141 @@ export default function ProfilePage() {
     stats.gamesPlayed > 0 ? Math.round((stats.gamesEscaped / stats.gamesPlayed) * 100) : 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 space-y-8 select-none text-left">
-      {/* Prime Video "Who's Watching?" Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-cyan-500/30">
-          <Tv className="w-3.5 h-3.5 text-cyan-400" />
-          <span>THE YAARI ACCOUNT &amp; PROFILES</span>
+    <div className="w-full bg-[#00050d] text-white select-none pt-24 sm:pt-28 pb-16">
+      <div className="w-full max-w-[1920px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-16 space-y-10">
+        {/* Prime Video "Who's Watching?" Header */}
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#00a8e1]/20 text-cyan-300 font-extrabold text-[11px] uppercase tracking-wider border border-[#00a8e1]/30">
+            <Tv className="w-3.5 h-3.5 text-[#00a8e1]" />
+            <span>THE YAARI PROFILES &amp; IDENTITY</span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            Who&apos;s Playing?
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400">
+            Manage your player display name, choose your favorite avatar, and view your escape record.
+          </p>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Who&apos;s Playing?
-        </h1>
-        <p className="text-xs sm:text-sm text-zinc-400">
-          Manage your player identity, select your favorite avatar, and view your escape record.
-        </p>
-      </div>
 
-      {/* Profile Card & Avatar */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#070b18] border border-white/10 shadow-2xl space-y-6">
-        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
-          {/* Avatar Icon */}
-          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 p-1 shrink-0 shadow-2xl shadow-cyan-950/60">
-            <div className="w-full h-full bg-[#050813] rounded-full flex items-center justify-center text-5xl">
-              {playerAvatar}
+        {/* Profile Card & Avatar Tile */}
+        <div className="max-w-3xl mx-auto p-6 sm:p-10 rounded-2xl bg-[#091122] border border-white/10 shadow-2xl space-y-8 text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
+            {/* Avatar Tile */}
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-[#00a8e1] to-[#8b5cf6] p-1 shrink-0 shadow-2xl shadow-cyan-950/60">
+              <div className="w-full h-full bg-[#050813] rounded-xl flex items-center justify-center text-5xl">
+                {playerAvatar}
+              </div>
+            </div>
+
+            <div className="space-y-2 flex-1 text-center sm:text-left w-full">
+              <div className="text-xs text-[#00a8e1] font-bold uppercase tracking-wider">
+                Profile Display Name
+              </div>
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                maxLength={20}
+                placeholder="Enter your name"
+                className="text-2xl sm:text-3xl font-black text-white bg-black/50 border border-white/15 focus:border-[#00a8e1] rounded-xl px-4 py-2 w-full focus:outline-none"
+              />
+              <p className="text-xs text-zinc-400">
+                Visible to friends and peers in live multiplayer party rooms.
+              </p>
             </div>
           </div>
 
-          <div className="space-y-2 flex-1 text-center sm:text-left">
-            <div className="text-xs text-cyan-400 font-bold uppercase tracking-wider">
-              Profile Display Name
+          {/* Choose Avatar Grid */}
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+              Choose Avatar
+            </label>
+            <div className="grid grid-cols-6 sm:grid-cols-9 gap-2.5">
+              {AVATAR_OPTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => {
+                    soundManager.playTap();
+                    setPlayerAvatar(emoji);
+                  }}
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl transition cursor-pointer ${
+                    playerAvatar === emoji
+                      ? 'bg-[#00a8e1]/30 border-2 border-[#00a8e1] scale-110 shadow-lg shadow-cyan-950/50'
+                      : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:scale-105'
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
             </div>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              maxLength={20}
-              placeholder="Enter your name"
-              className="text-2xl sm:text-3xl font-black text-white bg-black/50 border border-white/15 focus:border-cyan-400 rounded-2xl px-4 py-2 w-full focus:outline-none"
-            />
-            <p className="text-xs text-zinc-400">
-              Visible to all friends in private multiplayer rooms.
-            </p>
+          </div>
+
+          {/* Player Statistics Strip */}
+          <div className="space-y-3 pt-2">
+            <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+              Escape Statistics &amp; Record
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                  Games Played
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-white">{stats.gamesPlayed}</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                  Escape Rate
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-emerald-400">{escapeRate}%</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                  Rank 1 Escapes
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-amber-400">
+                  {stats.rank1Escapes}
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                  Bhabhi Count
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-rose-400">
+                  {stats.bhabhiCount}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="pt-2 flex items-center justify-between">
+            <Link
+              href="/"
+              className="text-xs font-bold text-zinc-400 hover:text-white transition"
+            >
+              Cancel
+            </Link>
+
+            <button
+              onClick={handleSave}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00a8e1] hover:bg-[#0094c7] text-white font-bold text-sm shadow-xl transition active:scale-95 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              <span>Save Profile</span>
+            </button>
           </div>
         </div>
 
-        {/* Choose Avatar Grid */}
-        <div className="space-y-3">
-          <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
-            Choose Your Avatar
-          </label>
-          <div className="grid grid-cols-6 sm:grid-cols-9 gap-2.5">
-            {AVATAR_OPTIONS.map((emoji) => (
-              <button
-                key={emoji}
-                onClick={() => {
-                  soundManager.playTap();
-                  setPlayerAvatar(emoji);
-                }}
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition cursor-pointer ${
-                  playerAvatar === emoji
-                    ? 'bg-cyan-500/30 border-2 border-cyan-400 scale-110 shadow-lg shadow-cyan-950/50'
-                    : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:scale-105'
-                }`}
-              >
-                {emoji}
-              </button>
-            ))}
+        {/* Save Toast */}
+        {savedToast && (
+          <div className="fixed bottom-8 right-8 z-50 flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 text-black font-extrabold text-xs shadow-2xl animate-bounce">
+            <Check className="w-4 h-4 stroke-[3]" />
+            <span>Profile saved successfully!</span>
           </div>
-        </div>
-
-        {/* Save Changes Button */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/10">
-          {savedToast ? (
-            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> Changes saved successfully!
-            </span>
-          ) : (
-            <span className="text-xs text-zinc-500">Auto-stored locally</span>
-          )}
-
-          <button
-            onClick={handleSave}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#00a8e1] hover:bg-[#0094c7] text-white font-black text-xs shadow-lg shadow-cyan-950/40 transition hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <Save className="w-4 h-4" />
-            <span>Save Profile</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Lifetime Stats (Prime Video Stats Dashboard) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
-          <span className="text-xs text-zinc-400 font-semibold">Games Played</span>
-          <div className="text-2xl sm:text-3xl font-black text-white">{stats.gamesPlayed}</div>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
-          <span className="text-xs text-emerald-400 font-semibold">Escape Rate</span>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-400">{escapeRate}%</div>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
-          <span className="text-xs text-amber-400 font-semibold">Rank #1 Escapes</span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-400">{stats.rank1Escapes}</div>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-[#070b18] border border-white/10 space-y-1">
-          <span className="text-xs text-rose-400 font-semibold">Crowned Bhabhi</span>
-          <div className="text-2xl sm:text-3xl font-black text-rose-400">{stats.bhabhiCount}</div>
-        </div>
+        )}
       </div>
     </div>
   );
